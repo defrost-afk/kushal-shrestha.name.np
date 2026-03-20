@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Furniture and Furnishing House — Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root{
+  --bg:        #0f0e0c;
+  --surface:   #181714;
+  --surface2:  #211f1b;
+  --border:    #2e2b25;
+  --gold:      #c9a84c;
+  --gold-dim:  #8a6d2f;
+  --text:      #e8e0d0;
+  --muted:     #7a7268;
+  --danger:    #c45a3a;
+  --success:   #5a9e72;
+  --info:      #4a82b0;
+  --radius:    6px;
+  --font-head: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+/* ── RESET ──────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:var(--font-body)}
+input,textarea,select{font-family:var(--font-body)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+#app{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ────────────────────────────────────────────── */
+#sidebar{
+  width:220px;min-width:220px;background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:0 0 16px;overflow-y:auto;
+}
+.logo{
+  padding:28px 20px 22px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:12px;
+}
+.logo h1{
+  font-family:var(--font-head);font-size:22px;font-weight:700;
+  letter-spacing:.02em;color:var(--gold);
+}
+.logo span{display:block;font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-top:2px}
+.nav-label{
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);padding:10px 20px 4px;margin-top:8px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 20px;font-size:13px;font-weight:400;
+  color:var(--muted);cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all .15s;
+}
+.nav-item:hover{color:var(--text);background:var(--surface2)}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:var(--surface2)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+
+/* ── MAIN ───────────────────────────────────────────────── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── TOPBAR ─────────────────────────────────────────────── */
+#topbar{
+  height:56px;min-height:56px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+}
+#topbar h2{font-family:var(--font-head);font-size:20px;font-weight:600;color:var(--text)}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+
+/* ── CONFIG BANNER ──────────────────────────────────────── */
+#config-banner{
+  background:#1a1508;border-bottom:1px solid var(--gold-dim);
+  padding:10px 24px;display:flex;align-items:center;gap:10px;
+  font-size:12px;color:#b8944a;
+}
+#config-banner a{color:var(--gold);text-decoration:underline;cursor:pointer}
+#config-banner.hidden{display:none}
+
+/* ── CONTENT ────────────────────────────────────────────── */
+#content{flex:1;overflow-y:auto;padding:24px}
+.page{display:none}
+.page.active{display:block}
+
+/* ── CARDS ──────────────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 20px;
+}
+.stat-card .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat-card .value{font-family:var(--font-head);font-size:30px;font-weight:600;color:var(--gold);margin:4px 0 2px}
+.stat-card .sub{font-size:11px;color:var(--muted)}
+
+/* ── TABLE ──────────────────────────────────────────────── */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.table-toolbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  gap:12px;flex-wrap:wrap;
+}
+.table-toolbar h3{font-family:var(--font-head);font-size:17px;font-weight:600}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:6px 12px;flex:1;max-width:260px;
+}
+.search-box input{background:none;border:none;outline:none;color:var(--text);width:100%;font-size:13px}
+.search-box input::placeholder{color:var(--muted)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--surface2)}
+th{padding:10px 16px;text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap}
+td{padding:11px 16px;border-top:1px solid var(--border);font-size:13px;color:var(--text)}
+tr:hover td{background:var(--surface2)}
+.badge{
+  display:inline-flex;align-items:center;padding:2px 9px;
+  border-radius:20px;font-size:11px;font-weight:500;
+}
+.badge.active{background:#1a3327;color:var(--success)}
+.badge.inactive{background:#2a1a14;color:var(--danger)}
+.badge.low{background:#2a1e0e;color:#d4963a}
+
+/* ── BUTTONS ────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 16px;border-radius:var(--radius);
+  font-size:13px;font-weight:500;border:none;
+  transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--gold);color:#0f0e0c}
+.btn-primary:hover{background:#d4b560}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--border)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-icon{padding:6px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted)}
+.btn-icon:hover{color:var(--text);border-color:var(--muted)}
+
+/* ── MODAL ──────────────────────────────────────────────── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:100;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px 32px;
+  width:min(520px,95vw);max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.modal h3{font-family:var(--font-head);font-size:20px;margin-bottom:20px;color:var(--gold)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:9px 12px;color:var(--text);
+  font-size:13px;outline:none;transition:border-color .15s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{border-color:var(--gold-dim)}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
+
+/* ── TOAST ──────────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px 18px;font-size:13px;
+  opacity:0;transform:translateY(6px);
+  transition:opacity .2s,transform .2s;pointer-events:none;
+  max-width:280px;
+}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.ok{border-left:3px solid var(--success)}
+#toast.err{border-left:3px solid var(--danger)}
+
+/* ── EMPTY STATE ────────────────────────────────────────── */
+.empty{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty svg{width:40px;height:40px;margin-bottom:12px;opacity:.4}
+.empty p{font-size:13px}
+
+/* ── CONFIG PAGE ────────────────────────────────────────── */
+.config-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px 32px;
+  max-width:560px;
+}
+.config-card h3{font-family:var(--font-head);font-size:20px;margin-bottom:6px;color:var(--gold)}
+.config-card .desc{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.7}
+.config-steps{counter-reset:steps;margin:20px 0}
+.config-steps li{
+  counter-increment:steps;list-style:none;
+  padding:8px 0 8px 36px;position:relative;font-size:13px;color:var(--muted);
+  border-bottom:1px solid var(--border);
+}
+.config-steps li::before{
+  content:counter(steps);position:absolute;left:0;top:9px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--gold-dim);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--gold);font-weight:600;
+  line-height:22px;text-align:center;
+}
+.config-steps li code{
+  background:var(--surface2);border:1px solid var(--border);
+  padding:1px 6px;border-radius:3px;font-size:11px;color:var(--gold);
+  font-family:monospace;
+}
+
+/* ── LOW STOCK HIGHLIGHT ────────────────────────────────── */
+.low-stock-row td{background:rgba(196,90,58,.06)}
+
+/* ── PAGINATION ─────────────────────────────────────────── */
+.pagination{display:flex;align-items:center;gap:6px;padding:12px 18px;border-top:1px solid var(--border);justify-content:flex-end}
+.pagination span{font-size:12px;color:var(--muted)}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:700px){
+  #sidebar{display:none}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- CONFIG MODAL (first run) -->
+<div class="modal-overlay" id="cfg-modal">
+  <div class="modal">
+    <h3>⚙ Connect to Supabase</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Enter your Supabase project credentials to get started. Find these in <strong style="color:var(--text)">Supabase → Settings → API</strong>.</p>
+    <div class="form-group">
+      <label>Project URL</label>
+      <input id="cfg-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co"/>
+    </div>
+    <div class="form-group">
+      <label>Anon / Public API Key</label>
+      <input id="cfg-key" type="text" placeholder="eyJhbGciOi..."/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveConfig()">Save & Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <h3 id="product-modal-title">Add Product</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>SKU *</label>
+        <input id="p-sku" placeholder="SOF-001"/>
+      </div>
+      <div class="form-group">
+        <label>Name *</label>
+        <input id="p-name" placeholder="3-Seater Sofa"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="p-desc" placeholder="Optional product description…"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="p-category"><option value="">— Select —</option></select>
+      </div>
+      <div class="form-group">
+        <label>Supplier</label>
+        <select id="p-supplier"><option value="">— Select —</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cost Price (NPR)</label>
+        <input id="p-cost" type="number" placeholder="0" min="0"/>
+      </div>
+      <div class="form-group">
+        <label>Selling Price (NPR)</label>
+        <input id="p-price" type="number" placeholder="0" min="0"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Unit</label>
+        <select id="p-unit">
+          <option value="piece">Piece</option>
+          <option value="set">Set</option>
+          <option value="meter">Meter</option>
+          <option value="pair">Pair</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="p-active">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPLIER MODAL -->
+<div class="modal-overlay" id="supplier-modal">
+  <div class="modal">
+    <h3 id="supplier-modal-title">Add Supplier</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Company Name *</label>
+        <input id="s-name" placeholder="Nepal Furniture Co."/>
+      </div>
+      <div class="form-group">
+        <label>Contact Person</label>
+        <input id="s-contact" placeholder="Ram Shrestha"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email</label>
+        <input id="s-email" type="email" placeholder="info@supplier.com"/>
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input id="s-phone" placeholder="+977-01-XXXXXXX"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input id="s-address" placeholder="Street address"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>City</label>
+        <input id="s-city" placeholder="Kathmandu"/>
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <input id="s-country" value="Nepal"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="s-notes" placeholder="Payment terms, lead time, etc."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="s-active">
+        <option value="true">Active</option>
+        <option value="false">Inactive</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('supplier-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSupplier()">Save Supplier</button>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK MODAL -->
+<div class="modal-overlay" id="stock-modal">
+  <div class="modal">
+    <h3>Stock Adjustment</h3>
+    <input type="hidden" id="stk-product-id"/>
+    <div class="form-group">
+      <label>Product</label>
+      <input id="stk-product-name" readonly style="opacity:.7"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Movement</label>
+        <select id="stk-type">
+          <option value="IN">Stock In (received)</option>
+          <option value="OUT">Stock Out (sold/used)</option>
+          <option value="ADJUSTMENT">Adjustment</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantity *</label>
+        <input id="stk-qty" type="number" min="1" placeholder="0"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Reference No.</label>
+      <input id="stk-ref" placeholder="Invoice / PO number"/>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="stk-notes" placeholder="Optional notes…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('stock-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStock()">Record Movement</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="logo">
+      <h1>F&amp;F House</h1>
+      <span>Admin Dashboard</span>
+    </div>
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-label">Catalogue</div>
+    <div class="nav-item" onclick="navigate('products')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Products
+    </div>
+    <div class="nav-item" onclick="navigate('inventory')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+      Inventory
+    </div>
+    <div class="nav-label">Sourcing</div>
+    <div class="nav-item" onclick="navigate('suppliers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a8 8 0 00-16 0v2"/></svg>
+      Suppliers
+    </div>
+    <div class="nav-label">System</div>
+    <div class="nav-item" onclick="navigate('setup')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Setup
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="topbar">
+      <h2 id="page-title">Dashboard</h2>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </div>
+
+    <div id="config-banner">
+      ⚠ Supabase not configured. <a onclick="openModal('cfg-modal')">Click here to connect</a> your database. Data shown is demo only.
+    </div>
+
+    <div id="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stat-grid" id="dash-stats">
+          <div class="stat-card"><div class="label">Total Products</div><div class="value" id="stat-products">—</div><div class="sub">catalogue items</div></div>
+          <div class="stat-card"><div class="label">Active Suppliers</div><div class="value" id="stat-suppliers">—</div><div class="sub">sourcing partners</div></div>
+          <div class="stat-card"><div class="label">Low Stock Alerts</div><div class="value" id="stat-low" style="color:var(--danger)">—</div><div class="sub">need reorder</div></div>
+          <div class="stat-card"><div class="label">Inventory Value</div><div class="value" id="stat-value">—</div><div class="sub">NPR (cost)</div></div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-toolbar"><h3>Low Stock Items</h3></div>
+          <table>
+            <thead><tr><th>Product</th><th>SKU</th><th>In Stock</th><th>Reorder Level</th><th>Action</th></tr></thead>
+            <tbody id="low-stock-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div class="page" id="page-products">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <h3>Products</h3>
+            <div class="search-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input id="product-search" placeholder="Search products…" oninput="filterProducts()"/>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Supplier</th><th>Sell Price</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="products-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- INVENTORY -->
+      <div class="page" id="page-inventory">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <h3>Inventory</h3>
+          </div>
+          <table>
+            <thead><tr><th>Product</th><th>SKU</th><th>In Stock</th><th>Reorder Level</th><th>Location</th><th>Last Updated</th><th>Actions</th></tr></thead>
+            <tbody id="inventory-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUPPLIERS -->
+      <div class="page" id="page-suppliers">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <h3>Suppliers</h3>
+            <div class="search-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input id="supplier-search" placeholder="Search suppliers…" oninput="filterSuppliers()"/>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>City</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="suppliers-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SETUP -->
+      <div class="page" id="page-setup">
+        <div class="config-card">
+          <h3>Supabase Setup Guide</h3>
+          <p class="desc">Follow these steps to connect this dashboard to your free Supabase database. This only needs to be done once.</p>
+          <ol class="config-steps">
+            <li>Go to <strong>supabase.com</strong> and create a free account.</li>
+            <li>Create a new project. Choose a region close to Nepal (e.g. Singapore).</li>
+            <li>In the left sidebar go to <code>SQL Editor</code> → <code>New Query</code>.</li>
+            <li>Paste the contents of <code>schema.sql</code> (provided with this dashboard) and click <strong>Run</strong>.</li>
+            <li>Go to <code>Settings</code> → <code>API</code> and copy your <strong>Project URL</strong> and <strong>anon public key</strong>.</li>
+            <li>Click the button below and enter those credentials.</li>
+          </ol>
+          <div style="margin-top:20px">
+            <button class="btn btn-primary" onclick="openModal('cfg-modal')">⚙ Enter Supabase Credentials</button>
+          </div>
+          <div style="margin-top:20px;padding:14px;background:var(--surface2);border-radius:var(--radius);font-size:12px;color:var(--muted)">
+            <strong style="color:var(--text)">Current connection:</strong><br/>
+            <span id="cfg-status">Not configured</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let SB_URL = localStorage.getItem('sb_url') || '';
+let SB_KEY = localStorage.getItem('sb_key') || '';
+let allProducts = [];
+let allSuppliers = [];
+let allCategories = [];
+let editingProductId = null;
+let editingSupplierId = null;
+
+/* ═══════════════════════════════════════════════════════════
+   SUPABASE API HELPERS
+═══════════════════════════════════════════════════════════ */
+async function sbFetch(path, opts = {}) {
+  if (!SB_URL || !SB_KEY) { toast('Supabase not configured', 'err'); return null; }
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: {
+      apikey: SB_KEY,
+      Authorization: `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: opts.prefer || 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    toast(err.message || 'Request failed', 'err');
+    return null;
+  }
+  if (res.status === 204) return true;
+  return res.json();
+}
+
+const sbGet  = (table, qs = '') => sbFetch(`${table}?${qs}`);
+const sbPost = (table, body)    => sbFetch(table, { method:'POST', body: JSON.stringify(body) });
+const sbPatch = (table, id, body) => sbFetch(`${table}?id=eq.${id}`, { method:'PATCH', body: JSON.stringify(body) });
+const sbDelete = (table, id)    => sbFetch(`${table}?id=eq.${id}`, { method:'DELETE', prefer:'return=minimal' });
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+window.onload = () => {
+  if (!SB_URL || !SB_KEY) {
+    openModal('cfg-modal');
+  } else {
+    document.getElementById('config-banner').classList.add('hidden');
+    updateCfgStatus();
+  }
+  navigate('dashboard');
+};
+
+function saveConfig() {
+  const url = document.getElementById('cfg-url').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { toast('Please fill both fields', 'err'); return; }
+  SB_URL = url; SB_KEY = key;
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  closeModal('cfg-modal');
+  document.getElementById('config-banner').classList.add('hidden');
+  updateCfgStatus();
+  toast('Connected to Supabase ✓', 'ok');
+  navigate('dashboard');
+}
+
+function updateCfgStatus() {
+  const el = document.getElementById('cfg-status');
+  if (SB_URL) {
+    el.innerHTML = `<span style="color:var(--success)">✓ Connected</span> — ${SB_URL}`;
+  } else {
+    el.textContent = 'Not configured';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════ */
+const PAGE_TITLES = { dashboard:'Dashboard', products:'Products', inventory:'Inventory', suppliers:'Suppliers', setup:'Setup' };
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[page];
+  setupTopbarActions(page);
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'products')  loadProducts();
+  if (page === 'inventory') loadInventory();
+  if (page === 'suppliers') loadSuppliers();
+}
+
+function setupTopbarActions(page) {
+  const el = document.getElementById('topbar-actions');
+  el.innerHTML = '';
+  if (page === 'products') {
+    el.innerHTML = `<button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>`;
+  }
+  if (page === 'suppliers') {
+    el.innerHTML = `<button class="btn btn-primary" onclick="openSupplierModal()">+ Add Supplier</button>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════ */
+async function loadDashboard() {
+  if (!SB_URL) { setDemoStats(); return; }
+  const [products, suppliers, inventory] = await Promise.all([
+    sbGet('products', 'select=id,is_active'),
+    sbGet('suppliers', 'select=id,is_active&is_active=eq.true'),
+    sbGet('inventory', 'select=product_id,quantity,reorder_level,products(name,sku,selling_price)')
+  ]);
+  if (!products) return;
+
+  const low = (inventory || []).filter(i => i.quantity <= i.reorder_level);
+  const val = (inventory || []).reduce((acc, i) => acc + (i.quantity * (i.products?.selling_price || 0)), 0);
+
+  document.getElementById('stat-products').textContent = products.length;
+  document.getElementById('stat-suppliers').textContent = (suppliers || []).length;
+  document.getElementById('stat-low').textContent = low.length;
+  document.getElementById('stat-value').textContent = 'NPR ' + val.toLocaleString();
+
+  const tbody = document.getElementById('low-stock-tbody');
+  if (!low.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--success)">✓ All items are sufficiently stocked</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = low.map(i => `
+    <tr class="low-stock-row">
+      <td>${i.products?.name || '—'}</td>
+      <td><code style="font-size:11px;color:var(--muted)">${i.products?.sku || '—'}</code></td>
+      <td><span class="badge low">${i.quantity}</span></td>
+      <td>${i.reorder_level}</td>
+      <td><button class="btn btn-sm btn-ghost" onclick="openStockModal('${i.product_id}','${i.products?.name}')">+ Stock In</button></td>
+    </tr>`).join('');
+}
+
+function setDemoStats() {
+  document.getElementById('stat-products').textContent = '—';
+  document.getElementById('stat-suppliers').textContent = '—';
+  document.getElementById('stat-low').textContent = '—';
+  document.getElementById('stat-value').textContent = '—';
+  document.getElementById('low-stock-tbody').innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRODUCTS
+═══════════════════════════════════════════════════════════ */
+async function loadProducts() {
+  if (!SB_URL) {
+    document.getElementById('products-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
+    return;
+  }
+  const [products, cats, sups] = await Promise.all([
+    sbGet('products', 'select=*,categories(name),suppliers(name)&order=created_at.desc'),
+    sbGet('categories', 'select=id,name&order=name'),
+    sbGet('suppliers', 'select=id,name&is_active=eq.true&order=name')
+  ]);
+  if (!products) return;
+  allProducts = products;
+  allCategories = cats || [];
+  allSuppliers = sups || [];
+  renderProducts(allProducts);
+}
+
+function renderProducts(list) {
+  const tbody = document.getElementById('products-tbody');
+  if (!list.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No products found</td></tr>`; return; }
+  tbody.innerHTML = list.map(p => `
+    <tr>
+      <td><code style="font-size:11px;color:var(--muted)">${p.sku}</code></td>
+      <td>${p.name}</td>
+      <td>${p.categories?.name || '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${p.suppliers?.name || '<span style="color:var(--muted)">—</span>'}</td>
+      <td>NPR ${Number(p.selling_price).toLocaleString()}</td>
+      <td><span class="badge ${p.is_active ? 'active' : 'inactive'}">${p.is_active ? 'Active' : 'Inactive'}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn-icon" title="Edit" onclick="openProductModal('${p.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon" title="Delete" onclick="deleteProduct('${p.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterProducts() {
+  const q = document.getElementById('product-search').value.toLowerCase();
+  renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)));
+}
+
+async function openProductModal(id = null) {
+  editingProductId = id;
+  document.getElementById('product-modal-title').textContent = id ? 'Edit Product' : 'Add Product';
+
+  // Populate selects
+  if (!allCategories.length) {
+    const [cats, sups] = await Promise.all([
+      sbGet('categories', 'select=id,name&order=name'),
+      sbGet('suppliers', 'select=id,name&is_active=eq.true&order=name')
+    ]);
+    allCategories = cats || [];
+    allSuppliers = sups || [];
+  }
+  const catSel = document.getElementById('p-category');
+  const supSel = document.getElementById('p-supplier');
+  catSel.innerHTML = '<option value="">— Select —</option>' + allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  supSel.innerHTML = '<option value="">— Select —</option>' + allSuppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+
+  if (id) {
+    const p = allProducts.find(x => x.id === id);
+    if (p) {
+      document.getElementById('p-sku').value = p.sku;
+      document.getElementById('p-name').value = p.name;
+      document.getElementById('p-desc').value = p.description || '';
+      document.getElementById('p-category').value = p.category_id || '';
+      document.getElementById('p-supplier').value = p.supplier_id || '';
+      document.getElementById('p-cost').value = p.cost_price;
+      document.getElementById('p-price').value = p.selling_price;
+      document.getElementById('p-unit').value = p.unit;
+      document.getElementById('p-active').value = p.is_active ? 'true' : 'false';
+    }
+  } else {
+    ['p-sku','p-name','p-desc','p-cost','p-price'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('p-unit').value = 'piece';
+    document.getElementById('p-active').value = 'true';
+    document.getElementById('p-category').value = '';
+    document.getElementById('p-supplier').value = '';
+  }
+  openModal('product-modal');
+}
+
+async function saveProduct() {
+  const body = {
+    sku: document.getElementById('p-sku').value.trim(),
+    name: document.getElementById('p-name').value.trim(),
+    description: document.getElementById('p-desc').value.trim() || null,
+    category_id: document.getElementById('p-category').value || null,
+    supplier_id: document.getElementById('p-supplier').value || null,
+    cost_price: parseFloat(document.getElementById('p-cost').value) || 0,
+    selling_price: parseFloat(document.getElementById('p-price').value) || 0,
+    unit: document.getElementById('p-unit').value,
+    is_active: document.getElementById('p-active').value === 'true'
+  };
+  if (!body.sku || !body.name) { toast('SKU and Name are required', 'err'); return; }
+
+  let result;
+  if (editingProductId) {
+    result = await sbPatch('products', editingProductId, body);
+  } else {
+    result = await sbPost('products', body);
+  }
+  if (result) {
+    toast(editingProductId ? 'Product updated ✓' : 'Product added ✓', 'ok');
+    closeModal('product-modal');
+    loadProducts();
+  }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  const r = await sbDelete('products', id);
+  if (r) { toast('Product deleted', 'ok'); loadProducts(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INVENTORY
+═══════════════════════════════════════════════════════════ */
+async function loadInventory() {
+  if (!SB_URL) {
+    document.getElementById('inventory-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
+    return;
+  }
+  const inv = await sbGet('inventory', 'select=*,products(name,sku)&order=last_updated.desc');
+  if (!inv) return;
+
+  const tbody = document.getElementById('inventory-tbody');
+  if (!inv.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No inventory records yet. Add products first.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = inv.map(i => {
+    const low = i.quantity <= i.reorder_level;
+    return `
+    <tr class="${low ? 'low-stock-row' : ''}">
+      <td>${i.products?.name || '—'}</td>
+      <td><code style="font-size:11px;color:var(--muted)">${i.products?.sku || '—'}</code></td>
+      <td><span class="badge ${low ? 'low' : 'active'}">${i.quantity}</span></td>
+      <td>${i.reorder_level}</td>
+      <td>${i.warehouse_loc || '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="color:var(--muted);font-size:12px">${new Date(i.last_updated).toLocaleDateString()}</td>
+      <td><button class="btn btn-sm btn-ghost" onclick="openStockModal('${i.product_id}','${i.products?.name}')">Adjust Stock</button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STOCK MOVEMENTS
+═══════════════════════════════════════════════════════════ */
+function openStockModal(productId, productName) {
+  document.getElementById('stk-product-id').value = productId;
+  document.getElementById('stk-product-name').value = productName;
+  document.getElementById('stk-qty').value = '';
+  document.getElementById('stk-ref').value = '';
+  document.getElementById('stk-notes').value = '';
+  openModal('stock-modal');
+}
+
+async function saveStock() {
+  const productId = document.getElementById('stk-product-id').value;
+  const qty = parseInt(document.getElementById('stk-qty').value);
+  const type = document.getElementById('stk-type').value;
+  if (!qty || qty < 1) { toast('Enter a valid quantity', 'err'); return; }
+
+  // Record movement
+  const mv = await sbPost('stock_movements', {
+    product_id: productId,
+    movement_type: type,
+    quantity: qty,
+    reference: document.getElementById('stk-ref').value || null,
+    notes: document.getElementById('stk-notes').value || null
+  });
+  if (!mv) return;
+
+  // Update inventory
+  const inv = await sbGet('inventory', `product_id=eq.${productId}`);
+  if (inv && inv.length) {
+    const current = inv[0].quantity;
+    const delta = type === 'IN' ? qty : type === 'OUT' ? -qty : qty;
+    await sbPatch('inventory', inv[0].id, { quantity: Math.max(0, current + delta), last_updated: new Date().toISOString() });
+  } else {
+    // First stock entry
+    await sbPost('inventory', { product_id: productId, quantity: qty, reorder_level: 5 });
+  }
+
+  toast('Stock movement recorded ✓', 'ok');
+  closeModal('stock-modal');
+  loadInventory();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUPPLIERS
+═══════════════════════════════════════════════════════════ */
+async function loadSuppliers() {
+  if (!SB_URL) {
+    document.getElementById('suppliers-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
+    return;
+  }
+  const suppliers = await sbGet('suppliers', 'select=*&order=created_at.desc');
+  if (!suppliers) return;
+  allSuppliers = suppliers;
+  renderSuppliers(allSuppliers);
+}
+
+function renderSuppliers(list) {
+  const tbody = document.getElementById('suppliers-tbody');
+  if (!list.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No suppliers yet</td></tr>`; return; }
+  tbody.innerHTML = list.map(s => `
+    <tr>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.contact_name || '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${s.email || '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${s.phone || '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${s.city || '<span style="color:var(--muted)">—</span>'}</td>
+      <td><span class="badge ${s.is_active ? 'active' : 'inactive'}">${s.is_active ? 'Active' : 'Inactive'}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn-icon" title="Edit" onclick="openSupplierModal('${s.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon" title="Delete" onclick="deleteSupplier('${s.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterSuppliers() {
+  const q = document.getElementById('supplier-search').value.toLowerCase();
+  renderSuppliers(allSuppliers.filter(s => s.name.toLowerCase().includes(q) || (s.city || '').toLowerCase().includes(q)));
+}
+
+function openSupplierModal(id = null) {
+  editingSupplierId = id;
+  document.getElementById('supplier-modal-title').textContent = id ? 'Edit Supplier' : 'Add Supplier';
+  if (id) {
+    const s = allSuppliers.find(x => x.id === id);
+    if (s) {
+      document.getElementById('s-name').value = s.name;
+      document.getElementById('s-contact').value = s.contact_name || '';
+      document.getElementById('s-email').value = s.email || '';
+      document.getElementById('s-phone').value = s.phone || '';
+      document.getElementById('s-address').value = s.address || '';
+      document.getElementById('s-city').value = s.city || '';
+      document.getElementById('s-country').value = s.country || 'Nepal';
+      document.getElementById('s-notes').value = s.notes || '';
+      document.getElementById('s-active').value = s.is_active ? 'true' : 'false';
+    }
+  } else {
+    ['s-name','s-contact','s-email','s-phone','s-address','s-city','s-notes'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('s-country').value = 'Nepal';
+    document.getElementById('s-active').value = 'true';
+  }
+  openModal('supplier-modal');
+}
+
+async function saveSupplier() {
+  const body = {
+    name: document.getElementById('s-name').value.trim(),
+    contact_name: document.getElementById('s-contact').value.trim() || null,
+    email: document.getElementById('s-email').value.trim() || null,
+    phone: document.getElementById('s-phone').value.trim() || null,
+    address: document.getElementById('s-address').value.trim() || null,
+    city: document.getElementById('s-city').value.trim() || null,
+    country: document.getElementById('s-country').value.trim() || 'Nepal',
+    notes: document.getElementById('s-notes').value.trim() || null,
+    is_active: document.getElementById('s-active').value === 'true'
+  };
+  if (!body.name) { toast('Company name is required', 'err'); return; }
+
+  let result;
+  if (editingSupplierId) {
+    result = await sbPatch('suppliers', editingSupplierId, body);
+  } else {
+    result = await sbPost('suppliers', body);
+  }
+  if (result) {
+    toast(editingSupplierId ? 'Supplier updated ✓' : 'Supplier added ✓', 'ok');
+    closeModal('supplier-modal');
+    loadSuppliers();
+  }
+}
+
+async function deleteSupplier(id) {
+  if (!confirm('Delete this supplier?')) return;
+  const r = await sbDelete('suppliers', id);
+  if (r) { toast('Supplier deleted', 'ok'); loadSuppliers(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════════ */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+let toastTimer;
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3000);
+}
+</script>
+</body>
+</html>
