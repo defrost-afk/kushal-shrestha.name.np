@@ -3,116 +3,130 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Furniture and Furnishing House — Admin Dashboard</title>
+<title>Furniture & Furnishing House — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-/* ── TOKENS ─────────────────────────────────────────────── */
 :root{
-  --bg:        #0f0e0c;
-  --surface:   #181714;
-  --surface2:  #211f1b;
-  --border:    #2e2b25;
-  --gold:      #c9a84c;
-  --gold-dim:  #8a6d2f;
-  --text:      #e8e0d0;
-  --muted:     #7a7268;
-  --danger:    #c45a3a;
-  --success:   #5a9e72;
-  --info:      #4a82b0;
-  --radius:    6px;
-  --font-head: 'Cormorant Garamond', serif;
-  --font-body: 'DM Sans', sans-serif;
+  --bg:       #f5f3f0;
+  --surface:  #ffffff;
+  --surface2: #f0ede8;
+  --border:   #e0dbd3;
+  --accent:   #5c4a32;
+  --accent2:  #8a7055;
+  --text:     #2a2420;
+  --muted:    #8a8078;
+  --danger:   #b84a2e;
+  --success:  #3d7d5a;
+  --warning:  #c47a1e;
+  --radius:   8px;
+  --shadow:   0 1px 4px rgba(0,0,0,.08);
+  --font-head:'Playfair Display',serif;
+  --font-body:'Inter',sans-serif;
 }
-
-/* ── RESET ──────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6}
-a{color:inherit;text-decoration:none}
 button{cursor:pointer;font-family:var(--font-body)}
 input,textarea,select{font-family:var(--font-body)}
 ::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-track{background:var(--surface2)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ── LAYOUT ─────────────────────────────────────────────── */
+/* ── LOGIN ──────────────────────────────────────────────── */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:var(--bg);
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px),
+                   repeating-linear-gradient(90deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px);
+}
+.login-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:48px 44px;width:min(420px,95vw);
+  box-shadow:0 8px 32px rgba(0,0,0,.1);
+}
+.login-card .brand{text-align:center;margin-bottom:32px}
+.login-card .brand h1{font-family:var(--font-head);font-size:26px;color:var(--accent);margin-bottom:4px}
+.login-card .brand p{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.login-card .form-group{margin-bottom:16px}
+.login-card label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500}
+.login-card input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:10px 14px;color:var(--text);
+  font-size:14px;outline:none;transition:border-color .15s;
+}
+.login-card input:focus{border-color:var(--accent2)}
+.login-error{color:var(--danger);font-size:12px;margin-top:8px;display:none}
+.login-error.show{display:block}
+#login-screen.hidden{display:none}
+
+/* ── APP ────────────────────────────────────────────────── */
 #app{display:flex;height:100vh;overflow:hidden}
+#app.hidden{display:none}
 
 /* ── SIDEBAR ────────────────────────────────────────────── */
 #sidebar{
-  width:220px;min-width:220px;background:var(--surface);
+  width:230px;min-width:230px;background:var(--surface);
   border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  padding:0 0 16px;overflow-y:auto;
+  display:flex;flex-direction:column;padding:0 0 16px;overflow-y:auto;
 }
-.logo{
-  padding:28px 20px 22px;
-  border-bottom:1px solid var(--border);
-  margin-bottom:12px;
-}
-.logo h1{
-  font-family:var(--font-head);font-size:22px;font-weight:700;
-  letter-spacing:.02em;color:var(--gold);
-}
-.logo span{display:block;font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-top:2px}
-.nav-label{
-  font-size:9px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--muted);padding:10px 20px 4px;margin-top:8px;
-}
+.logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.logo h1{font-family:var(--font-head);font-size:18px;font-weight:600;color:var(--accent);line-height:1.3}
+.logo span{display:block;font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-top:4px}
+.nav-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding:10px 20px 4px;margin-top:6px}
 .nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 20px;font-size:13px;font-weight:400;
-  color:var(--muted);cursor:pointer;
-  border-left:2px solid transparent;
-  transition:all .15s;
+  display:flex;align-items:center;gap:10px;padding:9px 20px;
+  font-size:13px;color:var(--muted);cursor:pointer;
+  border-left:2px solid transparent;transition:all .15s;
 }
 .nav-item:hover{color:var(--text);background:var(--surface2)}
-.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:var(--surface2)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--surface2)}
 .nav-item svg{width:15px;height:15px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:12px 20px;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:10px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:500;flex-shrink:0}
+.user-name{font-size:12px;color:var(--muted);flex:1}
+.btn-logout{background:none;border:none;color:var(--muted);padding:4px;border-radius:4px;font-size:11px;cursor:pointer}
+.btn-logout:hover{color:var(--danger)}
 
 /* ── MAIN ───────────────────────────────────────────────── */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-
-/* ── TOPBAR ─────────────────────────────────────────────── */
 #topbar{
-  height:56px;min-height:56px;
-  background:var(--surface);border-bottom:1px solid var(--border);
+  height:54px;min-height:54px;background:var(--surface);
+  border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 24px;
 }
 #topbar h2{font-family:var(--font-head);font-size:20px;font-weight:600;color:var(--text)}
 .topbar-actions{display:flex;gap:8px;align-items:center}
-
-/* ── CONFIG BANNER ──────────────────────────────────────── */
-#config-banner{
-  background:#1a1508;border-bottom:1px solid var(--gold-dim);
-  padding:10px 24px;display:flex;align-items:center;gap:10px;
-  font-size:12px;color:#b8944a;
-}
-#config-banner a{color:var(--gold);text-decoration:underline;cursor:pointer}
-#config-banner.hidden{display:none}
-
-/* ── CONTENT ────────────────────────────────────────────── */
 #content{flex:1;overflow-y:auto;padding:24px}
 .page{display:none}
 .page.active{display:block}
 
-/* ── CARDS ──────────────────────────────────────────────── */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+/* ── CONFIG BANNER ──────────────────────────────────────── */
+#config-banner{
+  background:#fdf6ec;border-bottom:1px solid #e8d5a8;
+  padding:10px 24px;display:flex;align-items:center;gap:10px;
+  font-size:12px;color:#8a6020;
+}
+#config-banner a{color:var(--accent);text-decoration:underline;cursor:pointer}
+#config-banner.hidden{display:none}
+
+/* ── STAT CARDS ─────────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
 .stat-card{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);padding:18px 20px;
+  box-shadow:var(--shadow);
 }
-.stat-card .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.stat-card .value{font-family:var(--font-head);font-size:30px;font-weight:600;color:var(--gold);margin:4px 0 2px}
+.stat-card .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.stat-card .value{font-family:var(--font-head);font-size:32px;font-weight:600;color:var(--accent);margin:4px 0 2px}
 .stat-card .sub{font-size:11px;color:var(--muted)}
 
 /* ── TABLE ──────────────────────────────────────────────── */
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .table-toolbar{
   display:flex;justify-content:space-between;align-items:center;
-  padding:14px 18px;border-bottom:1px solid var(--border);
-  gap:12px;flex-wrap:wrap;
+  padding:14px 18px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;
 }
 .table-toolbar h3{font-family:var(--font-head);font-size:17px;font-weight:600}
 .search-box{
@@ -125,25 +139,70 @@ input,textarea,select{font-family:var(--font-body)}
 table{width:100%;border-collapse:collapse}
 thead{background:var(--surface2)}
 th{padding:10px 16px;text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap}
-td{padding:11px 16px;border-top:1px solid var(--border);font-size:13px;color:var(--text)}
+td{padding:10px 16px;border-top:1px solid var(--border);font-size:13px;color:var(--text)}
 tr:hover td{background:var(--surface2)}
-.badge{
-  display:inline-flex;align-items:center;padding:2px 9px;
-  border-radius:20px;font-size:11px;font-weight:500;
+
+/* ── PRODUCT GRID (image-based) ─────────────────────────── */
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;padding:18px;
 }
-.badge.active{background:#1a3327;color:var(--success)}
-.badge.inactive{background:#2a1a14;color:var(--danger)}
-.badge.low{background:#2a1e0e;color:#d4963a}
+.product-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;
+  display:flex;flex-direction:column;
+}
+.product-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);transform:translateY(-2px)}
+.product-img{
+  width:100%;height:160px;object-fit:cover;
+  background:var(--surface2);display:flex;align-items:center;
+  justify-content:center;color:var(--muted);font-size:12px;
+  position:relative;overflow:hidden;
+}
+.product-img img{width:100%;height:100%;object-fit:cover}
+.product-img .no-img{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:100%;height:100%;justify-content:center;
+  background:var(--surface2);color:var(--muted);
+}
+.product-img .no-img svg{width:28px;height:28px;opacity:.4}
+.stock-badge{
+  position:absolute;top:8px;right:8px;
+  padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;
+}
+.stock-badge.ok{background:#e8f5ee;color:#2d6e47}
+.stock-badge.low{background:#fef3e2;color:#8a5c10}
+.stock-badge.out{background:#fdecea;color:#8a2a1e}
+.product-info{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:4px}
+.product-info .pname{font-weight:500;font-size:13px;color:var(--text);line-height:1.4}
+.product-info .psku{font-size:11px;color:var(--muted)}
+.product-info .pprice{font-family:var(--font-head);font-size:16px;color:var(--accent);margin-top:4px}
+.product-info .pcategory{font-size:11px;color:var(--muted)}
+.product-actions{
+  display:flex;border-top:1px solid var(--border);
+}
+.product-actions button{
+  flex:1;padding:9px;background:none;border:none;
+  font-size:12px;color:var(--muted);cursor:pointer;
+  transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.product-actions button:hover{background:var(--surface2);color:var(--text)}
+.product-actions button:first-child{border-right:1px solid var(--border)}
+.product-actions button.stock-btn:hover{color:var(--success)}
+.product-actions button.edit-btn:hover{color:var(--accent)}
+
+/* ── BADGES ─────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.badge.active{background:#e8f5ee;color:#2d6e47}
+.badge.inactive{background:#fdecea;color:#8a2a1e}
+.badge.low{background:#fef3e2;color:#8a5c10}
 
 /* ── BUTTONS ────────────────────────────────────────────── */
-.btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:7px 16px;border-radius:var(--radius);
-  font-size:13px;font-weight:500;border:none;
-  transition:all .15s;white-space:nowrap;
-}
-.btn-primary{background:var(--gold);color:#0f0e0c}
-.btn-primary:hover{background:#d4b560}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;border:none;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
 .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
 .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--border)}
@@ -153,170 +212,149 @@ tr:hover td{background:var(--surface2)}
 .btn-icon:hover{color:var(--text);border-color:var(--muted)}
 
 /* ── MODAL ──────────────────────────────────────────────── */
-.modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
-  z-index:100;align-items:center;justify-content:center;
-}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);padding:28px 32px;
-  width:min(520px,95vw);max-height:90vh;overflow-y:auto;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  width:min(560px,95vw);max-height:90vh;overflow-y:auto;
+  box-shadow:0 16px 48px rgba(0,0,0,.15);
 }
-.modal h3{font-family:var(--font-head);font-size:20px;margin-bottom:20px;color:var(--gold)}
+.modal h3{font-family:var(--font-head);font-size:20px;margin-bottom:20px;color:var(--accent)}
 .form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.form-group input,
-.form-group select,
-.form-group textarea{
+.form-group label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-group input,.form-group select,.form-group textarea{
   width:100%;background:var(--surface2);border:1px solid var(--border);
   border-radius:var(--radius);padding:9px 12px;color:var(--text);
   font-size:13px;outline:none;transition:border-color .15s;
 }
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus{border-color:var(--gold-dim)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent2)}
 .form-group textarea{min-height:80px;resize:vertical}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
 
+/* ── IMAGE UPLOAD ───────────────────────────────────────── */
+.img-upload-area{
+  border:2px dashed var(--border);border-radius:var(--radius);
+  padding:20px;text-align:center;cursor:pointer;
+  transition:border-color .15s,background .15s;
+  position:relative;overflow:hidden;
+}
+.img-upload-area:hover{border-color:var(--accent2);background:var(--surface2)}
+.img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-upload-area .preview{width:100%;height:140px;object-fit:cover;border-radius:4px;display:none}
+.img-upload-area .placeholder{color:var(--muted);font-size:12px}
+.img-upload-area .placeholder svg{width:28px;height:28px;margin-bottom:8px;opacity:.4}
+
 /* ── TOAST ──────────────────────────────────────────────── */
 #toast{
   position:fixed;bottom:24px;right:24px;z-index:999;
-  background:var(--surface2);border:1px solid var(--border);
+  background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);padding:12px 18px;font-size:13px;
   opacity:0;transform:translateY(6px);
   transition:opacity .2s,transform .2s;pointer-events:none;
-  max-width:280px;
+  max-width:280px;box-shadow:var(--shadow);
 }
 #toast.show{opacity:1;transform:translateY(0)}
 #toast.ok{border-left:3px solid var(--success)}
 #toast.err{border-left:3px solid var(--danger)}
 
-/* ── EMPTY STATE ────────────────────────────────────────── */
-.empty{text-align:center;padding:48px 24px;color:var(--muted)}
-.empty svg{width:40px;height:40px;margin-bottom:12px;opacity:.4}
-.empty p{font-size:13px}
-
-/* ── CONFIG PAGE ────────────────────────────────────────── */
-.config-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:28px 32px;
-  max-width:560px;
-}
-.config-card h3{font-family:var(--font-head);font-size:20px;margin-bottom:6px;color:var(--gold)}
+/* ── CONFIG CARD ────────────────────────────────────────── */
+.config-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;max-width:560px;box-shadow:var(--shadow)}
+.config-card h3{font-family:var(--font-head);font-size:20px;margin-bottom:6px;color:var(--accent)}
 .config-card .desc{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.7}
 .config-steps{counter-reset:steps;margin:20px 0}
-.config-steps li{
-  counter-increment:steps;list-style:none;
-  padding:8px 0 8px 36px;position:relative;font-size:13px;color:var(--muted);
-  border-bottom:1px solid var(--border);
-}
-.config-steps li::before{
-  content:counter(steps);position:absolute;left:0;top:9px;
-  width:22px;height:22px;border-radius:50%;
-  background:var(--surface2);border:1px solid var(--gold-dim);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;color:var(--gold);font-weight:600;
-  line-height:22px;text-align:center;
-}
-.config-steps li code{
-  background:var(--surface2);border:1px solid var(--border);
-  padding:1px 6px;border-radius:3px;font-size:11px;color:var(--gold);
-  font-family:monospace;
-}
+.config-steps li{counter-increment:steps;list-style:none;padding:8px 0 8px 36px;position:relative;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border)}
+.config-steps li::before{content:counter(steps);position:absolute;left:0;top:9px;width:22px;height:22px;border-radius:50%;background:var(--surface2);border:1px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--accent);font-weight:600;line-height:22px;text-align:center}
+.config-steps li code{background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:11px;color:var(--accent);font-family:monospace}
+.low-stock-row td{background:#fffbf5}
 
-/* ── LOW STOCK HIGHLIGHT ────────────────────────────────── */
-.low-stock-row td{background:rgba(196,90,58,.06)}
+/* ── PASSWORD CHANGE ────────────────────────────────────── */
+.pwd-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:400px;margin-top:20px;box-shadow:var(--shadow)}
+.pwd-section h4{font-family:var(--font-head);font-size:16px;margin-bottom:16px;color:var(--accent)}
 
-/* ── PAGINATION ─────────────────────────────────────────── */
-.pagination{display:flex;align-items:center;gap:6px;padding:12px 18px;border-top:1px solid var(--border);justify-content:flex-end}
-.pagination span{font-size:12px;color:var(--muted)}
-
-/* ── RESPONSIVE ─────────────────────────────────────────── */
 @media(max-width:700px){
   #sidebar{display:none}
   .form-row{grid-template-columns:1fr}
+  .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
 }
 </style>
 </head>
 <body>
 
-<!-- CONFIG MODAL (first run) -->
+<!-- ══ LOGIN SCREEN ══════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="brand">
+      <h1>Furniture & Furnishing House</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input id="login-user" type="text" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input id="login-pass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="login-error" id="login-error">Incorrect username or password.</div>
+    <div style="margin-top:20px">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" onclick="doLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ═══════════════════════════════════════════════════ -->
+<div id="app" class="hidden">
+
+<!-- MODALS -->
+<!-- Config -->
 <div class="modal-overlay" id="cfg-modal">
   <div class="modal">
-    <h3>⚙ Connect to Supabase</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Enter your Supabase project credentials to get started. Find these in <strong style="color:var(--text)">Supabase → Settings → API</strong>.</p>
-    <div class="form-group">
-      <label>Project URL</label>
-      <input id="cfg-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co"/>
-    </div>
-    <div class="form-group">
-      <label>Anon / Public API Key</label>
-      <input id="cfg-key" type="text" placeholder="eyJhbGciOi..."/>
-    </div>
+    <h3>Connect to Supabase</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Find these in <strong style="color:var(--text)">Supabase → Settings → API</strong>.</p>
+    <div class="form-group"><label>Project URL</label><input id="cfg-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co"/></div>
+    <div class="form-group"><label>Anon / Public API Key</label><input id="cfg-key" type="text" placeholder="eyJhbGciOi..."/></div>
     <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('cfg-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveConfig()">Save & Connect</button>
     </div>
   </div>
 </div>
 
-<!-- PRODUCT MODAL -->
+<!-- Product -->
 <div class="modal-overlay" id="product-modal">
   <div class="modal">
     <h3 id="product-modal-title">Add Product</h3>
-    <div class="form-row">
-      <div class="form-group">
-        <label>SKU *</label>
-        <input id="p-sku" placeholder="SOF-001"/>
-      </div>
-      <div class="form-group">
-        <label>Name *</label>
-        <input id="p-name" placeholder="3-Seater Sofa"/>
-      </div>
-    </div>
     <div class="form-group">
-      <label>Description</label>
-      <textarea id="p-desc" placeholder="Optional product description…"></textarea>
+      <label>Product Image</label>
+      <div class="img-upload-area" id="img-upload-area" onclick="document.getElementById('p-img-file').click()">
+        <input type="file" id="p-img-file" accept="image/*" onchange="previewImage(this)" style="display:none"/>
+        <img id="p-img-preview" class="preview" alt="preview"/>
+        <div class="placeholder" id="img-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 6px;display:block"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <div>Click to upload image</div>
+          <div style="font-size:11px;margin-top:2px">JPG, PNG up to 2MB</div>
+        </div>
+      </div>
+      <input type="hidden" id="p-img-url"/>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Category</label>
-        <select id="p-category"><option value="">— Select —</option></select>
-      </div>
-      <div class="form-group">
-        <label>Supplier</label>
-        <select id="p-supplier"><option value="">— Select —</option></select>
-      </div>
+      <div class="form-group"><label>SKU *</label><input id="p-sku" placeholder="SOF-001"/></div>
+      <div class="form-group"><label>Name *</label><input id="p-name" placeholder="3-Seater Sofa"/></div>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="p-desc" placeholder="Optional product description…"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Category</label><select id="p-category"><option value="">— Select —</option></select></div>
+      <div class="form-group"><label>Supplier</label><select id="p-supplier"><option value="">— Select —</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Cost Price (NPR)</label>
-        <input id="p-cost" type="number" placeholder="0" min="0"/>
-      </div>
-      <div class="form-group">
-        <label>Selling Price (NPR)</label>
-        <input id="p-price" type="number" placeholder="0" min="0"/>
-      </div>
+      <div class="form-group"><label>Cost Price (NPR)</label><input id="p-cost" type="number" placeholder="0" min="0"/></div>
+      <div class="form-group"><label>Selling Price (NPR)</label><input id="p-price" type="number" placeholder="0" min="0"/></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Unit</label>
-        <select id="p-unit">
-          <option value="piece">Piece</option>
-          <option value="set">Set</option>
-          <option value="meter">Meter</option>
-          <option value="pair">Pair</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Status</label>
-        <select id="p-active">
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
-        </select>
-      </div>
+      <div class="form-group"><label>Unit</label><select id="p-unit"><option value="piece">Piece</option><option value="set">Set</option><option value="meter">Meter</option><option value="pair">Pair</option></select></div>
+      <div class="form-group"><label>Status</label><select id="p-active"><option value="true">Active</option><option value="false">Inactive</option></select></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancel</button>
@@ -325,55 +363,25 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
-<!-- SUPPLIER MODAL -->
+<!-- Supplier -->
 <div class="modal-overlay" id="supplier-modal">
   <div class="modal">
     <h3 id="supplier-modal-title">Add Supplier</h3>
     <div class="form-row">
-      <div class="form-group">
-        <label>Company Name *</label>
-        <input id="s-name" placeholder="Nepal Furniture Co."/>
-      </div>
-      <div class="form-group">
-        <label>Contact Person</label>
-        <input id="s-contact" placeholder="Ram Shrestha"/>
-      </div>
+      <div class="form-group"><label>Company Name *</label><input id="s-name" placeholder="Nepal Furniture Co."/></div>
+      <div class="form-group"><label>Contact Person</label><input id="s-contact" placeholder="Ram Shrestha"/></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Email</label>
-        <input id="s-email" type="email" placeholder="info@supplier.com"/>
-      </div>
-      <div class="form-group">
-        <label>Phone</label>
-        <input id="s-phone" placeholder="+977-01-XXXXXXX"/>
-      </div>
+      <div class="form-group"><label>Email</label><input id="s-email" type="email" placeholder="info@supplier.com"/></div>
+      <div class="form-group"><label>Phone</label><input id="s-phone" placeholder="+977-01-XXXXXXX"/></div>
     </div>
-    <div class="form-group">
-      <label>Address</label>
-      <input id="s-address" placeholder="Street address"/>
-    </div>
+    <div class="form-group"><label>Address</label><input id="s-address" placeholder="Street address"/></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>City</label>
-        <input id="s-city" placeholder="Kathmandu"/>
-      </div>
-      <div class="form-group">
-        <label>Country</label>
-        <input id="s-country" value="Nepal"/>
-      </div>
+      <div class="form-group"><label>City</label><input id="s-city" placeholder="Kathmandu"/></div>
+      <div class="form-group"><label>Country</label><input id="s-country" value="Nepal"/></div>
     </div>
-    <div class="form-group">
-      <label>Notes</label>
-      <textarea id="s-notes" placeholder="Payment terms, lead time, etc."></textarea>
-    </div>
-    <div class="form-group">
-      <label>Status</label>
-      <select id="s-active">
-        <option value="true">Active</option>
-        <option value="false">Inactive</option>
-      </select>
-    </div>
+    <div class="form-group"><label>Notes</label><textarea id="s-notes" placeholder="Payment terms, lead time, etc."></textarea></div>
+    <div class="form-group"><label>Status</label><select id="s-active"><option value="true">Active</option><option value="false">Inactive</option></select></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('supplier-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSupplier()">Save Supplier</button>
@@ -381,37 +389,18 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
-<!-- STOCK MODAL -->
+<!-- Stock -->
 <div class="modal-overlay" id="stock-modal">
   <div class="modal">
     <h3>Stock Adjustment</h3>
     <input type="hidden" id="stk-product-id"/>
-    <div class="form-group">
-      <label>Product</label>
-      <input id="stk-product-name" readonly style="opacity:.7"/>
-    </div>
+    <div class="form-group"><label>Product</label><input id="stk-product-name" readonly style="opacity:.7"/></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Movement</label>
-        <select id="stk-type">
-          <option value="IN">Stock In (received)</option>
-          <option value="OUT">Stock Out (sold/used)</option>
-          <option value="ADJUSTMENT">Adjustment</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Quantity *</label>
-        <input id="stk-qty" type="number" min="1" placeholder="0"/>
-      </div>
+      <div class="form-group"><label>Movement</label><select id="stk-type"><option value="IN">Stock In (received)</option><option value="OUT">Stock Out (sold/used)</option><option value="ADJUSTMENT">Adjustment</option></select></div>
+      <div class="form-group"><label>Quantity *</label><input id="stk-qty" type="number" min="1" placeholder="0"/></div>
     </div>
-    <div class="form-group">
-      <label>Reference No.</label>
-      <input id="stk-ref" placeholder="Invoice / PO number"/>
-    </div>
-    <div class="form-group">
-      <label>Notes</label>
-      <textarea id="stk-notes" placeholder="Optional notes…"></textarea>
-    </div>
+    <div class="form-group"><label>Reference No.</label><input id="stk-ref" placeholder="Invoice / PO number"/></div>
+    <div class="form-group"><label>Notes</label><textarea id="stk-notes" placeholder="Optional notes…"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('stock-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveStock()">Record Movement</button>
@@ -419,608 +408,593 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
-<!-- APP SHELL -->
-<div id="app">
-  <!-- SIDEBAR -->
-  <nav id="sidebar">
-    <div class="logo">
-      <h1>F&amp;F House</h1>
-      <span>Admin Dashboard</span>
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="logo">
+    <h1>Furniture &<br>Furnishing House</h1>
+    <span>Admin Panel</span>
+  </div>
+  <div class="nav-label">Main</div>
+  <div class="nav-item active" onclick="navigate('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard
+  </div>
+  <div class="nav-label">Catalogue</div>
+  <div class="nav-item" onclick="navigate('products')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Products
+  </div>
+  <div class="nav-item" onclick="navigate('inventory')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Inventory
+  </div>
+  <div class="nav-label">Sourcing</div>
+  <div class="nav-item" onclick="navigate('suppliers')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a8 8 0 00-16 0v2"/></svg>Suppliers
+  </div>
+  <div class="nav-label">System</div>
+  <div class="nav-item" onclick="navigate('setup')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Setup
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar" id="user-avatar">A</div>
+      <span class="user-name" id="user-display">Admin</span>
+      <button class="btn-logout" onclick="doLogout()" title="Sign out">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
-    <div class="nav-label">Main</div>
-    <div class="nav-item active" onclick="navigate('dashboard')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      Dashboard
-    </div>
-    <div class="nav-label">Catalogue</div>
-    <div class="nav-item" onclick="navigate('products')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-      Products
-    </div>
-    <div class="nav-item" onclick="navigate('inventory')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
-      Inventory
-    </div>
-    <div class="nav-label">Sourcing</div>
-    <div class="nav-item" onclick="navigate('suppliers')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a8 8 0 00-16 0v2"/></svg>
-      Suppliers
-    </div>
-    <div class="nav-label">System</div>
-    <div class="nav-item" onclick="navigate('setup')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      Setup
-    </div>
-  </nav>
+  </div>
+</nav>
 
-  <!-- MAIN -->
-  <div id="main">
-    <div id="topbar">
-      <h2 id="page-title">Dashboard</h2>
-      <div class="topbar-actions" id="topbar-actions"></div>
-    </div>
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <h2 id="page-title">Dashboard</h2>
+    <div class="topbar-actions" id="topbar-actions"></div>
+  </div>
+  <div id="config-banner">
+    ⚠ Supabase not configured. <a onclick="openModal('cfg-modal')">Click here to connect</a> your database.
+  </div>
+  <div id="content">
 
-    <div id="config-banner">
-      ⚠ Supabase not configured. <a onclick="openModal('cfg-modal')">Click here to connect</a> your database. Data shown is demo only.
-    </div>
-
-    <div id="content">
-
-      <!-- DASHBOARD -->
-      <div class="page active" id="page-dashboard">
-        <div class="stat-grid" id="dash-stats">
-          <div class="stat-card"><div class="label">Total Products</div><div class="value" id="stat-products">—</div><div class="sub">catalogue items</div></div>
-          <div class="stat-card"><div class="label">Active Suppliers</div><div class="value" id="stat-suppliers">—</div><div class="sub">sourcing partners</div></div>
-          <div class="stat-card"><div class="label">Low Stock Alerts</div><div class="value" id="stat-low" style="color:var(--danger)">—</div><div class="sub">need reorder</div></div>
-          <div class="stat-card"><div class="label">Inventory Value</div><div class="value" id="stat-value">—</div><div class="sub">NPR (cost)</div></div>
-        </div>
-
-        <div class="table-wrap">
-          <div class="table-toolbar"><h3>Low Stock Items</h3></div>
-          <table>
-            <thead><tr><th>Product</th><th>SKU</th><th>In Stock</th><th>Reorder Level</th><th>Action</th></tr></thead>
-            <tbody id="low-stock-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
-          </table>
-        </div>
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stat-grid" id="dash-stats">
+        <div class="stat-card"><div class="label">Total Products</div><div class="value" id="stat-products">—</div><div class="sub">catalogue items</div></div>
+        <div class="stat-card"><div class="label">Active Suppliers</div><div class="value" id="stat-suppliers">—</div><div class="sub">sourcing partners</div></div>
+        <div class="stat-card"><div class="label">Low Stock Alerts</div><div class="value" id="stat-low" style="color:var(--danger)">—</div><div class="sub">need reorder</div></div>
+        <div class="stat-card"><div class="label">Inventory Value</div><div class="value" id="stat-value">—</div><div class="sub">NPR (cost)</div></div>
       </div>
+      <div class="table-wrap">
+        <div class="table-toolbar"><h3>Low Stock Items</h3></div>
+        <table>
+          <thead><tr><th>Product</th><th>SKU</th><th>In Stock</th><th>Reorder Level</th><th>Action</th></tr></thead>
+          <tbody id="low-stock-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
 
-      <!-- PRODUCTS -->
-      <div class="page" id="page-products">
-        <div class="table-wrap">
-          <div class="table-toolbar">
-            <h3>Products</h3>
+    <!-- PRODUCTS (image grid) -->
+    <div class="page" id="page-products">
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3>Products</h3>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <div class="search-box">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               <input id="product-search" placeholder="Search products…" oninput="filterProducts()"/>
             </div>
+            <select id="product-cat-filter" onchange="filterProducts()" style="padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);font-size:12px;outline:none">
+              <option value="">All Categories</option>
+            </select>
           </div>
-          <table>
-            <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Supplier</th><th>Sell Price</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="products-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
-          </table>
+        </div>
+        <div class="product-grid" id="products-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTORY (image grid) -->
+    <div class="page" id="page-inventory">
+      <div class="table-wrap">
+        <div class="table-toolbar"><h3>Inventory</h3></div>
+        <div class="product-grid" id="inventory-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPLIERS -->
+    <div class="page" id="page-suppliers">
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3>Suppliers</h3>
+          <div class="search-box">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input id="supplier-search" placeholder="Search suppliers…" oninput="filterSuppliers()"/>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>City</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="suppliers-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="page" id="page-setup">
+      <div class="config-card">
+        <h3>Supabase Setup Guide</h3>
+        <p class="desc">Follow these steps once to connect your database.</p>
+        <ol class="config-steps">
+          <li>Go to <strong>supabase.com</strong> and create a free account.</li>
+          <li>Create a new project. Choose Singapore as the region.</li>
+          <li>Go to <code>SQL Editor</code> → paste <code>schema.sql</code> → click Run.</li>
+          <li>Go to <code>Settings → API</code> and copy your Project URL and anon key.</li>
+          <li>Click the button below and enter those credentials.</li>
+        </ol>
+        <div style="margin-top:20px">
+          <button class="btn btn-primary" onclick="openModal('cfg-modal')">⚙ Enter Supabase Credentials</button>
+        </div>
+        <div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:var(--radius);font-size:12px;color:var(--muted)">
+          <strong style="color:var(--text)">Current connection:</strong><br/>
+          <span id="cfg-status">Not configured</span>
         </div>
       </div>
 
-      <!-- INVENTORY -->
-      <div class="page" id="page-inventory">
-        <div class="table-wrap">
-          <div class="table-toolbar">
-            <h3>Inventory</h3>
-          </div>
-          <table>
-            <thead><tr><th>Product</th><th>SKU</th><th>In Stock</th><th>Reorder Level</th><th>Location</th><th>Last Updated</th><th>Actions</th></tr></thead>
-            <tbody id="inventory-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
-          </table>
-        </div>
+      <!-- Change Password -->
+      <div class="pwd-section">
+        <h4>Change Admin Password</h4>
+        <div class="form-group"><label>Current Password</label><input type="password" id="pwd-current" placeholder="Current password"/></div>
+        <div class="form-group"><label>New Password</label><input type="password" id="pwd-new" placeholder="New password (min 6 chars)"/></div>
+        <div class="form-group"><label>Confirm New Password</label><input type="password" id="pwd-confirm" placeholder="Repeat new password"/></div>
+        <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
       </div>
+    </div>
 
-      <!-- SUPPLIERS -->
-      <div class="page" id="page-suppliers">
-        <div class="table-wrap">
-          <div class="table-toolbar">
-            <h3>Suppliers</h3>
-            <div class="search-box">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-              <input id="supplier-search" placeholder="Search suppliers…" oninput="filterSuppliers()"/>
-            </div>
-          </div>
-          <table>
-            <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>City</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="suppliers-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SETUP -->
-      <div class="page" id="page-setup">
-        <div class="config-card">
-          <h3>Supabase Setup Guide</h3>
-          <p class="desc">Follow these steps to connect this dashboard to your free Supabase database. This only needs to be done once.</p>
-          <ol class="config-steps">
-            <li>Go to <strong>supabase.com</strong> and create a free account.</li>
-            <li>Create a new project. Choose a region close to Nepal (e.g. Singapore).</li>
-            <li>In the left sidebar go to <code>SQL Editor</code> → <code>New Query</code>.</li>
-            <li>Paste the contents of <code>schema.sql</code> (provided with this dashboard) and click <strong>Run</strong>.</li>
-            <li>Go to <code>Settings</code> → <code>API</code> and copy your <strong>Project URL</strong> and <strong>anon public key</strong>.</li>
-            <li>Click the button below and enter those credentials.</li>
-          </ol>
-          <div style="margin-top:20px">
-            <button class="btn btn-primary" onclick="openModal('cfg-modal')">⚙ Enter Supabase Credentials</button>
-          </div>
-          <div style="margin-top:20px;padding:14px;background:var(--surface2);border-radius:var(--radius);font-size:12px;color:var(--muted)">
-            <strong style="color:var(--text)">Current connection:</strong><br/>
-            <span id="cfg-status">Not configured</span>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /content -->
-  </div><!-- /main -->
+  </div><!-- /content -->
+</div><!-- /main -->
 </div><!-- /app -->
-
 <div id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════════════════ */
-let SB_URL = localStorage.getItem('sb_url') || '';
-let SB_KEY = localStorage.getItem('sb_key') || '';
-let allProducts = [];
-let allSuppliers = [];
-let allCategories = [];
-let editingProductId = null;
-let editingSupplierId = null;
+/* ══ AUTH ═══════════════════════════════════════════════════ */
+const DEFAULT_USER = 'admin';
+const DEFAULT_PASS = 'furnitura2024';
 
-/* ═══════════════════════════════════════════════════════════
-   SUPABASE API HELPERS
-═══════════════════════════════════════════════════════════ */
-async function sbFetch(path, opts = {}) {
-  if (!SB_URL || !SB_KEY) { toast('Supabase not configured', 'err'); return null; }
-  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
-    headers: {
-      apikey: SB_KEY,
-      Authorization: `Bearer ${SB_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: opts.prefer || 'return=representation',
-      ...opts.headers
-    },
-    ...opts
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    toast(err.message || 'Request failed', 'err');
-    return null;
-  }
-  if (res.status === 204) return true;
-  return res.json();
+function getCredentials(){
+  return {
+    user: localStorage.getItem('admin_user') || DEFAULT_USER,
+    pass: localStorage.getItem('admin_pass') || DEFAULT_PASS
+  };
 }
 
-const sbGet  = (table, qs = '') => sbFetch(`${table}?${qs}`);
-const sbPost = (table, body)    => sbFetch(table, { method:'POST', body: JSON.stringify(body) });
-const sbPatch = (table, id, body) => sbFetch(`${table}?id=eq.${id}`, { method:'PATCH', body: JSON.stringify(body) });
-const sbDelete = (table, id)    => sbFetch(`${table}?id=eq.${id}`, { method:'DELETE', prefer:'return=minimal' });
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const creds = getCredentials();
+  const err = document.getElementById('login-error');
+  if(u === creds.user && p === creds.pass){
+    localStorage.setItem('logged_in','1');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('user-display').textContent = u;
+    document.getElementById('user-avatar').textContent = u[0].toUpperCase();
+    err.classList.remove('show');
+    initApp();
+  } else {
+    err.classList.add('show');
+    document.getElementById('login-pass').value = '';
+  }
+}
 
-/* ═══════════════════════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════════════════════ */
+function doLogout(){
+  localStorage.removeItem('logged_in');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+function changePassword(){
+  const cur = document.getElementById('pwd-current').value;
+  const nw  = document.getElementById('pwd-new').value;
+  const cf  = document.getElementById('pwd-confirm').value;
+  const creds = getCredentials();
+  if(cur !== creds.pass){ toast('Current password is incorrect','err'); return; }
+  if(nw.length < 6){ toast('New password must be at least 6 characters','err'); return; }
+  if(nw !== cf){ toast('Passwords do not match','err'); return; }
+  localStorage.setItem('admin_pass', nw);
+  toast('Password updated ✓','ok');
+  ['pwd-current','pwd-new','pwd-confirm'].forEach(id => document.getElementById(id).value='');
+}
+
+/* Auto-login if already logged in */
 window.onload = () => {
-  if (!SB_URL || !SB_KEY) {
+  if(localStorage.getItem('logged_in')==='1'){
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    const u = getCredentials().user;
+    document.getElementById('user-display').textContent = u;
+    document.getElementById('user-avatar').textContent = u[0].toUpperCase();
+    initApp();
+  }
+};
+
+function initApp(){
+  if(!SB_URL || !SB_KEY){
     openModal('cfg-modal');
   } else {
     document.getElementById('config-banner').classList.add('hidden');
     updateCfgStatus();
   }
   navigate('dashboard');
-};
+}
 
-function saveConfig() {
-  const url = document.getElementById('cfg-url').value.trim().replace(/\/$/, '');
-  const key = document.getElementById('cfg-key').value.trim();
-  if (!url || !key) { toast('Please fill both fields', 'err'); return; }
-  SB_URL = url; SB_KEY = key;
-  localStorage.setItem('sb_url', url);
-  localStorage.setItem('sb_key', key);
+/* ══ SUPABASE ════════════════════════════════════════════════ */
+let SB_URL = localStorage.getItem('sb_url') || '';
+let SB_KEY = localStorage.getItem('sb_key') || '';
+let allProducts=[], allSuppliers=[], allCategories=[], allInventory=[];
+let editingProductId=null, editingSupplierId=null;
+
+async function sbFetch(path, opts={}){
+  if(!SB_URL||!SB_KEY){ toast('Supabase not configured','err'); return null; }
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`,{
+    headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json',Prefer:opts.prefer||'return=representation',...opts.headers},
+    ...opts
+  });
+  if(!res.ok){ const e=await res.json().catch(()=>({})); toast(e.message||'Request failed','err'); return null; }
+  if(res.status===204) return true;
+  return res.json();
+}
+const sbGet=(t,q='')=>sbFetch(`${t}?${q}`);
+const sbPost=(t,b)=>sbFetch(t,{method:'POST',body:JSON.stringify(b)});
+const sbPatch=(t,id,b)=>sbFetch(`${t}?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(b)});
+const sbDelete=(t,id)=>sbFetch(`${t}?id=eq.${id}`,{method:'DELETE',prefer:'return=minimal'});
+
+function saveConfig(){
+  const url=document.getElementById('cfg-url').value.trim().replace(/\/$/,'');
+  const key=document.getElementById('cfg-key').value.trim();
+  if(!url||!key){ toast('Please fill both fields','err'); return; }
+  SB_URL=url; SB_KEY=key;
+  localStorage.setItem('sb_url',url); localStorage.setItem('sb_key',key);
   closeModal('cfg-modal');
   document.getElementById('config-banner').classList.add('hidden');
-  updateCfgStatus();
-  toast('Connected to Supabase ✓', 'ok');
+  updateCfgStatus(); toast('Connected to Supabase ✓','ok');
   navigate('dashboard');
 }
-
-function updateCfgStatus() {
-  const el = document.getElementById('cfg-status');
-  if (SB_URL) {
-    el.innerHTML = `<span style="color:var(--success)">✓ Connected</span> — ${SB_URL}`;
-  } else {
-    el.textContent = 'Not configured';
-  }
+function updateCfgStatus(){
+  const el=document.getElementById('cfg-status');
+  el.innerHTML=SB_URL?`<span style="color:var(--success)">✓ Connected</span> — ${SB_URL}`:'Not configured';
 }
 
-/* ═══════════════════════════════════════════════════════════
-   NAVIGATION
-═══════════════════════════════════════════════════════════ */
-const PAGE_TITLES = { dashboard:'Dashboard', products:'Products', inventory:'Inventory', suppliers:'Suppliers', setup:'Setup' };
-
-function navigate(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+/* ══ NAVIGATION ══════════════════════════════════════════════ */
+const PAGE_TITLES={dashboard:'Dashboard',products:'Products',inventory:'Inventory',suppliers:'Suppliers',setup:'Setup'};
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`page-${page}`).classList.add('active');
   document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
-  document.getElementById('page-title').textContent = PAGE_TITLES[page];
+  document.getElementById('page-title').textContent=PAGE_TITLES[page];
   setupTopbarActions(page);
-  if (page === 'dashboard') loadDashboard();
-  if (page === 'products')  loadProducts();
-  if (page === 'inventory') loadInventory();
-  if (page === 'suppliers') loadSuppliers();
+  if(page==='dashboard') loadDashboard();
+  if(page==='products')  loadProducts();
+  if(page==='inventory') loadInventoryGrid();
+  if(page==='suppliers') loadSuppliers();
+}
+function setupTopbarActions(page){
+  const el=document.getElementById('topbar-actions');
+  el.innerHTML='';
+  if(page==='products') el.innerHTML=`<button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>`;
+  if(page==='suppliers') el.innerHTML=`<button class="btn btn-primary" onclick="openSupplierModal()">+ Add Supplier</button>`;
 }
 
-function setupTopbarActions(page) {
-  const el = document.getElementById('topbar-actions');
-  el.innerHTML = '';
-  if (page === 'products') {
-    el.innerHTML = `<button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>`;
-  }
-  if (page === 'suppliers') {
-    el.innerHTML = `<button class="btn btn-primary" onclick="openSupplierModal()">+ Add Supplier</button>`;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   DASHBOARD
-═══════════════════════════════════════════════════════════ */
-async function loadDashboard() {
-  if (!SB_URL) { setDemoStats(); return; }
-  const [products, suppliers, inventory] = await Promise.all([
-    sbGet('products', 'select=id,is_active'),
-    sbGet('suppliers', 'select=id,is_active&is_active=eq.true'),
-    sbGet('inventory', 'select=product_id,quantity,reorder_level,products(name,sku,selling_price)')
+/* ══ DASHBOARD ═══════════════════════════════════════════════ */
+async function loadDashboard(){
+  if(!SB_URL){ setDemoStats(); return; }
+  const [products,suppliers,inventory]=await Promise.all([
+    sbGet('products','select=id,is_active'),
+    sbGet('suppliers','select=id,is_active&is_active=eq.true'),
+    sbGet('inventory','select=product_id,quantity,reorder_level,products(name,sku,selling_price)')
   ]);
-  if (!products) return;
+  if(!products) return;
+  const low=(inventory||[]).filter(i=>i.quantity<=i.reorder_level);
+  const val=(inventory||[]).reduce((a,i)=>a+(i.quantity*(i.products?.selling_price||0)),0);
+  document.getElementById('stat-products').textContent=products.length;
+  document.getElementById('stat-suppliers').textContent=(suppliers||[]).length;
+  document.getElementById('stat-low').textContent=low.length;
+  document.getElementById('stat-value').textContent='NPR '+val.toLocaleString();
+  const tbody=document.getElementById('low-stock-tbody');
+  if(!low.length){ tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--success)">✓ All items are sufficiently stocked</td></tr>`; return; }
+  tbody.innerHTML=low.map(i=>`<tr class="low-stock-row"><td>${i.products?.name||'—'}</td><td><code style="font-size:11px;color:var(--muted)">${i.products?.sku||'—'}</code></td><td><span class="badge low">${i.quantity}</span></td><td>${i.reorder_level}</td><td><button class="btn btn-sm btn-ghost" onclick="openStockModal('${i.product_id}','${i.products?.name}')">+ Stock In</button></td></tr>`).join('');
+}
+function setDemoStats(){
+  ['stat-products','stat-suppliers','stat-low','stat-value'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('low-stock-tbody').innerHTML=`<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
+}
 
-  const low = (inventory || []).filter(i => i.quantity <= i.reorder_level);
-  const val = (inventory || []).reduce((acc, i) => acc + (i.quantity * (i.products?.selling_price || 0)), 0);
+/* ══ IMAGE UPLOAD (base64 stored in Supabase) ════════════════ */
+function previewImage(input){
+  const file=input.files[0]; if(!file) return;
+  if(file.size>2*1024*1024){ toast('Image must be under 2MB','err'); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const preview=document.getElementById('p-img-preview');
+    const placeholder=document.getElementById('img-placeholder');
+    preview.src=e.target.result;
+    preview.style.display='block';
+    placeholder.style.display='none';
+    document.getElementById('p-img-url').value=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
-  document.getElementById('stat-products').textContent = products.length;
-  document.getElementById('stat-suppliers').textContent = (suppliers || []).length;
-  document.getElementById('stat-low').textContent = low.length;
-  document.getElementById('stat-value').textContent = 'NPR ' + val.toLocaleString();
+function resetImageUpload(){
+  document.getElementById('p-img-preview').style.display='none';
+  document.getElementById('img-placeholder').style.display='flex';
+  document.getElementById('p-img-url').value='';
+  document.getElementById('p-img-file').value='';
+}
 
-  const tbody = document.getElementById('low-stock-tbody');
-  if (!low.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--success)">✓ All items are sufficiently stocked</td></tr>`;
+/* ══ PRODUCTS (grid) ═════════════════════════════════════════ */
+async function loadProducts(){
+  if(!SB_URL){
+    document.getElementById('products-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Connect Supabase to view data</div>`;
     return;
   }
-  tbody.innerHTML = low.map(i => `
-    <tr class="low-stock-row">
-      <td>${i.products?.name || '—'}</td>
-      <td><code style="font-size:11px;color:var(--muted)">${i.products?.sku || '—'}</code></td>
-      <td><span class="badge low">${i.quantity}</span></td>
-      <td>${i.reorder_level}</td>
-      <td><button class="btn btn-sm btn-ghost" onclick="openStockModal('${i.product_id}','${i.products?.name}')">+ Stock In</button></td>
-    </tr>`).join('');
-}
-
-function setDemoStats() {
-  document.getElementById('stat-products').textContent = '—';
-  document.getElementById('stat-suppliers').textContent = '—';
-  document.getElementById('stat-low').textContent = '—';
-  document.getElementById('stat-value').textContent = '—';
-  document.getElementById('low-stock-tbody').innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   PRODUCTS
-═══════════════════════════════════════════════════════════ */
-async function loadProducts() {
-  if (!SB_URL) {
-    document.getElementById('products-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
-    return;
-  }
-  const [products, cats, sups] = await Promise.all([
-    sbGet('products', 'select=*,categories(name),suppliers(name)&order=created_at.desc'),
-    sbGet('categories', 'select=id,name&order=name'),
-    sbGet('suppliers', 'select=id,name&is_active=eq.true&order=name')
+  const [products,cats,sups]=await Promise.all([
+    sbGet('products','select=*,categories(name),suppliers(name)&order=created_at.desc'),
+    sbGet('categories','select=id,name&order=name'),
+    sbGet('suppliers','select=id,name&is_active=eq.true&order=name')
   ]);
-  if (!products) return;
-  allProducts = products;
-  allCategories = cats || [];
-  allSuppliers = sups || [];
-  renderProducts(allProducts);
+  if(!products) return;
+  allProducts=products; allCategories=cats||[]; allSuppliers=sups||[];
+  // populate category filter
+  const cf=document.getElementById('product-cat-filter');
+  cf.innerHTML='<option value="">All Categories</option>'+allCategories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  renderProductGrid(allProducts);
 }
 
-function renderProducts(list) {
-  const tbody = document.getElementById('products-tbody');
-  if (!list.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No products found</td></tr>`; return; }
-  tbody.innerHTML = list.map(p => `
-    <tr>
-      <td><code style="font-size:11px;color:var(--muted)">${p.sku}</code></td>
-      <td>${p.name}</td>
-      <td>${p.categories?.name || '<span style="color:var(--muted)">—</span>'}</td>
-      <td>${p.suppliers?.name || '<span style="color:var(--muted)">—</span>'}</td>
-      <td>NPR ${Number(p.selling_price).toLocaleString()}</td>
-      <td><span class="badge ${p.is_active ? 'active' : 'inactive'}">${p.is_active ? 'Active' : 'Inactive'}</span></td>
-      <td style="display:flex;gap:6px">
-        <button class="btn-icon" title="Edit" onclick="openProductModal('${p.id}')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+function renderProductGrid(list){
+  const grid=document.getElementById('products-grid');
+  if(!list.length){ grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No products found</div>`; return; }
+  grid.innerHTML=list.map(p=>{
+    const imgHtml=p.image_url
+      ?`<img src="${p.image_url}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>`
+      :`<div class="no-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>${p.name}</span></div>`;
+    return `<div class="product-card">
+      <div class="product-img">
+        ${imgHtml}
+        <span class="stock-badge ok">${p.is_active?'Active':'Inactive'}</span>
+      </div>
+      <div class="product-info">
+        <div class="pname">${p.name}</div>
+        <div class="psku">${p.sku}</div>
+        <div class="pcategory">${p.categories?.name||'Uncategorised'}</div>
+        <div class="pprice">NPR ${Number(p.selling_price).toLocaleString()}</div>
+      </div>
+      <div class="product-actions">
+        <button class="edit-btn" onclick="openProductModal('${p.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit
         </button>
-        <button class="btn-icon" title="Delete" onclick="deleteProduct('${p.id}')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        <button class="btn-danger" style="flex:1;padding:9px;border:none;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px" onclick="deleteProduct('${p.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>Delete
         </button>
-      </td>
-    </tr>`).join('');
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function filterProducts() {
-  const q = document.getElementById('product-search').value.toLowerCase();
-  renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)));
+function filterProducts(){
+  const q=document.getElementById('product-search').value.toLowerCase();
+  const cat=document.getElementById('product-cat-filter').value;
+  renderProductGrid(allProducts.filter(p=>
+    (!q||(p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q)))&&
+    (!cat||p.category_id===cat)
+  ));
 }
 
-async function openProductModal(id = null) {
-  editingProductId = id;
-  document.getElementById('product-modal-title').textContent = id ? 'Edit Product' : 'Add Product';
-
-  // Populate selects
-  if (!allCategories.length) {
-    const [cats, sups] = await Promise.all([
-      sbGet('categories', 'select=id,name&order=name'),
-      sbGet('suppliers', 'select=id,name&is_active=eq.true&order=name')
+async function openProductModal(id=null){
+  editingProductId=id;
+  document.getElementById('product-modal-title').textContent=id?'Edit Product':'Add Product';
+  if(!allCategories.length){
+    const [cats,sups]=await Promise.all([
+      sbGet('categories','select=id,name&order=name'),
+      sbGet('suppliers','select=id,name&is_active=eq.true&order=name')
     ]);
-    allCategories = cats || [];
-    allSuppliers = sups || [];
+    allCategories=cats||[]; allSuppliers=sups||[];
   }
-  const catSel = document.getElementById('p-category');
-  const supSel = document.getElementById('p-supplier');
-  catSel.innerHTML = '<option value="">— Select —</option>' + allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-  supSel.innerHTML = '<option value="">— Select —</option>' + allSuppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-
-  if (id) {
-    const p = allProducts.find(x => x.id === id);
-    if (p) {
-      document.getElementById('p-sku').value = p.sku;
-      document.getElementById('p-name').value = p.name;
-      document.getElementById('p-desc').value = p.description || '';
-      document.getElementById('p-category').value = p.category_id || '';
-      document.getElementById('p-supplier').value = p.supplier_id || '';
-      document.getElementById('p-cost').value = p.cost_price;
-      document.getElementById('p-price').value = p.selling_price;
-      document.getElementById('p-unit').value = p.unit;
-      document.getElementById('p-active').value = p.is_active ? 'true' : 'false';
+  document.getElementById('p-category').innerHTML='<option value="">— Select —</option>'+allCategories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('p-supplier').innerHTML='<option value="">— Select —</option>'+allSuppliers.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  if(id){
+    const p=allProducts.find(x=>x.id===id);
+    if(p){
+      document.getElementById('p-sku').value=p.sku;
+      document.getElementById('p-name').value=p.name;
+      document.getElementById('p-desc').value=p.description||'';
+      document.getElementById('p-category').value=p.category_id||'';
+      document.getElementById('p-supplier').value=p.supplier_id||'';
+      document.getElementById('p-cost').value=p.cost_price;
+      document.getElementById('p-price').value=p.selling_price;
+      document.getElementById('p-unit').value=p.unit;
+      document.getElementById('p-active').value=p.is_active?'true':'false';
+      if(p.image_url){
+        document.getElementById('p-img-preview').src=p.image_url;
+        document.getElementById('p-img-preview').style.display='block';
+        document.getElementById('img-placeholder').style.display='none';
+        document.getElementById('p-img-url').value=p.image_url;
+      } else { resetImageUpload(); }
     }
   } else {
-    ['p-sku','p-name','p-desc','p-cost','p-price'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('p-unit').value = 'piece';
-    document.getElementById('p-active').value = 'true';
-    document.getElementById('p-category').value = '';
-    document.getElementById('p-supplier').value = '';
+    ['p-sku','p-name','p-desc','p-cost','p-price'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('p-unit').value='piece';
+    document.getElementById('p-active').value='true';
+    document.getElementById('p-category').value='';
+    document.getElementById('p-supplier').value='';
+    resetImageUpload();
   }
   openModal('product-modal');
 }
 
-async function saveProduct() {
-  const body = {
-    sku: document.getElementById('p-sku').value.trim(),
-    name: document.getElementById('p-name').value.trim(),
-    description: document.getElementById('p-desc').value.trim() || null,
-    category_id: document.getElementById('p-category').value || null,
-    supplier_id: document.getElementById('p-supplier').value || null,
-    cost_price: parseFloat(document.getElementById('p-cost').value) || 0,
-    selling_price: parseFloat(document.getElementById('p-price').value) || 0,
-    unit: document.getElementById('p-unit').value,
-    is_active: document.getElementById('p-active').value === 'true'
+async function saveProduct(){
+  const body={
+    sku:document.getElementById('p-sku').value.trim(),
+    name:document.getElementById('p-name').value.trim(),
+    description:document.getElementById('p-desc').value.trim()||null,
+    category_id:document.getElementById('p-category').value||null,
+    supplier_id:document.getElementById('p-supplier').value||null,
+    cost_price:parseFloat(document.getElementById('p-cost').value)||0,
+    selling_price:parseFloat(document.getElementById('p-price').value)||0,
+    unit:document.getElementById('p-unit').value,
+    is_active:document.getElementById('p-active').value==='true',
+    image_url:document.getElementById('p-img-url').value||null
   };
-  if (!body.sku || !body.name) { toast('SKU and Name are required', 'err'); return; }
-
-  let result;
-  if (editingProductId) {
-    result = await sbPatch('products', editingProductId, body);
-  } else {
-    result = await sbPost('products', body);
-  }
-  if (result) {
-    toast(editingProductId ? 'Product updated ✓' : 'Product added ✓', 'ok');
-    closeModal('product-modal');
-    loadProducts();
-  }
+  if(!body.sku||!body.name){ toast('SKU and Name are required','err'); return; }
+  const result=editingProductId?await sbPatch('products',editingProductId,body):await sbPost('products',body);
+  if(result){ toast(editingProductId?'Product updated ✓':'Product added ✓','ok'); closeModal('product-modal'); loadProducts(); }
 }
 
-async function deleteProduct(id) {
-  if (!confirm('Delete this product?')) return;
-  const r = await sbDelete('products', id);
-  if (r) { toast('Product deleted', 'ok'); loadProducts(); }
+async function deleteProduct(id){
+  if(!confirm('Delete this product?')) return;
+  const r=await sbDelete('products',id);
+  if(r){ toast('Product deleted','ok'); loadProducts(); }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   INVENTORY
-═══════════════════════════════════════════════════════════ */
-async function loadInventory() {
-  if (!SB_URL) {
-    document.getElementById('inventory-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
+/* ══ INVENTORY (image grid) ══════════════════════════════════ */
+async function loadInventoryGrid(){
+  if(!SB_URL){
+    document.getElementById('inventory-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Connect Supabase to view data</div>`;
     return;
   }
-  const inv = await sbGet('inventory', 'select=*,products(name,sku)&order=last_updated.desc');
-  if (!inv) return;
-
-  const tbody = document.getElementById('inventory-tbody');
-  if (!inv.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No inventory records yet. Add products first.</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = inv.map(i => {
-    const low = i.quantity <= i.reorder_level;
-    return `
-    <tr class="${low ? 'low-stock-row' : ''}">
-      <td>${i.products?.name || '—'}</td>
-      <td><code style="font-size:11px;color:var(--muted)">${i.products?.sku || '—'}</code></td>
-      <td><span class="badge ${low ? 'low' : 'active'}">${i.quantity}</span></td>
-      <td>${i.reorder_level}</td>
-      <td>${i.warehouse_loc || '<span style="color:var(--muted)">—</span>'}</td>
-      <td style="color:var(--muted);font-size:12px">${new Date(i.last_updated).toLocaleDateString()}</td>
-      <td><button class="btn btn-sm btn-ghost" onclick="openStockModal('${i.product_id}','${i.products?.name}')">Adjust Stock</button></td>
-    </tr>`;
+  const inv=await sbGet('inventory','select=*,products(name,sku,selling_price,image_url,categories(name))&order=last_updated.desc');
+  if(!inv) return;
+  allInventory=inv;
+  const grid=document.getElementById('inventory-grid');
+  if(!inv.length){ grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No inventory records yet. Add products first.</div>`; return; }
+  grid.innerHTML=inv.map(i=>{
+    const low=i.quantity<=i.reorder_level;
+    const out=i.quantity===0;
+    const badgeClass=out?'out':low?'low':'ok';
+    const badgeText=out?'Out of stock':low?`Low: ${i.quantity}`:i.quantity;
+    const imgHtml=i.products?.image_url
+      ?`<img src="${i.products.image_url}" alt="${i.products?.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>`
+      :`<div class="no-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>${i.products?.name||'—'}</span></div>`;
+    return `<div class="product-card">
+      <div class="product-img">
+        ${imgHtml}
+        <span class="stock-badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="product-info">
+        <div class="pname">${i.products?.name||'—'}</div>
+        <div class="psku">${i.products?.sku||'—'}</div>
+        <div class="pcategory">${i.products?.categories?.name||'—'} · Reorder at ${i.reorder_level}</div>
+        <div class="pprice" style="font-size:13px;color:var(--muted)">Updated ${new Date(i.last_updated).toLocaleDateString()}</div>
+      </div>
+      <div class="product-actions">
+        <button class="stock-btn" onclick="openStockModal('${i.product_id}','${i.products?.name}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Adjust Stock
+        </button>
+      </div>
+    </div>`;
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════════════════
-   STOCK MOVEMENTS
-═══════════════════════════════════════════════════════════ */
-function openStockModal(productId, productName) {
-  document.getElementById('stk-product-id').value = productId;
-  document.getElementById('stk-product-name').value = productName;
-  document.getElementById('stk-qty').value = '';
-  document.getElementById('stk-ref').value = '';
-  document.getElementById('stk-notes').value = '';
+/* ══ STOCK ═══════════════════════════════════════════════════ */
+function openStockModal(productId,productName){
+  document.getElementById('stk-product-id').value=productId;
+  document.getElementById('stk-product-name').value=productName;
+  ['stk-qty','stk-ref','stk-notes'].forEach(id=>document.getElementById(id).value='');
   openModal('stock-modal');
 }
-
-async function saveStock() {
-  const productId = document.getElementById('stk-product-id').value;
-  const qty = parseInt(document.getElementById('stk-qty').value);
-  const type = document.getElementById('stk-type').value;
-  if (!qty || qty < 1) { toast('Enter a valid quantity', 'err'); return; }
-
-  // Record movement
-  const mv = await sbPost('stock_movements', {
-    product_id: productId,
-    movement_type: type,
-    quantity: qty,
-    reference: document.getElementById('stk-ref').value || null,
-    notes: document.getElementById('stk-notes').value || null
-  });
-  if (!mv) return;
-
-  // Update inventory
-  const inv = await sbGet('inventory', `product_id=eq.${productId}`);
-  if (inv && inv.length) {
-    const current = inv[0].quantity;
-    const delta = type === 'IN' ? qty : type === 'OUT' ? -qty : qty;
-    await sbPatch('inventory', inv[0].id, { quantity: Math.max(0, current + delta), last_updated: new Date().toISOString() });
+async function saveStock(){
+  const productId=document.getElementById('stk-product-id').value;
+  const qty=parseInt(document.getElementById('stk-qty').value);
+  const type=document.getElementById('stk-type').value;
+  if(!qty||qty<1){ toast('Enter a valid quantity','err'); return; }
+  const mv=await sbPost('stock_movements',{product_id:productId,movement_type:type,quantity:qty,reference:document.getElementById('stk-ref').value||null,notes:document.getElementById('stk-notes').value||null});
+  if(!mv) return;
+  const inv=await sbGet('inventory',`product_id=eq.${productId}`);
+  if(inv&&inv.length){
+    const delta=type==='IN'?qty:type==='OUT'?-qty:qty;
+    await sbPatch('inventory',inv[0].id,{quantity:Math.max(0,inv[0].quantity+delta),last_updated:new Date().toISOString()});
   } else {
-    // First stock entry
-    await sbPost('inventory', { product_id: productId, quantity: qty, reorder_level: 5 });
+    await sbPost('inventory',{product_id:productId,quantity:qty,reorder_level:5});
   }
-
-  toast('Stock movement recorded ✓', 'ok');
-  closeModal('stock-modal');
-  loadInventory();
+  toast('Stock movement recorded ✓','ok'); closeModal('stock-modal'); loadInventoryGrid();
 }
 
-/* ═══════════════════════════════════════════════════════════
-   SUPPLIERS
-═══════════════════════════════════════════════════════════ */
-async function loadSuppliers() {
-  if (!SB_URL) {
-    document.getElementById('suppliers-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`;
-    return;
-  }
-  const suppliers = await sbGet('suppliers', 'select=*&order=created_at.desc');
-  if (!suppliers) return;
-  allSuppliers = suppliers;
-  renderSuppliers(allSuppliers);
+/* ══ SUPPLIERS ═══════════════════════════════════════════════ */
+async function loadSuppliers(){
+  if(!SB_URL){ document.getElementById('suppliers-tbody').innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</td></tr>`; return; }
+  const suppliers=await sbGet('suppliers','select=*&order=created_at.desc');
+  if(!suppliers) return;
+  allSuppliers=suppliers; renderSuppliers(allSuppliers);
 }
-
-function renderSuppliers(list) {
-  const tbody = document.getElementById('suppliers-tbody');
-  if (!list.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No suppliers yet</td></tr>`; return; }
-  tbody.innerHTML = list.map(s => `
-    <tr>
-      <td><strong>${s.name}</strong></td>
-      <td>${s.contact_name || '<span style="color:var(--muted)">—</span>'}</td>
-      <td>${s.email || '<span style="color:var(--muted)">—</span>'}</td>
-      <td>${s.phone || '<span style="color:var(--muted)">—</span>'}</td>
-      <td>${s.city || '<span style="color:var(--muted)">—</span>'}</td>
-      <td><span class="badge ${s.is_active ? 'active' : 'inactive'}">${s.is_active ? 'Active' : 'Inactive'}</span></td>
-      <td style="display:flex;gap:6px">
-        <button class="btn-icon" title="Edit" onclick="openSupplierModal('${s.id}')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="btn-icon" title="Delete" onclick="deleteSupplier('${s.id}')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-        </button>
-      </td>
-    </tr>`).join('');
+function renderSuppliers(list){
+  const tbody=document.getElementById('suppliers-tbody');
+  if(!list.length){ tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No suppliers yet</td></tr>`; return; }
+  tbody.innerHTML=list.map(s=>`<tr>
+    <td><strong>${s.name}</strong></td>
+    <td>${s.contact_name||'<span style="color:var(--muted)">—</span>'}</td>
+    <td>${s.email||'<span style="color:var(--muted)">—</span>'}</td>
+    <td>${s.phone||'<span style="color:var(--muted)">—</span>'}</td>
+    <td>${s.city||'<span style="color:var(--muted)">—</span>'}</td>
+    <td><span class="badge ${s.is_active?'active':'inactive'}">${s.is_active?'Active':'Inactive'}</span></td>
+    <td style="display:flex;gap:6px">
+      <button class="btn-icon" onclick="openSupplierModal('${s.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="btn-icon" onclick="deleteSupplier('${s.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+    </td></tr>`).join('');
 }
-
-function filterSuppliers() {
-  const q = document.getElementById('supplier-search').value.toLowerCase();
-  renderSuppliers(allSuppliers.filter(s => s.name.toLowerCase().includes(q) || (s.city || '').toLowerCase().includes(q)));
+function filterSuppliers(){
+  const q=document.getElementById('supplier-search').value.toLowerCase();
+  renderSuppliers(allSuppliers.filter(s=>s.name.toLowerCase().includes(q)||(s.city||'').toLowerCase().includes(q)));
 }
-
-function openSupplierModal(id = null) {
-  editingSupplierId = id;
-  document.getElementById('supplier-modal-title').textContent = id ? 'Edit Supplier' : 'Add Supplier';
-  if (id) {
-    const s = allSuppliers.find(x => x.id === id);
-    if (s) {
-      document.getElementById('s-name').value = s.name;
-      document.getElementById('s-contact').value = s.contact_name || '';
-      document.getElementById('s-email').value = s.email || '';
-      document.getElementById('s-phone').value = s.phone || '';
-      document.getElementById('s-address').value = s.address || '';
-      document.getElementById('s-city').value = s.city || '';
-      document.getElementById('s-country').value = s.country || 'Nepal';
-      document.getElementById('s-notes').value = s.notes || '';
-      document.getElementById('s-active').value = s.is_active ? 'true' : 'false';
+function openSupplierModal(id=null){
+  editingSupplierId=id;
+  document.getElementById('supplier-modal-title').textContent=id?'Edit Supplier':'Add Supplier';
+  if(id){
+    const s=allSuppliers.find(x=>x.id===id);
+    if(s){
+      document.getElementById('s-name').value=s.name;
+      document.getElementById('s-contact').value=s.contact_name||'';
+      document.getElementById('s-email').value=s.email||'';
+      document.getElementById('s-phone').value=s.phone||'';
+      document.getElementById('s-address').value=s.address||'';
+      document.getElementById('s-city').value=s.city||'';
+      document.getElementById('s-country').value=s.country||'Nepal';
+      document.getElementById('s-notes').value=s.notes||'';
+      document.getElementById('s-active').value=s.is_active?'true':'false';
     }
   } else {
-    ['s-name','s-contact','s-email','s-phone','s-address','s-city','s-notes'].forEach(i => document.getElementById(i).value = '');
-    document.getElementById('s-country').value = 'Nepal';
-    document.getElementById('s-active').value = 'true';
+    ['s-name','s-contact','s-email','s-phone','s-address','s-city','s-notes'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('s-country').value='Nepal';
+    document.getElementById('s-active').value='true';
   }
   openModal('supplier-modal');
 }
-
-async function saveSupplier() {
-  const body = {
-    name: document.getElementById('s-name').value.trim(),
-    contact_name: document.getElementById('s-contact').value.trim() || null,
-    email: document.getElementById('s-email').value.trim() || null,
-    phone: document.getElementById('s-phone').value.trim() || null,
-    address: document.getElementById('s-address').value.trim() || null,
-    city: document.getElementById('s-city').value.trim() || null,
-    country: document.getElementById('s-country').value.trim() || 'Nepal',
-    notes: document.getElementById('s-notes').value.trim() || null,
-    is_active: document.getElementById('s-active').value === 'true'
-  };
-  if (!body.name) { toast('Company name is required', 'err'); return; }
-
-  let result;
-  if (editingSupplierId) {
-    result = await sbPatch('suppliers', editingSupplierId, body);
-  } else {
-    result = await sbPost('suppliers', body);
-  }
-  if (result) {
-    toast(editingSupplierId ? 'Supplier updated ✓' : 'Supplier added ✓', 'ok');
-    closeModal('supplier-modal');
-    loadSuppliers();
-  }
+async function saveSupplier(){
+  const body={name:document.getElementById('s-name').value.trim(),contact_name:document.getElementById('s-contact').value.trim()||null,email:document.getElementById('s-email').value.trim()||null,phone:document.getElementById('s-phone').value.trim()||null,address:document.getElementById('s-address').value.trim()||null,city:document.getElementById('s-city').value.trim()||null,country:document.getElementById('s-country').value.trim()||'Nepal',notes:document.getElementById('s-notes').value.trim()||null,is_active:document.getElementById('s-active').value==='true'};
+  if(!body.name){ toast('Company name is required','err'); return; }
+  const result=editingSupplierId?await sbPatch('suppliers',editingSupplierId,body):await sbPost('suppliers',body);
+  if(result){ toast(editingSupplierId?'Supplier updated ✓':'Supplier added ✓','ok'); closeModal('supplier-modal'); loadSuppliers(); }
+}
+async function deleteSupplier(id){
+  if(!confirm('Delete this supplier?')) return;
+  const r=await sbDelete('suppliers',id);
+  if(r){ toast('Supplier deleted','ok'); loadSuppliers(); }
 }
 
-async function deleteSupplier(id) {
-  if (!confirm('Delete this supplier?')) return;
-  const r = await sbDelete('suppliers', id);
-  if (r) { toast('Supplier deleted', 'ok'); loadSuppliers(); }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════════════════════ */
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+/* ══ UTILS ═══════════════════════════════════════════════════ */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); });
 });
-
 let toastTimer;
-function toast(msg, type = 'ok') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `show ${type}`;
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`show ${type}`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.className = '', 3000);
+  toastTimer=setTimeout(()=>el.className='',3000);
 }
 </script>
 </body>
