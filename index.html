@@ -4,6 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Furniture & Furnishing House — Admin</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="icon" type="image/png" href="/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -408,6 +410,32 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
+<!-- Sale Modal -->
+<div class="modal-overlay" id="sale-modal">
+  <div class="modal">
+    <h3>Record Sale</h3>
+    <input type="hidden" id="sale-product-id"/>
+    <input type="hidden" id="sale-inv-id"/>
+    <div class="form-group"><label>Product</label><input id="sale-product-name" readonly style="opacity:.7"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>In Stock</label><input id="sale-in-stock" readonly style="opacity:.7"/></div>
+      <div class="form-group"><label>Unit Price (NPR)</label><input id="sale-unit-price" type="number" min="0" placeholder="0"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Quantity Sold *</label><input id="sale-qty" type="number" min="1" placeholder="0"/></div>
+      <div class="form-group"><label>Customer Name</label><input id="sale-customer" placeholder="Optional"/></div>
+    </div>
+    <div class="form-group"><label>Notes</label><textarea id="sale-notes" placeholder="Optional notes…"></textarea></div>
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;margin-bottom:4px;font-size:13px">
+      Total: <strong id="sale-total" style="font-family:var(--font-head);font-size:18px;color:var(--accent)">NPR 0</strong>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('sale-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="completeSale()">Complete Sale</button>
+    </div>
+  </div>
+</div>
+
 <!-- SIDEBAR -->
 <nav id="sidebar">
   <div class="logo">
@@ -424,6 +452,9 @@ tr:hover td{background:var(--surface2)}
   </div>
   <div class="nav-item" onclick="navigate('inventory')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Inventory
+  </div>
+  <div class="nav-item" onclick="navigate('sales')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Sales
   </div>
   <div class="nav-label">Sourcing</div>
   <div class="nav-item" onclick="navigate('suppliers')">
@@ -500,6 +531,27 @@ tr:hover td{background:var(--surface2)}
         <div class="product-grid" id="inventory-grid">
           <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Loading…</div>
         </div>
+      </div>
+    </div>
+
+    <!-- SALES -->
+    <div class="page" id="page-sales">
+      <!-- Sale Modal trigger row -->
+      <div class="table-wrap" style="margin-bottom:20px">
+        <div class="table-toolbar">
+          <h3>Record a Sale</h3>
+        </div>
+        <div style="padding:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px" id="sale-product-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">Loading products…</div>
+        </div>
+      </div>
+      <!-- Sales history -->
+      <div class="table-wrap">
+        <div class="table-toolbar"><h3>Sales History</h3></div>
+        <table>
+          <thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Customer</th><th>Date</th></tr></thead>
+          <tbody id="sales-tbody"><tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
       </div>
     </div>
 
@@ -664,7 +716,7 @@ function updateCfgStatus(){
 }
 
 /* ══ NAVIGATION ══════════════════════════════════════════════ */
-const PAGE_TITLES={dashboard:'Dashboard',products:'Products',inventory:'Inventory',suppliers:'Suppliers',setup:'Setup'};
+const PAGE_TITLES={dashboard:'Dashboard',products:'Products',inventory:'Inventory',sales:'Sales',suppliers:'Suppliers',setup:'Setup'};
 function navigate(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -675,6 +727,7 @@ function navigate(page){
   if(page==='dashboard') loadDashboard();
   if(page==='products')  loadProducts();
   if(page==='inventory') loadInventoryGrid();
+  if(page==='sales')     loadSales();
   if(page==='suppliers') loadSuppliers();
 }
 function setupTopbarActions(page){
@@ -861,8 +914,23 @@ async function loadInventoryGrid(){
     document.getElementById('inventory-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Connect Supabase to view data</div>`;
     return;
   }
-  const inv=await sbGet('inventory','select=*,products(name,sku,selling_price,image_url,categories(name))&order=last_updated.desc');
-  if(!inv) return;
+  // Load all products and their inventory records
+  const [products, invRaw] = await Promise.all([
+    sbGet('products','select=id,name,sku,selling_price,image_url,category_id,categories(name)&is_active=eq.true&order=name'),
+    sbGet('inventory','select=*')
+  ]);
+  if(!products) return;
+  // Merge: for each product, find its inventory record (or default to 0)
+  const invMap = {};
+  (invRaw||[]).forEach(i => invMap[i.product_id] = i);
+  const inv = products.map(p => ({
+    product_id: p.id,
+    quantity: invMap[p.id]?.quantity ?? 0,
+    reorder_level: invMap[p.id]?.reorder_level ?? 5,
+    last_updated: invMap[p.id]?.last_updated ?? null,
+    inv_id: invMap[p.id]?.id ?? null,
+    products: p
+  }));
   allInventory=inv;
   const grid=document.getElementById('inventory-grid');
   if(!inv.length){ grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No inventory records yet. Add products first.</div>`; return; }
@@ -977,6 +1045,122 @@ async function deleteSupplier(id){
   if(!confirm('Delete this supplier?')) return;
   const r=await sbDelete('suppliers',id);
   if(r){ toast('Supplier deleted','ok'); loadSuppliers(); }
+}
+
+/* ══ SALES ═══════════════════════════════════════════════════ */
+async function loadSales(){
+  if(!SB_URL){
+    document.getElementById('sale-product-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">Connect Supabase to view data</div>`;
+    return;
+  }
+  const [products, invRaw, sales] = await Promise.all([
+    sbGet('products','select=id,name,sku,selling_price,image_url,categories(name)&is_active=eq.true&order=name'),
+    sbGet('inventory','select=*'),
+    sbGet('sales','select=*,products(name,sku)&order=sold_at.desc&limit=50')
+  ]);
+  if(!products) return;
+  const invMap={};
+  (invRaw||[]).forEach(i=>invMap[i.product_id]=i);
+
+  // Product cards for recording a sale
+  const grid=document.getElementById('sale-product-grid');
+  if(!products.length){ grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">No products found. Add products first.</div>`; }
+  else {
+    grid.innerHTML=products.map(p=>{
+      const inv=invMap[p.id];
+      const qty=inv?.quantity??0;
+      const out=qty===0;
+      const imgHtml=p.image_url
+        ?`<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:110px;object-fit:cover"/>`
+        :`<div style="width:100%;height:110px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px">${p.name}</div>`;
+      return `<div class="product-card" style="${out?'opacity:.55':''}">
+        <div class="product-img" style="height:110px">
+          ${imgHtml}
+          <span class="stock-badge ${out?'out':qty<=5?'low':'ok'}">${out?'Out':qty+' in stock'}</span>
+        </div>
+        <div class="product-info" style="padding:10px 12px">
+          <div class="pname" style="font-size:12px">${p.name}</div>
+          <div class="pprice" style="font-size:14px">NPR ${Number(p.selling_price).toLocaleString()}</div>
+        </div>
+        <div class="product-actions">
+          <button ${out?'disabled':''} style="flex:1;padding:8px;background:${out?'var(--surface2)':'var(--accent)'};color:${out?'var(--muted)':'#fff'};border:none;font-size:12px;cursor:${out?'not-allowed':'pointer'};border-radius:0 0 var(--radius) var(--radius)"
+            onclick="${out?'':`openSaleModal('${p.id}','${p.name.replace(/'/g,"\'")}',${p.selling_price},'${inv?.id||''}',${qty})`}">
+            ${out?'Out of Stock':'Sell'}
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Sales history table
+  const tbody=document.getElementById('sales-tbody');
+  if(!sales||!sales.length){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">No sales recorded yet</td></tr>`; return; }
+  tbody.innerHTML=(sales||[]).map(s=>`<tr>
+    <td>${s.products?.name||'—'}</td>
+    <td>${s.quantity}</td>
+    <td>NPR ${Number(s.unit_price).toLocaleString()}</td>
+    <td><strong>NPR ${Number(s.total_price).toLocaleString()}</strong></td>
+    <td>${s.customer_name||'<span style="color:var(--muted)">—</span>'}</td>
+    <td style="color:var(--muted);font-size:12px">${new Date(s.sold_at).toLocaleDateString()}</td>
+  </tr>`).join('');
+}
+
+function openSaleModal(productId, productName, unitPrice, invId, inStock){
+  document.getElementById('sale-product-id').value=productId;
+  document.getElementById('sale-inv-id').value=invId;
+  document.getElementById('sale-product-name').value=productName;
+  document.getElementById('sale-in-stock').value=inStock+' units';
+  document.getElementById('sale-unit-price').value=unitPrice;
+  document.getElementById('sale-qty').value='';
+  document.getElementById('sale-customer').value='';
+  document.getElementById('sale-notes').value='';
+  document.getElementById('sale-total').textContent='NPR 0';
+  document.getElementById('sale-qty').oninput=function(){
+    const t=parseInt(this.value)||0;
+    const p=parseFloat(document.getElementById('sale-unit-price').value)||0;
+    document.getElementById('sale-total').textContent='NPR '+(t*p).toLocaleString();
+  };
+  document.getElementById('sale-unit-price').oninput=function(){
+    const t=parseInt(document.getElementById('sale-qty').value)||0;
+    const p=parseFloat(this.value)||0;
+    document.getElementById('sale-total').textContent='NPR '+(t*p).toLocaleString();
+  };
+  openModal('sale-modal');
+}
+
+async function completeSale(){
+  const productId=document.getElementById('sale-product-id').value;
+  const invId=document.getElementById('sale-inv-id').value;
+  const qty=parseInt(document.getElementById('sale-qty').value);
+  const unitPrice=parseFloat(document.getElementById('sale-unit-price').value)||0;
+  const inStock=parseInt(document.getElementById('sale-in-stock').value)||0;
+  if(!qty||qty<1){ toast('Enter quantity sold','err'); return; }
+  if(qty>inStock){ toast('Not enough stock! Only '+inStock+' available','err'); return; }
+
+  // Record sale
+  const sale=await sbPost('sales',{
+    product_id:productId,
+    quantity:qty,
+    unit_price:unitPrice,
+    total_price:qty*unitPrice,
+    customer_name:document.getElementById('sale-customer').value||null,
+    notes:document.getElementById('sale-notes').value||null
+  });
+  if(!sale) return;
+
+  // Deduct from inventory
+  if(invId){
+    await sbPatch('inventory',invId,{quantity:Math.max(0,inStock-qty),last_updated:new Date().toISOString()});
+  } else {
+    await sbPost('inventory',{product_id:productId,quantity:Math.max(0,inStock-qty),reorder_level:5});
+  }
+
+  // Record stock movement
+  await sbPost('stock_movements',{product_id:productId,movement_type:'OUT',quantity:qty,reference:'SALE',notes:document.getElementById('sale-notes').value||null});
+
+  toast('Sale recorded ✓ — NPR '+(qty*unitPrice).toLocaleString(),'ok');
+  closeModal('sale-modal');
+  loadSales();
 }
 
 /* ══ UTILS ═══════════════════════════════════════════════════ */
