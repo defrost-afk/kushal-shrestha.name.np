@@ -126,6 +126,8 @@ input,textarea,select{font-family:var(--font-body)}
 
 /* ── TABLE ──────────────────────────────────────────────── */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.table-wrap table{min-width:500px}
+.table-wrap>table,.table-wrap .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;display:block}
 .table-toolbar{
   display:flex;justify-content:space-between;align-items:center;
   padding:14px 18px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;
@@ -271,14 +273,100 @@ tr:hover td{background:var(--surface2)}
 .config-steps li code{background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:11px;color:var(--accent);font-family:monospace}
 .low-stock-row td{background:#fffbf5}
 
+/* ── INVENTORY CATEGORY TABS ────────────────────────────── */
+.inv-tab{
+  padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;
+  border:1px solid var(--border);background:var(--surface);color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.inv-tab:hover{color:var(--text);border-color:var(--accent2)}
+.inv-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.inv-section{margin-bottom:24px}
+.inv-section-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius) var(--radius) 0 0;cursor:pointer;
+}
+.inv-section-header h3{font-family:var(--font-head);font-size:16px;font-weight:600;color:var(--accent)}
+.inv-section-header .cat-stats{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+.inv-section-header .cat-stats span{display:flex;align-items:center;gap:4px}
+.inv-section-body{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+.inv-section-body .product-grid{padding:14px;margin:0}
+.inv-section.collapsed .inv-section-body{display:none}
+.collapse-icon{transition:transform .2s;font-size:12px;color:var(--muted)}
+.inv-section.collapsed .collapse-icon{transform:rotate(-90deg)}
+
 /* ── PASSWORD CHANGE ────────────────────────────────────── */
 .pwd-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:400px;margin-top:20px;box-shadow:var(--shadow)}
 .pwd-section h4{font-family:var(--font-head);font-size:16px;margin-bottom:16px;color:var(--accent)}
 
-@media(max-width:700px){
-  #sidebar{display:none}
+/* ── MOBILE MENU BUTTON ─────────────────────────────────── */
+#mobile-menu-btn{
+  display:none;background:none;border:1px solid var(--border);
+  border-radius:var(--radius);padding:6px 8px;color:var(--muted);
+  cursor:pointer;margin-right:8px;
+}
+#sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
+  z-index:199;
+}
+#sidebar-overlay.show{display:block}
+
+/* ── TABLET (max 1024px) ────────────────────────────────── */
+@media(max-width:1024px){
+  #sidebar{width:200px;min-width:200px}
+  .product-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .modal{padding:22px 20px}
+}
+
+/* ── MOBILE (max 768px) ─────────────────────────────────── */
+@media(max-width:768px){
+  /* Sidebar becomes a slide-in drawer */
+  #sidebar{
+    position:fixed;left:-240px;top:0;bottom:0;z-index:200;
+    width:240px;min-width:240px;
+    transition:left .25s ease;
+    box-shadow:4px 0 20px rgba(0,0,0,.15);
+  }
+  #sidebar.open{left:0}
+  #mobile-menu-btn{display:flex;align-items:center;justify-content:center}
+  #app{flex-direction:column}
+  #main{width:100%;height:100vh}
+  #topbar{padding:0 14px;gap:6px}
+  #topbar h2{font-size:17px}
+  #content{padding:14px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .stat-card{padding:14px}
+  .stat-card .value{font-size:24px}
+  .product-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:12px}
   .form-row{grid-template-columns:1fr}
-  .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .modal{padding:20px 16px;width:95vw}
+  .table-toolbar{flex-direction:column;align-items:flex-start;gap:10px}
+  .search-box{max-width:100%!important;width:100%}
+  table{font-size:12px}
+  th,td{padding:8px 10px}
+  .inv-section-header{flex-direction:column;align-items:flex-start;gap:6px}
+  .login-card{padding:32px 20px}
+  .config-card{padding:20px}
+  .pwd-section{max-width:100%}
+  #inv-stats-bar .stat-card{min-width:calc(50% - 8px)}
+  .topbar-actions .btn span{display:none}
+}
+
+/* ── SMALL MOBILE (max 480px) ───────────────────────────── */
+@media(max-width:480px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .product-grid{grid-template-columns:repeat(2,1fr);gap:8px;padding:10px}
+  .product-card .pname{font-size:12px}
+  .product-card .pprice{font-size:13px}
+  #topbar h2{font-size:15px}
+  .modal{width:100vw;border-radius:12px 12px 0 0;position:fixed;bottom:0;max-height:90vh}
+  .modal-overlay{align-items:flex-end}
+  th{font-size:9px;padding:8px 6px}
+  td{font-size:11px;padding:8px 6px}
+  .btn{padding:6px 10px;font-size:12px}
+  .logo h1{font-size:15px}
 }
 </style>
 </head>
@@ -308,6 +396,9 @@ tr:hover td{background:var(--surface2)}
 
 <!-- ══ APP ═══════════════════════════════════════════════════ -->
 <div id="app" class="hidden">
+
+<!-- Mobile sidebar overlay -->
+<div id="sidebar-overlay" onclick="toggleMobileMenu()"></div>
 
 <!-- MODALS -->
 <!-- Config -->
@@ -478,7 +569,12 @@ tr:hover td{background:var(--surface2)}
 <!-- MAIN -->
 <div id="main">
   <div id="topbar">
-    <h2 id="page-title">Dashboard</h2>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h2 id="page-title">Dashboard</h2>
+    </div>
     <div class="topbar-actions" id="topbar-actions"></div>
   </div>
   <div id="config-banner">
@@ -526,12 +622,20 @@ tr:hover td{background:var(--surface2)}
 
     <!-- INVENTORY (image grid) -->
     <div class="page" id="page-inventory">
-      <div class="table-wrap">
-        <div class="table-toolbar"><h3>Inventory</h3></div>
-        <div class="product-grid" id="inventory-grid">
-          <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Loading…</div>
+      <!-- Category tabs -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="inv-cat-tabs">
+          <button class="inv-tab active" onclick="filterInventory('all')" data-cat="all">All</button>
+        </div>
+        <div class="search-box" style="max-width:220px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="inv-search" placeholder="Search inventory…" oninput="filterInventory()"/>
         </div>
       </div>
+      <!-- Stats bar -->
+      <div id="inv-stats-bar" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px"></div>
+      <!-- Grouped inventory sections -->
+      <div id="inventory-sections"></div>
     </div>
 
     <!-- SALES -->
@@ -593,13 +697,17 @@ tr:hover td{background:var(--surface2)}
         </div>
       </div>
 
-      <!-- Change Password -->
+      <!-- Change Credentials -->
       <div class="pwd-section">
-        <h4>Change Admin Password</h4>
-        <div class="form-group"><label>Current Password</label><input type="password" id="pwd-current" placeholder="Current password"/></div>
-        <div class="form-group"><label>New Password</label><input type="password" id="pwd-new" placeholder="New password (min 6 chars)"/></div>
+        <h4>Change Admin Credentials</h4>
+        <div style="background:var(--surface2);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--muted)">
+          Current username: <strong id="current-username-display" style="color:var(--text)">admin</strong>
+        </div>
+        <div class="form-group"><label>Current Password</label><input type="password" id="pwd-current" placeholder="Current password (required to make changes)"/></div>
+        <div class="form-group"><label>New Username</label><input type="text" id="pwd-username" placeholder="Leave blank to keep current username"/></div>
+        <div class="form-group"><label>New Password</label><input type="password" id="pwd-new" placeholder="Leave blank to keep current password"/></div>
         <div class="form-group"><label>Confirm New Password</label><input type="password" id="pwd-confirm" placeholder="Repeat new password"/></div>
-        <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+        <button class="btn btn-primary" onclick="changeCredentials()">Update Credentials</button>
       </div>
     </div>
 
@@ -647,17 +755,35 @@ function doLogout(){
   document.getElementById('login-pass').value = '';
 }
 
-function changePassword(){
-  const cur = document.getElementById('pwd-current').value;
-  const nw  = document.getElementById('pwd-new').value;
-  const cf  = document.getElementById('pwd-confirm').value;
-  const creds = getCredentials();
+function changeCredentials(){
+  const cur     = document.getElementById('pwd-current').value;
+  const newUser = document.getElementById('pwd-username').value.trim();
+  const newPass = document.getElementById('pwd-new').value;
+  const cfPass  = document.getElementById('pwd-confirm').value;
+  const creds   = getCredentials();
+
+  // Verify current password
+  if(!cur){ toast('Enter your current password to make changes','err'); return; }
   if(cur !== creds.pass){ toast('Current password is incorrect','err'); return; }
-  if(nw.length < 6){ toast('New password must be at least 6 characters','err'); return; }
-  if(nw !== cf){ toast('Passwords do not match','err'); return; }
-  localStorage.setItem('admin_pass', nw);
-  toast('Password updated ✓','ok');
-  ['pwd-current','pwd-new','pwd-confirm'].forEach(id => document.getElementById(id).value='');
+
+  // Validate new password if provided
+  if(newPass && newPass.length < 6){ toast('New password must be at least 6 characters','err'); return; }
+  if(newPass && newPass !== cfPass){ toast('Passwords do not match','err'); return; }
+
+  // Must change at least one thing
+  if(!newUser && !newPass){ toast('Enter a new username or new password','err'); return; }
+
+  // Apply changes
+  if(newUser) {
+    localStorage.setItem('admin_user', newUser);
+    document.getElementById('user-display').textContent = newUser;
+    document.getElementById('user-avatar').textContent = newUser[0].toUpperCase();
+    document.getElementById('current-username-display').textContent = newUser;
+  }
+  if(newPass) localStorage.setItem('admin_pass', newPass);
+
+  toast((newUser && newPass) ? 'Username and password updated ✓' : newUser ? 'Username updated ✓' : 'Password updated ✓', 'ok');
+  ['pwd-current','pwd-username','pwd-new','pwd-confirm'].forEach(id => document.getElementById(id).value='');
 }
 
 /* Auto-login if already logged in */
@@ -675,6 +801,9 @@ window.onload = () => {
 function initApp(){
   document.getElementById('config-banner').classList.add('hidden');
   updateCfgStatus();
+  // Show current username in setup page
+  const u = getCredentials().user;
+  document.getElementById('current-username-display').textContent = u;
   navigate('dashboard');
 }
 
@@ -724,11 +853,25 @@ function navigate(page){
   document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
   document.getElementById('page-title').textContent=PAGE_TITLES[page];
   setupTopbarActions(page);
+  // Close mobile sidebar on navigation
+  closeMobileMenu();
   if(page==='dashboard') loadDashboard();
   if(page==='products')  loadProducts();
   if(page==='inventory') loadInventoryGrid();
   if(page==='sales')     loadSales();
   if(page==='suppliers') loadSuppliers();
+}
+
+function toggleMobileMenu(){
+  const sidebar=document.getElementById('sidebar');
+  const overlay=document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+
+function closeMobileMenu(){
+  document.getElementById('sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-overlay')?.classList.remove('show');
 }
 function setupTopbarActions(page){
   const el=document.getElementById('topbar-actions');
@@ -932,34 +1075,110 @@ async function loadInventoryGrid(){
     products: p
   }));
   allInventory=inv;
-  const grid=document.getElementById('inventory-grid');
-  if(!inv.length){ grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No inventory records yet. Add products first.</div>`; return; }
-  grid.innerHTML=inv.map(i=>{
-    const low=i.quantity<=i.reorder_level;
-    const out=i.quantity===0;
-    const badgeClass=out?'out':low?'low':'ok';
-    const badgeText=out?'Out of stock':low?`Low: ${i.quantity}`:i.quantity;
-    const imgHtml=i.products?.image_url
-      ?`<img src="${i.products.image_url}" alt="${i.products?.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>`
-      :`<div class="no-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>${i.products?.name||'—'}</span></div>`;
-    return `<div class="product-card">
-      <div class="product-img">
-        ${imgHtml}
-        <span class="stock-badge ${badgeClass}">${badgeText}</span>
+
+  // Build category tabs
+  const cats = [...new Map(inv.map(i=>[i.products?.category_id, i.products?.categories?.name||'Uncategorised']).filter(([id])=>id)).values()];
+  const allCatNames = ['Uncategorised', ...cats];
+  const tabsEl = document.getElementById('inv-cat-tabs');
+  tabsEl.innerHTML = `<button class="inv-tab active" onclick="filterInventory('all')" data-cat="all">All</button>` +
+    [...new Set(inv.map(i=>i.products?.categories?.name||'Uncategorised'))].sort().map(c=>
+      `<button class="inv-tab" onclick="filterInventory('${c}')" data-cat="${c}">${c}</button>`
+    ).join('');
+
+  renderInventorySections(inv, 'all');
+}
+
+function renderInventorySections(inv, activeCat){
+  const q = (document.getElementById('inv-search')?.value||'').toLowerCase();
+  let filtered = inv;
+  if(q) filtered = filtered.filter(i=>(i.products?.name||'').toLowerCase().includes(q)||(i.products?.sku||'').toLowerCase().includes(q));
+  if(activeCat && activeCat!=='all') filtered = filtered.filter(i=>(i.products?.categories?.name||'Uncategorised')===activeCat);
+
+  // Stats bar
+  const total = filtered.length;
+  const lowCount = filtered.filter(i=>i.quantity<=i.reorder_level && i.quantity>0).length;
+  const outCount = filtered.filter(i=>i.quantity===0).length;
+  const totalVal = filtered.reduce((a,i)=>a+(i.quantity*(i.products?.selling_price||0)),0);
+  document.getElementById('inv-stats-bar').innerHTML = `
+    <div class="stat-card" style="padding:12px 16px;flex:1;min-width:120px">
+      <div class="label">Showing</div><div class="value" style="font-size:22px">${total}</div><div class="sub">products</div>
+    </div>
+    <div class="stat-card" style="padding:12px 16px;flex:1;min-width:120px">
+      <div class="label">Low Stock</div><div class="value" style="font-size:22px;color:var(--warning)">${lowCount}</div><div class="sub">need reorder</div>
+    </div>
+    <div class="stat-card" style="padding:12px 16px;flex:1;min-width:120px">
+      <div class="label">Out of Stock</div><div class="value" style="font-size:22px;color:var(--danger)">${outCount}</div><div class="sub">unavailable</div>
+    </div>
+    <div class="stat-card" style="padding:12px 16px;flex:1;min-width:120px">
+      <div class="label">Stock Value</div><div class="value" style="font-size:18px;color:var(--accent)">NPR ${totalVal.toLocaleString()}</div><div class="sub">selling price</div>
+    </div>`;
+
+  // Group by category
+  const groups = {};
+  filtered.forEach(i=>{
+    const cat = i.products?.categories?.name || 'Uncategorised';
+    if(!groups[cat]) groups[cat]=[];
+    groups[cat].push(i);
+  });
+
+  if(!filtered.length){
+    document.getElementById('inventory-sections').innerHTML=`<div style="text-align:center;padding:48px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">No products found</div>`;
+    return;
+  }
+
+  document.getElementById('inventory-sections').innerHTML = Object.entries(groups).sort(([a],[b])=>a.localeCompare(b)).map(([cat, items])=>{
+    const lowC = items.filter(i=>i.quantity<=i.reorder_level&&i.quantity>0).length;
+    const outC = items.filter(i=>i.quantity===0).length;
+    const cards = items.map(i=>{
+      const low=i.quantity<=i.reorder_level;
+      const out=i.quantity===0;
+      const badgeClass=out?'out':low?'low':'ok';
+      const badgeText=out?'Out of stock':low?`Low: ${i.quantity}`:i.quantity;
+      const imgHtml=i.products?.image_url
+        ?`<img src="${i.products.image_url}" alt="${i.products?.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>`
+        :`<div class="no-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>${i.products?.name||'—'}</span></div>`;
+      return `<div class="product-card">
+        <div class="product-img">${imgHtml}<span class="stock-badge ${badgeClass}">${badgeText}</span></div>
+        <div class="product-info">
+          <div class="pname">${i.products?.name||'—'}</div>
+          <div class="psku">${i.products?.sku||'—'}</div>
+          <div class="pcategory">Reorder at ${i.reorder_level}</div>
+          <div class="pprice" style="font-size:12px;color:var(--muted)">${i.last_updated?'Updated '+new Date(i.last_updated).toLocaleDateString():'Not stocked yet'}</div>
+        </div>
+        <div class="product-actions">
+          <button class="stock-btn" onclick="openStockModal('${i.product_id}','${i.products?.name}','${i.inv_id||''}',${i.quantity})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Adjust Stock
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="inv-section" id="inv-sec-${cat.replace(/\s+/g,'_')}">
+      <div class="inv-section-header" onclick="toggleInvSection('${cat.replace(/\s+/g,'_')}')">
+        <h3>${cat} <span style="font-size:13px;font-weight:400;color:var(--muted)">(${items.length})</span></h3>
+        <div class="cat-stats">
+          ${outC?`<span style="color:var(--danger)">● ${outC} out</span>`:''}
+          ${lowC?`<span style="color:var(--warning)">● ${lowC} low</span>`:''}
+          ${!outC&&!lowC?`<span style="color:var(--success)">✓ All stocked</span>`:''}
+          <span class="collapse-icon">▼</span>
+        </div>
       </div>
-      <div class="product-info">
-        <div class="pname">${i.products?.name||'—'}</div>
-        <div class="psku">${i.products?.sku||'—'}</div>
-        <div class="pcategory">${i.products?.categories?.name||'—'} · Reorder at ${i.reorder_level}</div>
-        <div class="pprice" style="font-size:13px;color:var(--muted)">Updated ${new Date(i.last_updated).toLocaleDateString()}</div>
-      </div>
-      <div class="product-actions">
-        <button class="stock-btn" onclick="openStockModal('${i.product_id}','${i.products?.name}')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Adjust Stock
-        </button>
+      <div class="inv-section-body">
+        <div class="product-grid">${cards}</div>
       </div>
     </div>`;
   }).join('');
+}
+
+function toggleInvSection(catId){
+  document.getElementById('inv-sec-'+catId)?.classList.toggle('collapsed');
+}
+
+function filterInventory(cat){
+  if(cat!==undefined){
+    document.querySelectorAll('.inv-tab').forEach(t=>t.classList.toggle('active', t.dataset.cat===cat));
+    window._activeCat = cat;
+  }
+  renderInventorySections(allInventory, window._activeCat||'all');
 }
 
 /* ══ STOCK ═══════════════════════════════════════════════════ */
