@@ -470,7 +470,7 @@ tr:hover td{background:var(--surface2)}
     </div>
     <div class="form-group"><label>Address</label><input id="s-address" placeholder="Street address"/></div>
     <div class="form-row">
-      <div class="form-group"><label>City</label><input id="s-city" placeholder="Kathmandu"/></div>
+      <div class="form-group"><label>City</label><input id="s-city" placeholder="Lalitpur"/></div>
       <div class="form-group"><label>Country</label><input id="s-country" value="Nepal"/></div>
     </div>
     <div class="form-group"><label>Notes</label><textarea id="s-notes" placeholder="Payment terms, lead time, etc."></textarea></div>
@@ -527,6 +527,89 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
+<!-- Invoice Modal -->
+<div class="modal-overlay" id="invoice-modal">
+  <div class="modal" style="max-width:680px">
+    <h3 id="invoice-modal-title">New Invoice</h3>
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1;min-width:180px"><label>Customer Name</label><input id="inv-cname" placeholder="Walk-in customer" list="customer-datalist"/><datalist id="customer-datalist"></datalist></div>
+      <div class="form-group" style="flex:1;min-width:140px"><label>Phone</label><input id="inv-cphone" placeholder="98XXXXXXXX"/></div>
+      <div class="form-group" style="flex:1;min-width:180px"><label>Address</label><input id="inv-caddress" placeholder="Lalitpur"/></div>
+    </div>
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;margin-bottom:12px">
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <select id="inv-product-select" style="flex:1;min-width:180px;padding:7px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);outline:none"><option value="">— Select product —</option></select>
+        <input id="inv-item-qty" type="number" min="1" value="1" placeholder="Qty" style="width:70px;padding:7px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);outline:none"/>
+        <input id="inv-item-price" type="number" min="0" placeholder="Price" style="width:110px;padding:7px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);outline:none"/>
+        <button class="btn btn-primary btn-sm" onclick="addInvoiceItem()">+ Add</button>
+      </div>
+      <table style="width:100%"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead>
+      <tbody id="invoice-items-tbody"><tr><td colspan="5" style="text-align:center;padding:12px;color:var(--muted);font-size:12px">No items added yet</td></tr></tbody></table>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap">
+      <div class="form-group" style="width:130px"><label>Discount (NPR)</label><input id="inv-discount" type="number" value="0" min="0" oninput="updateInvoiceTotals()"/></div>
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;min-width:200px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px"><span>Subtotal</span><span id="inv-subtotal">NPR 0</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px"><span>Discount</span><span id="inv-discount-show">NPR 0</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:500;font-size:15px;border-top:1px solid var(--border);padding-top:6px;margin-top:4px"><span>Total</span><span id="inv-total" style="color:var(--accent);font-family:var(--font-head)">NPR 0</span></div>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:8px"><label>Status</label>
+      <select id="inv-status" style="padding:7px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);outline:none">
+        <option value="paid">Paid</option><option value="unpaid">Unpaid</option><option value="partial">Partial</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('invoice-modal')">Cancel</button>
+      <button class="btn btn-ghost" onclick="saveAndPrintInvoice()">Save & Print</button>
+      <button class="btn btn-primary" onclick="saveInvoice()">Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="modal-overlay" id="customer-modal">
+  <div class="modal">
+    <h3 id="customer-modal-title">Add Customer</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Name *</label><input id="c-name" placeholder="Full name"/></div>
+      <div class="form-group"><label>Phone</label><input id="c-phone" placeholder="98XXXXXXXX"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Email</label><input id="c-email" type="email" placeholder="optional"/></div>
+      <div class="form-group"><label>City</label><input id="c-city" value="Lalitpur"/></div>
+    </div>
+    <div class="form-group"><label>Address</label><input id="c-address" placeholder="Street address"/></div>
+    <div class="form-group"><label>Notes</label><textarea id="c-notes" placeholder="Optional notes…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('customer-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Supplier Payment Modal -->
+<div class="modal-overlay" id="supplier-payment-modal">
+  <div class="modal">
+    <h3>Record Supplier Payment</h3>
+    <input type="hidden" id="sp-supplier-id"/>
+    <div class="form-group"><label>Supplier</label><input id="sp-supplier-name" readonly style="opacity:.7"/></div>
+    <div class="form-group"><label>Balance Due</label><input id="sp-balance" readonly style="opacity:.7;color:var(--danger)"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Amount Paid (NPR) *</label><input id="sp-amount" type="number" min="0" placeholder="0"/></div>
+      <div class="form-group"><label>Reference</label><input id="sp-ref" placeholder="Cheque / transfer no."/></div>
+    </div>
+    <div class="form-group"><label>Notes</label><textarea id="sp-notes" placeholder="Optional…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('supplier-payment-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSupplierPayment()">Record Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice Print Template (hidden) -->
+<div id="print-area" style="display:none"></div>
+
 <!-- SIDEBAR -->
 <nav id="sidebar">
   <div class="logo">
@@ -550,6 +633,16 @@ tr:hover td{background:var(--surface2)}
   <div class="nav-label">Sourcing</div>
   <div class="nav-item" onclick="navigate('suppliers')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a8 8 0 00-16 0v2"/></svg>Suppliers
+  </div>
+  <div class="nav-label">Finance</div>
+  <div class="nav-item" onclick="navigate('invoices')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices
+  </div>
+  <div class="nav-item" onclick="navigate('customers')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Customers
+  </div>
+  <div class="nav-item" onclick="navigate('reports')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports
   </div>
   <div class="nav-label">System</div>
   <div class="nav-item" onclick="navigate('setup')">
@@ -673,6 +766,59 @@ tr:hover td{background:var(--surface2)}
           <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>City</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="suppliers-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- INVOICES PAGE -->
+    <div class="page" id="page-invoices">
+      <div class="table-wrap" style="margin-bottom:20px">
+        <div class="table-toolbar">
+          <h3>Invoices</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div class="search-box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input id="inv-search-box" placeholder="Search invoices…" oninput="filterInvoices()"/></div>
+          </div>
+        </div>
+        <table><thead><tr><th>Invoice #</th><th>Customer</th><th>Date (BS)</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="invoices-tbody"><tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS PAGE -->
+    <div class="page" id="page-customers">
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3>Customers</h3>
+          <div class="search-box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input id="customer-search" placeholder="Search customers…" oninput="filterCustomers()"/></div>
+        </div>
+        <table><thead><tr><th>Name</th><th>Phone</th><th>City</th><th>Total Purchases</th><th>Actions</th></tr></thead>
+        <tbody id="customers-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- REPORTS PAGE -->
+    <div class="page" id="page-reports">
+      <div class="stat-grid" id="report-stats" style="margin-bottom:20px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" id="report-grid">
+        <!-- Stock by Category -->
+        <div class="table-wrap">
+          <div class="table-toolbar"><h3>Stock by Category</h3></div>
+          <table><thead><tr><th>Category</th><th>Products</th><th>Stock Value</th></tr></thead>
+          <tbody id="report-cat-tbody"></tbody></table>
+        </div>
+        <!-- P&L by Month -->
+        <div class="table-wrap">
+          <div class="table-toolbar"><h3>Profit & Loss</h3></div>
+          <table><thead><tr><th>Month (BS)</th><th>Sales</th><th>Purchases</th><th>Profit</th></tr></thead>
+          <tbody id="report-pl-tbody"></tbody></table>
+        </div>
+      </div>
+      <!-- Supplier Payment Tracker -->
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3>Supplier Balance Tracker</h3>
+        </div>
+        <table><thead><tr><th>Supplier</th><th>Total Purchased</th><th>Total Paid</th><th>Balance Due</th><th>Action</th></tr></thead>
+        <tbody id="report-supplier-tbody"></tbody></table>
       </div>
     </div>
 
@@ -845,7 +991,7 @@ function updateCfgStatus(){
 }
 
 /* ══ NAVIGATION ══════════════════════════════════════════════ */
-const PAGE_TITLES={dashboard:'Dashboard',products:'Products',inventory:'Inventory',sales:'Sales',suppliers:'Suppliers',setup:'Setup'};
+const PAGE_TITLES={dashboard:'Dashboard',products:'Products',inventory:'Inventory',sales:'Sales',invoices:'Invoices',customers:'Customers',reports:'Reports',suppliers:'Suppliers',setup:'Setup'};
 function navigate(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -859,6 +1005,9 @@ function navigate(page){
   if(page==='products')  loadProducts();
   if(page==='inventory') loadInventoryGrid();
   if(page==='sales')     loadSales();
+  if(page==='invoices')  loadInvoices();
+  if(page==='customers') loadCustomers();
+  if(page==='reports')   loadReports();
   if(page==='suppliers') loadSuppliers();
 }
 
@@ -876,8 +1025,10 @@ function closeMobileMenu(){
 function setupTopbarActions(page){
   const el=document.getElementById('topbar-actions');
   el.innerHTML='';
-  if(page==='products') el.innerHTML=`<button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>`;
+  if(page==='products')  el.innerHTML=`<button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>`;
   if(page==='suppliers') el.innerHTML=`<button class="btn btn-primary" onclick="openSupplierModal()">+ Add Supplier</button>`;
+  if(page==='invoices')  el.innerHTML=`<button class="btn btn-primary" onclick="openInvoiceModal()">+ New Invoice</button>`;
+  if(page==='customers') el.innerHTML=`<button class="btn btn-primary" onclick="openCustomerModal()">+ Add Customer</button>`;
 }
 
 /* ══ DASHBOARD ═══════════════════════════════════════════════ */
@@ -1380,6 +1531,352 @@ async function completeSale(){
   toast('Sale recorded ✓ — NPR '+(qty*unitPrice).toLocaleString(),'ok');
   closeModal('sale-modal');
   loadSales();
+}
+
+
+/* ══ NEPALI DATE ════════════════════════════════════════════ */
+const NepaliDate = (() => {
+  const months = ['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'];
+  const data = [[2079,[31,31,32,31,31,31,30,29,30,29,30,30]],[2080,[31,31,32,32,31,30,30,29,30,29,30,30]],[2081,[31,32,31,32,31,30,30,30,29,29,30,31]],[2082,[31,31,31,32,31,30,30,30,29,30,29,31]],[2083,[31,31,32,31,31,31,30,29,30,29,30,30]]];
+  function adToBS(adDate){
+    const d=new Date(adDate);
+    let totalDays=Math.floor((d-new Date(1943,3,14))/86400000)+1;
+    // Fast forward through years before 2079
+    const skipDays={2000:365,2001:365,2002:366,2003:365,2004:365,2005:365,2006:366,2007:365,2008:365,2009:365,2010:366,2011:365,2012:365,2013:365,2014:366,2015:365,2016:365,2017:365,2018:366,2019:365,2020:365,2021:365,2022:366,2023:365,2024:365,2025:365,2026:366,2027:365,2028:365,2029:365,2030:366,2031:365,2032:365,2033:365,2034:366,2035:365,2036:365,2037:365,2038:366,2039:365,2040:365,2041:365,2042:366,2043:365,2044:365,2045:365,2046:366,2047:365,2048:366,2049:365,2050:365,2051:365,2052:366,2053:365,2054:365,2055:365,2056:366,2057:365,2058:365,2059:365,2060:366,2061:365,2062:365,2063:365,2064:366,2065:365,2066:365,2067:365,2068:366,2069:365,2070:365,2071:365,2072:366,2073:365,2074:365,2075:365,2076:366,2077:365,2078:365};
+    let bsYear=2000;
+    for(const [yr,days] of Object.entries(skipDays)){if(parseInt(yr)<2079){totalDays-=days;bsYear=parseInt(yr)+1;}}
+    let y=bsYear,m=0,day=0;
+    for(const [yr,mdays] of data){
+      y=yr;let done=false;
+      for(let i=0;i<12;i++){if(totalDays<=mdays[i]){m=i;day=totalDays;done=true;break;}totalDays-=mdays[i];}
+      if(done)break;
+    }
+    return{year:y,month:m,day,monthName:months[m]};
+  }
+  function formatBS(adDate){try{const b=adToBS(adDate);return`${b.day} ${b.monthName} ${b.year}`;}catch(e){return new Date(adDate).toLocaleDateString();}}
+  function todayBS(){return formatBS(new Date());}
+  return{adToBS,formatBS,todayBS,months};
+})();
+
+/* ══ INVOICES ═══════════════════════════════════════════════ */
+let allInvoices=[], invoiceItems=[], editingInvoiceId=null, allCustomers=[];
+
+async function loadInvoices(){
+  if(!SB_URL){document.getElementById('invoices-tbody').innerHTML=`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase</td></tr>`;return;}
+  const inv=await sbGet('invoices','select=*&order=created_at.desc');
+  if(!inv)return;
+  allInvoices=inv;
+  renderInvoices(allInvoices);
+  // Populate customer datalist
+  const custs=await sbGet('customers','select=name,phone&order=name');
+  const dl=document.getElementById('customer-datalist');
+  if(dl&&custs) dl.innerHTML=custs.map(c=>`<option value="${c.name}">${c.phone||''}</option>`).join('');
+}
+
+function renderInvoices(list){
+  const tb=document.getElementById('invoices-tbody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">No invoices yet. Create your first invoice!</td></tr>`;return;}
+  tb.innerHTML=list.map(i=>`<tr>
+    <td><strong>${i.invoice_no}</strong></td>
+    <td>${i.customer_name||'Walk-in'}</td>
+    <td style="color:var(--muted);font-size:12px">${NepaliDate.formatBS(i.created_at)}</td>
+    <td><strong>NPR ${Number(i.total).toLocaleString()}</strong></td>
+    <td><span class="badge ${i.status==='paid'?'active':i.status==='unpaid'?'inactive':'low'}">${i.status}</span></td>
+    <td style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-ghost" onclick="printInvoice('${i.id}')">Print</button>
+      <button class="btn-icon" onclick="deleteInvoice('${i.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+    </td></tr>`).join('');
+}
+
+function filterInvoices(){
+  const q=document.getElementById('inv-search-box').value.toLowerCase();
+  renderInvoices(allInvoices.filter(i=>(i.invoice_no||'').toLowerCase().includes(q)||(i.customer_name||'').toLowerCase().includes(q)));
+}
+
+async function openInvoiceModal(){
+  editingInvoiceId=null; invoiceItems=[];
+  document.getElementById('invoice-modal-title').textContent='New Invoice';
+  ['inv-cname','inv-cphone','inv-caddress'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inv-discount').value='0';
+  document.getElementById('inv-status').value='paid';
+  // Load products
+  if(!allProducts.length) await loadProducts();
+  const sel=document.getElementById('inv-product-select');
+  sel.innerHTML='<option value="">— Select product —</option>'+allProducts.map(p=>`<option value="${p.id}" data-price="${p.selling_price}" data-name="${p.name}">${p.name} — NPR ${Number(p.selling_price).toLocaleString()}</option>`).join('');
+  sel.onchange=()=>{const o=sel.options[sel.selectedIndex];document.getElementById('inv-item-price').value=o.dataset.price||'';};
+  renderInvoiceItems();
+  openModal('invoice-modal');
+}
+
+function addInvoiceItem(){
+  const sel=document.getElementById('inv-product-select');
+  const qty=parseInt(document.getElementById('inv-item-qty').value)||1;
+  const price=parseFloat(document.getElementById('inv-item-price').value)||0;
+  const opt=sel.options[sel.selectedIndex];
+  if(!sel.value&&!opt.dataset.name){toast('Select a product','err');return;}
+  const name=opt.dataset.name||opt.text||'Item';
+  const id=sel.value||null;
+  invoiceItems.push({product_id:id,product_name:name,quantity:qty,unit_price:price,total:qty*price});
+  renderInvoiceItems();
+  sel.value=''; document.getElementById('inv-item-qty').value='1'; document.getElementById('inv-item-price').value='';
+}
+
+function removeInvoiceItem(idx){invoiceItems.splice(idx,1);renderInvoiceItems();}
+
+function renderInvoiceItems(){
+  const tb=document.getElementById('invoice-items-tbody');
+  if(!invoiceItems.length){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--muted);font-size:12px">No items added yet</td></tr>`;updateInvoiceTotals();return;}
+  tb.innerHTML=invoiceItems.map((it,i)=>`<tr>
+    <td>${it.product_name}</td><td>${it.quantity}</td>
+    <td>NPR ${Number(it.unit_price).toLocaleString()}</td>
+    <td>NPR ${Number(it.total).toLocaleString()}</td>
+    <td><button onclick="removeInvoiceItem(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px">×</button></td>
+  </tr>`).join('');
+  updateInvoiceTotals();
+}
+
+function updateInvoiceTotals(){
+  const sub=invoiceItems.reduce((a,i)=>a+i.total,0);
+  const disc=parseFloat(document.getElementById('inv-discount').value)||0;
+  const total=Math.max(0,sub-disc);
+  document.getElementById('inv-subtotal').textContent='NPR '+sub.toLocaleString();
+  document.getElementById('inv-discount-show').textContent='NPR '+disc.toLocaleString();
+  document.getElementById('inv-total').textContent='NPR '+total.toLocaleString();
+}
+
+async function saveInvoice(andPrint=false){
+  if(!invoiceItems.length){toast('Add at least one item','err');return;}
+  const sub=invoiceItems.reduce((a,i)=>a+i.total,0);
+  const disc=parseFloat(document.getElementById('inv-discount').value)||0;
+  const total=Math.max(0,sub-disc);
+  const invNo='INV-'+Date.now().toString().slice(-6);
+  const body={
+    invoice_no:invNo,
+    customer_name:document.getElementById('inv-cname').value||'Walk-in',
+    customer_phone:document.getElementById('inv-cphone').value||null,
+    customer_address:document.getElementById('inv-caddress').value||null,
+    subtotal:sub,discount:disc,total,
+    status:document.getElementById('inv-status').value
+  };
+  const inv=await sbPost('invoices',body);
+  if(!inv||!inv[0])return;
+  const invId=inv[0].id;
+  // Save items
+  for(const item of invoiceItems){
+    await sbPost('invoice_items',{...item,invoice_id:invId});
+  }
+  // Deduct from inventory if paid
+  if(body.status==='paid'){
+    for(const item of invoiceItems){
+      if(item.product_id){
+        const invRec=await sbGet('inventory',`product_id=eq.${item.product_id}`);
+        if(invRec&&invRec.length){
+          await sbPatch('inventory',invRec[0].id,{quantity:Math.max(0,invRec[0].quantity-item.quantity),last_updated:new Date().toISOString()});
+        }
+        await sbPost('stock_movements',{product_id:item.product_id,movement_type:'OUT',quantity:item.quantity,reference:invNo,notes:'Invoice sale'});
+      }
+    }
+  }
+  toast('Invoice saved ✓','ok');
+  if(andPrint) printInvoiceData(body,invoiceItems,invId);
+  closeModal('invoice-modal');
+  loadInvoices();
+}
+
+async function saveAndPrintInvoice(){await saveInvoice(true);}
+
+async function printInvoice(id){
+  const [inv,items]=await Promise.all([
+    sbGet('invoices',`id=eq.${id}`),
+    sbGet('invoice_items',`invoice_id=eq.${id}`)
+  ]);
+  if(!inv||!inv[0])return;
+  printInvoiceData(inv[0],items||[],id);
+}
+
+function printInvoiceData(inv,items,id){
+  const rows=items.map(i=>`<tr><td>${i.product_name}</td><td style="text-align:center">${i.quantity}</td><td style="text-align:right">NPR ${Number(i.unit_price).toLocaleString()}</td><td style="text-align:right">NPR ${Number(i.total).toLocaleString()}</td></tr>`).join('');
+  const today=NepaliDate.todayBS();
+  const content=`<html><head><title>Invoice ${inv.invoice_no}</title>
+  <style>body{font-family:Arial,sans-serif;font-size:13px;color:#333;margin:0;padding:20px}
+  .header{text-align:center;border-bottom:2px solid #5c4a32;padding-bottom:12px;margin-bottom:16px}
+  .header h1{font-size:22px;color:#5c4a32;margin:0}
+  .header p{margin:2px 0;font-size:12px;color:#666}
+  .meta{display:flex;justify-content:space-between;margin-bottom:16px;font-size:12px}
+  table{width:100%;border-collapse:collapse;margin-bottom:16px}
+  th{background:#f5f3f0;padding:8px;text-align:left;border:1px solid #ddd;font-size:12px}
+  td{padding:8px;border:1px solid #ddd;font-size:12px}
+  .totals{text-align:right;font-size:13px}
+  .totals .total-row{font-size:16px;font-weight:bold;color:#5c4a32;border-top:2px solid #5c4a32;padding-top:8px;margin-top:8px}
+  .footer{text-align:center;margin-top:24px;font-size:11px;color:#999;border-top:1px solid #ddd;padding-top:12px}
+  @media print{body{padding:0}}</style></head>
+  <body>
+  <div class="header"><h1>Furniture & Furnishing House</h1><p>Kathmandu, Nepal</p><p>Invoice #: <strong>${inv.invoice_no}</strong> &nbsp;|&nbsp; Date: ${today}</p></div>
+  <div class="meta">
+    <div><strong>Bill To:</strong><br>${inv.customer_name||'Walk-in Customer'}<br>${inv.customer_phone||''}<br>${inv.customer_address||''}</div>
+    <div style="text-align:right"><strong>Status:</strong> ${(inv.status||'paid').toUpperCase()}<br><strong>Date (BS):</strong> ${today}</div>
+  </div>
+  <table><thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <div class="totals">
+    <div>Subtotal: NPR ${Number(inv.subtotal).toLocaleString()}</div>
+    ${Number(inv.discount)>0?`<div>Discount: - NPR ${Number(inv.discount).toLocaleString()}</div>`:''}
+    <div class="total-row">Grand Total: NPR ${Number(inv.total).toLocaleString()}</div>
+  </div>
+  <div class="footer">Thank you for your business! &nbsp;|&nbsp; Furniture & Furnishing House</div>
+  </body></html>`;
+  const w=window.open('','_blank','width=700,height=900');
+  w.document.write(content);w.document.close();w.focus();setTimeout(()=>w.print(),500);
+}
+
+async function deleteInvoice(id){
+  if(!confirm('Delete this invoice?'))return;
+  await sbDelete('invoices',id);
+  toast('Invoice deleted','ok');loadInvoices();
+}
+
+/* ══ CUSTOMERS ══════════════════════════════════════════════ */
+let editingCustomerId=null;
+
+async function loadCustomers(){
+  if(!SB_URL){document.getElementById('customers-tbody').innerHTML=`<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Connect Supabase</td></tr>`;return;}
+  const custs=await sbGet('customers','select=*&order=created_at.desc');
+  if(!custs)return;
+  allCustomers=custs;
+  renderCustomers(allCustomers);
+}
+
+async function renderCustomers(list){
+  const tb=document.getElementById('customers-tbody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">No customers yet</td></tr>`;return;}
+  // Get purchase totals per customer
+  const invs=await sbGet('invoices','select=customer_name,total');
+  const totals={};
+  (invs||[]).forEach(i=>{totals[i.customer_name]=(totals[i.customer_name]||0)+Number(i.total);});
+  tb.innerHTML=list.map(c=>`<tr>
+    <td><strong>${c.name}</strong></td>
+    <td>${c.phone||'<span style="color:var(--muted)">—</span>'}</td>
+    <td>${c.city||'<span style="color:var(--muted)">—</span>'}</td>
+    <td><strong>NPR ${(totals[c.name]||0).toLocaleString()}</strong></td>
+    <td style="display:flex;gap:6px">
+      <button class="btn-icon" onclick="openCustomerModal('${c.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="btn-icon" onclick="deleteCustomer('${c.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+    </td></tr>`).join('');
+}
+
+function filterCustomers(){
+  const q=document.getElementById('customer-search').value.toLowerCase();
+  renderCustomers(allCustomers.filter(c=>c.name.toLowerCase().includes(q)||(c.phone||'').includes(q)));
+}
+
+function openCustomerModal(id=null){
+  editingCustomerId=id;
+  document.getElementById('customer-modal-title').textContent=id?'Edit Customer':'Add Customer';
+  if(id){
+    const c=allCustomers.find(x=>x.id===id);
+    if(c){document.getElementById('c-name').value=c.name;document.getElementById('c-phone').value=c.phone||'';document.getElementById('c-email').value=c.email||'';document.getElementById('c-city').value=c.city||'Lalitpur';document.getElementById('c-address').value=c.address||'';document.getElementById('c-notes').value=c.notes||'';}
+  } else {
+    ['c-name','c-phone','c-email','c-address','c-notes'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('c-city').value='Lalitpur';
+  }
+  openModal('customer-modal');
+}
+
+async function saveCustomer(){
+  const body={name:document.getElementById('c-name').value.trim(),phone:document.getElementById('c-phone').value.trim()||null,email:document.getElementById('c-email').value.trim()||null,city:document.getElementById('c-city').value.trim()||null,address:document.getElementById('c-address').value.trim()||null,notes:document.getElementById('c-notes').value.trim()||null};
+  if(!body.name){toast('Name is required','err');return;}
+  const r=editingCustomerId?await sbPatch('customers',editingCustomerId,body):await sbPost('customers',body);
+  if(r){toast(editingCustomerId?'Customer updated ✓':'Customer added ✓','ok');closeModal('customer-modal');loadCustomers();}
+}
+
+async function deleteCustomer(id){
+  if(!confirm('Delete this customer?'))return;
+  await sbDelete('customers',id);toast('Customer deleted','ok');loadCustomers();
+}
+
+/* ══ REPORTS ════════════════════════════════════════════════ */
+async function loadReports(){
+  if(!SB_URL){return;}
+  const [products,inventory,sales,invoices,suppliers,payments]=await Promise.all([
+    sbGet('products','select=id,name,selling_price,cost_price,category_id,categories(name)'),
+    sbGet('inventory','select=*'),
+    sbGet('sales','select=*'),
+    sbGet('invoices','select=*'),
+    sbGet('suppliers','select=id,name'),
+    sbGet('supplier_payments','select=*')
+  ]);
+
+  const invMap={};
+  (inventory||[]).forEach(i=>invMap[i.product_id]=i);
+
+  // ── Summary stats ──
+  const totalStockVal=(products||[]).reduce((a,p)=>a+(invMap[p.id]?.quantity||0)*p.selling_price,0);
+  const totalSales=(invoices||[]).reduce((a,i)=>a+Number(i.total),0);
+  const totalPurchases=(payments||[]).filter(p=>p.payment_type==='purchase').reduce((a,p)=>a+Number(p.amount),0);
+  document.getElementById('report-stats').innerHTML=`
+    <div class="stat-card"><div class="label">Total Stock Value</div><div class="value" style="font-size:20px">NPR ${totalStockVal.toLocaleString()}</div><div class="sub">selling price</div></div>
+    <div class="stat-card"><div class="label">Total Sales (Invoices)</div><div class="value" style="font-size:20px;color:var(--success)">NPR ${totalSales.toLocaleString()}</div><div class="sub">all time</div></div>
+    <div class="stat-card"><div class="label">Products</div><div class="value">${(products||[]).length}</div><div class="sub">in catalogue</div></div>
+    <div class="stat-card"><div class="label">Low Stock Items</div><div class="value" style="color:var(--danger)">${(inventory||[]).filter(i=>i.quantity<=i.reorder_level).length}</div><div class="sub">need reorder</div></div>`;
+
+  // ── Stock by Category ──
+  const catMap={};
+  (products||[]).forEach(p=>{
+    const cat=p.categories?.name||'Uncategorised';
+    if(!catMap[cat])catMap[cat]={count:0,value:0};
+    catMap[cat].count++;
+    catMap[cat].value+=(invMap[p.id]?.quantity||0)*p.selling_price;
+  });
+  document.getElementById('report-cat-tbody').innerHTML=Object.entries(catMap).sort((a,b)=>b[1].value-a[1].value).map(([cat,d])=>`<tr><td>${cat}</td><td>${d.count}</td><td><strong>NPR ${d.value.toLocaleString()}</strong></td></tr>`).join('');
+
+  // ── P&L by Month ──
+  const monthMap={};
+  (invoices||[]).forEach(i=>{
+    const d=new Date(i.created_at);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if(!monthMap[key])monthMap[key]={sales:0,purchases:0,label:NepaliDate.formatBS(i.created_at).split(' ').slice(1).join(' ')};
+    monthMap[key].sales+=Number(i.total);
+  });
+  document.getElementById('report-pl-tbody').innerHTML=Object.entries(monthMap).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,12).map(([k,d])=>{
+    const profit=d.sales-d.purchases;
+    return`<tr><td>${d.label}</td><td style="color:var(--success)">NPR ${d.sales.toLocaleString()}</td><td style="color:var(--danger)">NPR ${d.purchases.toLocaleString()}</td><td style="color:${profit>=0?'var(--success)':'var(--danger)'}"><strong>${profit>=0?'+':''}NPR ${profit.toLocaleString()}</strong></td></tr>`;
+  }).join('')||'<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted)">No invoice data yet</td></tr>';
+
+  // ── Supplier Payment Tracker ──
+  const supPayMap={};
+  (payments||[]).forEach(p=>{
+    if(!supPayMap[p.supplier_id])supPayMap[p.supplier_id]={purchased:0,paid:0};
+    if(p.payment_type==='purchase') supPayMap[p.supplier_id].purchased+=Number(p.amount);
+    else supPayMap[p.supplier_id].paid+=Number(p.amount);
+  });
+  document.getElementById('report-supplier-tbody').innerHTML=(suppliers||[]).map(s=>{
+    const d=supPayMap[s.id]||{purchased:0,paid:0};
+    const bal=d.purchased-d.paid;
+    return`<tr>
+      <td><strong>${s.name}</strong></td>
+      <td>NPR ${d.purchased.toLocaleString()}</td>
+      <td style="color:var(--success)">NPR ${d.paid.toLocaleString()}</td>
+      <td style="color:${bal>0?'var(--danger)':'var(--success)'}"><strong>NPR ${bal.toLocaleString()}</strong></td>
+      <td><button class="btn btn-sm btn-ghost" onclick="openSupplierPaymentModal('${s.id}','${s.name}',${bal})">+ Payment</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">No suppliers yet</td></tr>';
+}
+
+/* ══ SUPPLIER PAYMENTS ══════════════════════════════════════ */
+function openSupplierPaymentModal(supplierId,name,balance){
+  document.getElementById('sp-supplier-id').value=supplierId;
+  document.getElementById('sp-supplier-name').value=name;
+  document.getElementById('sp-balance').value='NPR '+Number(balance).toLocaleString();
+  ['sp-amount','sp-ref','sp-notes'].forEach(id=>document.getElementById(id).value='');
+  openModal('supplier-payment-modal');
+}
+
+async function saveSupplierPayment(){
+  const supplierId=document.getElementById('sp-supplier-id').value;
+  const amount=parseFloat(document.getElementById('sp-amount').value);
+  if(!amount||amount<=0){toast('Enter a valid amount','err');return;}
+  const r=await sbPost('supplier_payments',{supplier_id:supplierId,amount,payment_type:'payment',reference:document.getElementById('sp-ref').value||null,notes:document.getElementById('sp-notes').value||null});
+  if(r){toast('Payment recorded ✓','ok');closeModal('supplier-payment-modal');loadReports();}
 }
 
 /* ══ UTILS ═══════════════════════════════════════════════════ */
