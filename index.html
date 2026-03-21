@@ -621,18 +621,14 @@ window.onload = () => {
 };
 
 function initApp(){
-  if(!SB_URL || !SB_KEY){
-    openModal('cfg-modal');
-  } else {
-    document.getElementById('config-banner').classList.add('hidden');
-    updateCfgStatus();
-  }
+  document.getElementById('config-banner').classList.add('hidden');
+  updateCfgStatus();
   navigate('dashboard');
 }
 
 /* ══ SUPABASE ════════════════════════════════════════════════ */
-let SB_URL = localStorage.getItem('sb_url') || '';
-let SB_KEY = localStorage.getItem('sb_key') || '';
+let SB_URL = localStorage.getItem('sb_url') || 'https://wjdqozkusivuzvqttclp.supabase.co';
+let SB_KEY = localStorage.getItem('sb_key') || 'sb_publishable_U6whgLolGRRmgJsZY2fcjw_bLms2sEz';
 let allProducts=[], allSuppliers=[], allCategories=[], allInventory=[];
 let editingProductId=null, editingSupplierId=null;
 
