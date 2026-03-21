@@ -656,6 +656,7 @@ tr:hover td{background:var(--surface2)}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
+    <div id="session-timer" style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;letter-spacing:.05em">Session: 2h 0m left</div>
   </div>
 </nav>
 
@@ -874,6 +875,10 @@ function getCredentials(){
   };
 }
 
+const SESSION_DURATION = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+let sessionTimer = null;
+let warningTimer = null;
+
 function doLogin(){
   const u = document.getElementById('login-user').value.trim();
   const p = document.getElementById('login-pass').value;
@@ -881,11 +886,13 @@ function doLogin(){
   const err = document.getElementById('login-error');
   if(u === creds.user && p === creds.pass){
     localStorage.setItem('logged_in','1');
+    localStorage.setItem('login_time', Date.now().toString());
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     document.getElementById('user-display').textContent = u;
     document.getElementById('user-avatar').textContent = u[0].toUpperCase();
     err.classList.remove('show');
+    startSessionTimer();
     initApp();
   } else {
     err.classList.add('show');
@@ -893,8 +900,57 @@ function doLogin(){
   }
 }
 
+function startSessionTimer(){
+  // Clear any existing timers
+  if(sessionTimer) clearTimeout(sessionTimer);
+  if(warningTimer) clearTimeout(warningTimer);
+
+  const loginTime = parseInt(localStorage.getItem('login_time') || Date.now());
+  const elapsed = Date.now() - loginTime;
+  const remaining = SESSION_DURATION - elapsed;
+
+  if(remaining <= 0){
+    // Already expired
+    doLogout();
+    return;
+  }
+
+  // Show warning 5 minutes before logout
+  const warnIn = remaining - (5 * 60 * 1000);
+  if(warnIn > 0){
+    warningTimer = setTimeout(() => {
+      toast('⚠ You will be signed out in 5 minutes due to inactivity', 'err');
+    }, warnIn);
+  }
+
+  // Auto logout when session expires
+  sessionTimer = setTimeout(() => {
+    toast('Session expired. Signing out…', 'err');
+    setTimeout(() => doLogout(), 2000);
+  }, remaining);
+
+  // Update session timer display
+  updateSessionDisplay(remaining);
+}
+
+function updateSessionDisplay(remaining){
+  const hours = Math.floor(remaining / 3600000);
+  const mins = Math.floor((remaining % 3600000) / 60000);
+  const el = document.getElementById('session-timer');
+  if(el) el.textContent = `Session: ${hours}h ${mins}m left`;
+}
+
+// Reset timer on any user activity
+function resetSessionTimer(){
+  localStorage.setItem('login_time', Date.now().toString());
+  startSessionTimer();
+}
+
 function doLogout(){
+  if(sessionTimer) clearTimeout(sessionTimer);
+  if(warningTimer) clearTimeout(warningTimer);
   localStorage.removeItem('logged_in');
+  localStorage.removeItem('login_time');
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('login-user').value = '';
@@ -935,11 +991,20 @@ function changeCredentials(){
 /* Auto-login if already logged in */
 window.onload = () => {
   if(localStorage.getItem('logged_in')==='1'){
+    // Check if session has expired
+    const loginTime = parseInt(localStorage.getItem('login_time') || '0');
+    const elapsed = Date.now() - loginTime;
+    if(elapsed > SESSION_DURATION){
+      localStorage.removeItem('logged_in');
+      localStorage.removeItem('login_time');
+      return; // Stay on login page
+    }
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     const u = getCredentials().user;
     document.getElementById('user-display').textContent = u;
     document.getElementById('user-avatar').textContent = u[0].toUpperCase();
+    startSessionTimer();
     initApp();
   }
 };
@@ -1878,6 +1943,22 @@ async function saveSupplierPayment(){
   const r=await sbPost('supplier_payments',{supplier_id:supplierId,amount,payment_type:'payment',reference:document.getElementById('sp-ref').value||null,notes:document.getElementById('sp-notes').value||null});
   if(r){toast('Payment recorded ✓','ok');closeModal('supplier-payment-modal');loadReports();}
 }
+
+// Reset session timer on user activity
+['click','keydown','mousemove','touchstart','scroll'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    if(localStorage.getItem('logged_in')==='1') resetSessionTimer();
+  }, {passive:true});
+});
+
+// Update session display every minute
+setInterval(() => {
+  if(localStorage.getItem('logged_in')==='1'){
+    const loginTime = parseInt(localStorage.getItem('login_time')||'0');
+    const remaining = SESSION_DURATION - (Date.now() - loginTime);
+    if(remaining > 0) updateSessionDisplay(remaining);
+  }
+}, 60000);
 
 /* ══ UTILS ═══════════════════════════════════════════════════ */
 function openModal(id){ document.getElementById(id).classList.add('open'); }
