@@ -656,7 +656,6 @@ tr:hover td{background:var(--surface2)}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
-    <div id="session-timer" style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;letter-spacing:.05em">Session: 2h 0m left</div>
   </div>
 </nav>
 
@@ -875,9 +874,11 @@ function getCredentials(){
   };
 }
 
-const SESSION_DURATION = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
-let sessionTimer = null;
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 min of inactivity
+const INACTIVITY_CHECK  =  5 * 60 * 1000; // start countdown after 5 min no activity
+let inactivityTimer = null;
 let warningTimer = null;
+let lastActivity = Date.now();
 
 function doLogin(){
   const u = document.getElementById('login-user').value.trim();
@@ -886,13 +887,13 @@ function doLogin(){
   const err = document.getElementById('login-error');
   if(u === creds.user && p === creds.pass){
     localStorage.setItem('logged_in','1');
-    localStorage.setItem('login_time', Date.now().toString());
+    lastActivity = Date.now();
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     document.getElementById('user-display').textContent = u;
     document.getElementById('user-avatar').textContent = u[0].toUpperCase();
     err.classList.remove('show');
-    startSessionTimer();
+    startInactivityTimer();
     initApp();
   } else {
     err.classList.add('show');
@@ -900,57 +901,36 @@ function doLogin(){
   }
 }
 
-function startSessionTimer(){
-  // Clear any existing timers
-  if(sessionTimer) clearTimeout(sessionTimer);
+function startInactivityTimer(){
+  if(inactivityTimer) clearTimeout(inactivityTimer);
   if(warningTimer) clearTimeout(warningTimer);
 
-  const loginTime = parseInt(localStorage.getItem('login_time') || Date.now());
-  const elapsed = Date.now() - loginTime;
-  const remaining = SESSION_DURATION - elapsed;
+  // Show warning 5 min before logout (at 25 min of inactivity)
+  warningTimer = setTimeout(() => {
+    if(localStorage.getItem('logged_in')==='1'){
+      toast('⚠ No activity detected. Signing out in 5 minutes…', 'err');
+    }
+  }, INACTIVITY_TIMEOUT - (5 * 60 * 1000));
 
-  if(remaining <= 0){
-    // Already expired
-    doLogout();
-    return;
-  }
-
-  // Show warning 5 minutes before logout
-  const warnIn = remaining - (5 * 60 * 1000);
-  if(warnIn > 0){
-    warningTimer = setTimeout(() => {
-      toast('⚠ You will be signed out in 5 minutes due to inactivity', 'err');
-    }, warnIn);
-  }
-
-  // Auto logout when session expires
-  sessionTimer = setTimeout(() => {
-    toast('Session expired. Signing out…', 'err');
-    setTimeout(() => doLogout(), 2000);
-  }, remaining);
-
-  // Update session timer display
-  updateSessionDisplay(remaining);
+  // Auto logout after 30 min of no activity
+  inactivityTimer = setTimeout(() => {
+    if(localStorage.getItem('logged_in')==='1'){
+      toast('Signed out due to inactivity.', 'err');
+      setTimeout(() => doLogout(), 2000);
+    }
+  }, INACTIVITY_TIMEOUT);
 }
 
-function updateSessionDisplay(remaining){
-  const hours = Math.floor(remaining / 3600000);
-  const mins = Math.floor((remaining % 3600000) / 60000);
-  const el = document.getElementById('session-timer');
-  if(el) el.textContent = `Session: ${hours}h ${mins}m left`;
-}
-
-// Reset timer on any user activity
+// Reset timer only on real user activity
 function resetSessionTimer(){
-  localStorage.setItem('login_time', Date.now().toString());
-  startSessionTimer();
+  lastActivity = Date.now();
+  startInactivityTimer();
 }
 
 function doLogout(){
-  if(sessionTimer) clearTimeout(sessionTimer);
+  if(inactivityTimer) clearTimeout(inactivityTimer);
   if(warningTimer) clearTimeout(warningTimer);
   localStorage.removeItem('logged_in');
-  localStorage.removeItem('login_time');
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('login-user').value = '';
@@ -991,20 +971,13 @@ function changeCredentials(){
 /* Auto-login if already logged in */
 window.onload = () => {
   if(localStorage.getItem('logged_in')==='1'){
-    // Check if session has expired
-    const loginTime = parseInt(localStorage.getItem('login_time') || '0');
-    const elapsed = Date.now() - loginTime;
-    if(elapsed > SESSION_DURATION){
-      localStorage.removeItem('logged_in');
-      localStorage.removeItem('login_time');
-      return; // Stay on login page
-    }
+    // Session check — valid if logged_in is set
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     const u = getCredentials().user;
     document.getElementById('user-display').textContent = u;
     document.getElementById('user-avatar').textContent = u[0].toUpperCase();
-    startSessionTimer();
+    startInactivityTimer();
     initApp();
   }
 };
@@ -1944,21 +1917,19 @@ async function saveSupplierPayment(){
   if(r){toast('Payment recorded ✓','ok');closeModal('supplier-payment-modal');loadReports();}
 }
 
-// Reset session timer on user activity
-['click','keydown','mousemove','touchstart','scroll'].forEach(evt => {
+// Only reset inactivity timer after 5 min of no activity threshold
+let activityDebounce = null;
+['click','keydown','touchstart'].forEach(evt => {
   document.addEventListener(evt, () => {
-    if(localStorage.getItem('logged_in')==='1') resetSessionTimer();
+    if(localStorage.getItem('logged_in')!=='1') return;
+    // Only reset if user has been inactive for 5+ min
+    if(Date.now() - lastActivity >= INACTIVITY_CHECK){
+      resetSessionTimer();
+    } else {
+      lastActivity = Date.now();
+    }
   }, {passive:true});
 });
-
-// Update session display every minute
-setInterval(() => {
-  if(localStorage.getItem('logged_in')==='1'){
-    const loginTime = parseInt(localStorage.getItem('login_time')||'0');
-    const remaining = SESSION_DURATION - (Date.now() - loginTime);
-    if(remaining > 0) updateSessionDisplay(remaining);
-  }
-}, 60000);
 
 /* ══ UTILS ═══════════════════════════════════════════════════ */
 function openModal(id){ document.getElementById(id).classList.add('open'); }
