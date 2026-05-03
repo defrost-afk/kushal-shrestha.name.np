@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  
+  --color-natural-bg: #F9F6F1;
+  --color-natural-text: #4A3728;
+  --color-natural-heading: #2D1F16;
+  --color-natural-accent: #C0573E;
+  --color-natural-border: #E2D1C3;
+  --color-natural-muted: #8C7A6B;
+  --color-natural-secondary: #3E5C52;
+}
+
+@layer base {
+  body {
+    @apply bg-natural-bg text-natural-text font-sans;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
