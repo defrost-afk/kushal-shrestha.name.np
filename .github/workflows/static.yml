@@ -1,23 +1,27 @@
-name: Deploy to GitHub Pages
+
 
 on:
   push:
     branches: ["main"]
 
-# ADD THIS PERMISSIONS BLOCK
 permissions:
   contents: read
   pages: write
-  id-token: write
+  id-token: write # This is required to authorize the deployment
+name: Deploy to GitHub Pages
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Install and Build
         run: |
-          npm install
+          npm ci
           npm run build
       - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v3
