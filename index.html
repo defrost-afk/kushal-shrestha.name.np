@@ -432,6 +432,16 @@
   .btn-primary:hover::before { background: rgba(255,255,255,0.1); }
   .btn-primary:active { transform: scale(0.98); }
 
+  #startGameBtn {
+    background: #111111;
+    color: #ffffff;
+  }
+
+  body.dark-mode #startGameBtn {
+    background: #c62828;
+    color: #ffffff;
+  }
+
   .btn-secondary {
     background: none;
     border: 1px solid var(--border);
@@ -881,7 +891,7 @@
       <div style="margin-top:10px;color:var(--text-dim);font-size:12px">Minimum 3 players. Names are required.</div>
     </div>
 
-    <button class="btn-primary" onclick="startGame()" style="margin-bottom:40px">START GAME</button>
+    <button class="btn-primary" id="startGameBtn" onclick="startGame()" style="margin-bottom:40px">START GAME</button>
   </div>
 
   <!-- ===== PASS DEVICE SCREEN ===== -->
