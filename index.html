@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Imposter — Nepali Edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="icon" href="favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Nepali:ital@0;1&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -833,7 +832,7 @@ function startGame() {
   const cat = categories[catKey];
   const entry = cat.words[Math.floor(Math.random() * cat.words.length)];
   state.word = entry.word;
-  state.hint = entry.hint;
+  state.hint = entry.hints[Math.floor(Math.random() * entry.hints.length)];
   state.categoryName = cat.name;
   state.category = catKey;
 
@@ -1060,7 +1059,7 @@ function playAgain() {
   const cat = categories[catKey];
   const entry = cat.words[Math.floor(Math.random() * cat.words.length)];
   state.word = entry.word;
-  state.hint = entry.hint;
+  state.hint = entry.hints[Math.floor(Math.random() * entry.hints.length)];
   state.categoryName = cat.name;
 
   // Reassign roles
