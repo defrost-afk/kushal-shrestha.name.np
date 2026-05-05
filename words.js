@@ -96,7 +96,7 @@ const categories = {
       { word: "Bhairav (भैरव)",               hints: ["Shiva", "Fierce", "Mask", "Terror", "Powerful"] },
       { word: "Taleju (तलेजु)",               hints: ["Malla", "Royal", "Secret", "Goddess", "Temple"] },
       { word: "Machhindranath (मच्छिन्द्रनाथ)", hints: ["Rain", "Chariot", "Harvest", "Patan", "Festival"] },
-      { word: "Ganesh (गणेश)",                hints: ["Elephant", "Obstacles", "Wisdom", "Trunk", "Worship"] },
+      { word: "Ganesh (गणेश)",                hints: ["Elephant", "rat", "Wisdom", "Trunk", "Worship"] },
       { word: "Saraswati (सरस्वती)",          hints: ["Knowledge", "Education", "Music", "White", "Goddess"] },
       { word: "Indra (इन्द्र)",               hints: ["Rain", "King", "Thunder", "Heaven", "Gods"] },
     ]
