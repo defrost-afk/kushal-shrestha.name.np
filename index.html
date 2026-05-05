@@ -105,7 +105,7 @@
     border-radius: 4px;
     padding: 10px 12px;
     cursor: pointer;
-    display: none;
+    display: inline-block;
   }
 
   /* HEADER */
@@ -316,7 +316,7 @@
     align-items: stretch;
     gap: 10px;
     margin-top: 12px;
-    background: var(--card);
+    background: transparent;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 12px;
@@ -327,8 +327,8 @@
     width: 74px;
     height: 74px;
     border-radius: 6px;
-    object-fit: cover;
-    border: 1px solid var(--border);
+    object-fit: contain;
+    border: none;
     flex-shrink: 0;
   }
 
@@ -366,7 +366,7 @@
 
   .category-item {
     border: 1px solid var(--border);
-    background: var(--card);
+    background: transparent;
     border-radius: 6px;
     cursor: pointer;
     overflow: hidden;
@@ -385,7 +385,7 @@
 
   .category-item img {
     width: 100%;
-    height: 80px;
+    height: 116px;
     object-fit: cover;
     display: block;
   }
@@ -977,16 +977,16 @@
 // categories is loaded from words.js
 
 const categoryMedia = {
-  random: { icon: "🎲", label: "Random category each round", image: createCategoryImage("🎲", "र्‍यान्डम", "#355C7D", "#6C5B7B") },
-  custom: { icon: "🛠️", label: "Use your own word and hint", image: createCategoryImage("🛠️", "कस्टम", "#1B4FAE", "#003893") },
-  festivals: { icon: "🎊", label: "Festivals and celebrations", image: createCategoryImage("🎊", "चाडपर्व", "#E04B2D", "#FF9A3C") },
-  food: { icon: "🍲", label: "Traditional Nepali foods", image: createCategoryImage("🍲", "खाना", "#A13D2D", "#F4B266") },
-  places: { icon: "🛕", label: "Sacred and famous places", image: createCategoryImage("🛕", "तीर्थ", "#6D2E8C", "#C45AC0") },
-  attire: { icon: "🥻", label: "Traditional outfits", image: createCategoryImage("🥻", "पहिरन", "#7A1E3A", "#D65A7A") },
-  music: { icon: "🥁", label: "Music and dance culture", image: createCategoryImage("🥁", "संगीत", "#8C2F39", "#F08A4B") },
-  deities: { icon: "🕉️", label: "Deities and mythology", image: createCategoryImage("🕉️", "देवता", "#3C2A78", "#7E57C2") },
-  crafts: { icon: "🎨", label: "Arts and handmade crafts", image: createCategoryImage("🎨", "कला", "#005B7F", "#23A6D5") },
-  customs: { icon: "🙏", label: "Customs and rituals", image: createCategoryImage("🙏", "संस्कार", "#9A3412", "#EA580C") }
+  random: { icon: "🎲", label: "Random category each round", image: createCategoryImage("🎲", "RANDOM", "#355C7D", "#6C5B7B") },
+  custom: { icon: "🛠️", label: "Use your own word and hint", image: createCategoryImage("🛠️", "CUSTOM", "#1B4FAE", "#003893") },
+  festivals: { icon: "🎊", label: "Festivals and celebrations", image: createCategoryImage("🎊", "FESTIVALS", "#E04B2D", "#FF9A3C") },
+  food: { icon: "🍲", label: "Traditional Nepali foods", image: createCategoryImage("🍲", "FOOD", "#A13D2D", "#F4B266") },
+  places: { icon: "🛕", label: "Sacred and famous places", image: createCategoryImage("🛕", "PLACES", "#6D2E8C", "#C45AC0") },
+  attire: { icon: "🥻", label: "Traditional outfits", image: createCategoryImage("🥻", "ATTIRE", "#7A1E3A", "#D65A7A") },
+  music: { icon: "🥁", label: "Music and dance culture", image: createCategoryImage("🥁", "MUSIC", "#8C2F39", "#F08A4B") },
+  deities: { icon: "🕉️", label: "Deities and mythology", image: createCategoryImage("🕉️", "DEITIES", "#3C2A78", "#7E57C2") },
+  crafts: { icon: "🎨", label: "Arts and handmade crafts", image: createCategoryImage("🎨", "CRAFTS", "#005B7F", "#23A6D5") },
+  customs: { icon: "🙏", label: "Customs and rituals", image: createCategoryImage("🙏", "CUSTOMS", "#9A3412", "#EA580C") }
 };
 
 // ========================
@@ -1388,7 +1388,7 @@ function getCategoryDisplayName(key) {
   if (key === 'random') return '🎲 Random';
   if (key === 'custom') return '🛠️ Custom Game';
   const cat = categories[key];
-  return cat ? cat.name : key;
+  return cat ? cat.name.replace(/\s*\([^)]*\)/g, '').trim() : key;
 }
 
 function renderCategoryList() {
@@ -1428,6 +1428,12 @@ function toggleMoreCategories() {
 }
 
 function setupPWAInstall() {
+  const installBtn = document.getElementById('installBtn');
+
+  if (isStandaloneMode()) {
+    installBtn.style.display = 'none';
+  }
+
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
@@ -1435,18 +1441,33 @@ function setupPWAInstall() {
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    document.getElementById('installBtn').style.display = 'inline-block';
+    installBtn.style.display = 'inline-block';
   });
 
   window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
-    document.getElementById('installBtn').style.display = 'none';
+    installBtn.style.display = 'none';
   });
 }
 
 async function installApp() {
+  if (isStandaloneMode()) {
+    alert('App is already installed on this device.');
+    return;
+  }
+
   if (!deferredInstallPrompt) {
-    alert('Install option will appear when your browser allows app install.');
+    if (!window.isSecureContext) {
+      alert('Install only works on HTTPS (or localhost). Open this site with your domain over HTTPS.');
+      return;
+    }
+
+    if (isIOSDevice()) {
+      alert('On iPhone/iPad: tap Share -> Add to Home Screen.');
+      return;
+    }
+
+    alert('Install prompt is not available yet. Use Chrome/Edge and visit the site a few times, then try again.');
     return;
   }
 
@@ -1458,6 +1479,14 @@ async function installApp() {
   }
   deferredInstallPrompt = null;
   document.getElementById('installBtn').style.display = 'none';
+}
+
+function isIOSDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
 
 function launchConfetti() {
@@ -1524,7 +1553,7 @@ function applySavedTheme() {
   document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
 }
 
-function createCategoryImage(icon, nepaliText, colorA, colorB) {
+function createCategoryImage(icon, titleText, colorA, colorB) {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160">
       <defs>
@@ -1533,11 +1562,10 @@ function createCategoryImage(icon, nepaliText, colorA, colorB) {
           <stop offset="100%" stop-color="${colorB}" />
         </linearGradient>
       </defs>
-      <rect width="220" height="160" fill="url(#g)" />
-      <path d="M0,130 C55,110 80,155 132,132 C170,117 191,126 220,116 L220,160 L0,160 Z" fill="rgba(255,255,255,0.18)" />
-      <text x="18" y="52" font-size="34">${icon}</text>
-      <text x="18" y="88" font-size="22" font-family="Noto Sans Devanagari, sans-serif" fill="#ffffff">${nepaliText}</text>
-      <text x="18" y="116" font-size="13" font-family="DM Mono, monospace" fill="rgba(255,255,255,0.9)">Chal Category</text>
+      <rect width="220" height="160" rx="14" fill="url(#g)" />
+      <path d="M0,124 C46,103 84,147 130,126 C170,110 194,121 220,112 L220,160 L0,160 Z" fill="rgba(255,255,255,0.22)" />
+      <text x="18" y="58" font-size="34">${icon}</text>
+      <text x="18" y="98" font-size="18" font-family="DM Mono, monospace" fill="#ffffff">${titleText}</text>
     </svg>
   `.trim();
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
