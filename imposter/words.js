@@ -129,6 +129,102 @@ const categories = {
     ]
   },
 
+  animals: {
+    name: "Animals",
+    words: [
+      { word: "Lion",        hints: ["Mane", "Roar", "Jungle", "King", "Predator"] },
+      { word: "Tiger",       hints: ["Stripes", "Orange", "Big cat", "Hunter", "Forest"] },
+      { word: "Elephant",    hints: ["Trunk", "Tusks", "Huge", "Memory", "Herd"] },
+      { word: "Dolphin",     hints: ["Ocean", "Smart", "Echolocation", "Jump", "Fin"] },
+      { word: "Penguin",     hints: ["Ice", "Waddle", "Bird", "Black and white", "Colony"] },
+      { word: "Kangaroo",    hints: ["Pouch", "Jump", "Australia", "Marsupial", "Tail"] },
+      { word: "Panda",       hints: ["Bamboo", "Black and white", "Bear", "China", "Cute"] },
+      { word: "Owl",         hints: ["Night", "Wise", "Hoot", "Bird", "Silent wings"] },
+      { word: "Crocodile",   hints: ["River", "Teeth", "Reptile", "Swamp", "Predator"] },
+      { word: "Giraffe",     hints: ["Long neck", "Spots", "Savanna", "Tall", "Herbivore"] },
+    ]
+  },
+
+  sports: {
+    name: "Sports",
+    words: [
+      { word: "Football",    hints: ["Goal", "Team", "Ball", "Field", "Kick"] },
+      { word: "Cricket",     hints: ["Bat", "Wicket", "Bowler", "Runs", "Pitch"] },
+      { word: "Basketball",  hints: ["Hoop", "Dribble", "Court", "Dunk", "Team"] },
+      { word: "Tennis",      hints: ["Racket", "Serve", "Net", "Court", "Match"] },
+      { word: "Volleyball",  hints: ["Net", "Spike", "Block", "Court", "Team"] },
+      { word: "Badminton",   hints: ["Shuttlecock", "Racket", "Smash", "Indoor", "Net"] },
+      { word: "Boxing",      hints: ["Ring", "Gloves", "Punch", "Rounds", "Knockout"] },
+      { word: "Swimming",    hints: ["Pool", "Laps", "Freestyle", "Goggles", "Water"] },
+      { word: "Chess",       hints: ["Board", "King", "Checkmate", "Strategy", "Pieces"] },
+      { word: "Table Tennis", hints: ["Paddle", "Spin", "Ping pong", "Fast", "Table"] },
+    ]
+  },
+
+  movies: {
+    name: "Movies & TV",
+    words: [
+      { word: "Titanic",          hints: ["Ship", "Iceberg", "Romance", "Ocean", "Classic"] },
+      { word: "Harry Potter",     hints: ["Wizard", "School", "Magic", "Scar", "Wand"] },
+      { word: "Spider-Man",       hints: ["Hero", "Web", "Mask", "Marvel", "Swing"] },
+      { word: "Avengers",         hints: ["Superheroes", "Team", "Marvel", "Battle", "Infinity"] },
+      { word: "Game of Thrones",  hints: ["Dragons", "Kingdoms", "Winter", "Throne", "Series"] },
+      { word: "Money Heist",      hints: ["Heist", "Masks", "Professor", "Spain", "Series"] },
+      { word: "Frozen",           hints: ["Snow", "Princess", "Sisters", "Disney", "Let it go"] },
+      { word: "Interstellar",     hints: ["Space", "Black hole", "Time", "NASA", "Sci-fi"] },
+      { word: "Breaking Bad",     hints: ["Chemistry", "Teacher", "Crime", "Series", "Blue"] },
+      { word: "Jurassic Park",    hints: ["Dinosaurs", "Island", "Theme park", "Adventure", "Fossils"] },
+    ]
+  },
+
+  technology: {
+    name: "Technology",
+    words: [
+      { word: "Smartphone",   hints: ["Apps", "Touchscreen", "Camera", "Pocket", "Calls"] },
+      { word: "Laptop",       hints: ["Keyboard", "Portable", "Screen", "Work", "Battery"] },
+      { word: "Robot",        hints: ["Automation", "Machine", "AI", "Sensors", "Programmed"] },
+      { word: "Internet",     hints: ["Web", "Network", "Online", "Data", "Connection"] },
+      { word: "Password",     hints: ["Login", "Security", "Secret", "Characters", "Account"] },
+      { word: "Cloud Storage", hints: ["Files", "Online", "Backup", "Drive", "Sync"] },
+      { word: "USB Drive",    hints: ["Portable", "Storage", "Plug", "Data", "Small"] },
+      { word: "Bluetooth",    hints: ["Wireless", "Pairing", "Devices", "Short range", "Connection"] },
+      { word: "Drone",        hints: ["Flying", "Remote", "Camera", "Propellers", "Aerial"] },
+      { word: "3D Printer",   hints: ["Layers", "Plastic", "Model", "Design", "Printing"] },
+    ]
+  },
+
+  travel: {
+    name: "Travel & World",
+    words: [
+      { word: "Airport",       hints: ["Flights", "Terminal", "Runway", "Passport", "Check-in"] },
+      { word: "Passport",      hints: ["Travel", "Identity", "Stamp", "Country", "Visa"] },
+      { word: "Suitcase",      hints: ["Luggage", "Travel", "Pack", "Wheels", "Clothes"] },
+      { word: "Hotel",         hints: ["Room", "Booking", "Stay", "Reception", "Vacation"] },
+      { word: "Beach",         hints: ["Sand", "Waves", "Sea", "Sun", "Vacation"] },
+      { word: "Mountain",      hints: ["Peak", "Climb", "Trail", "High", "Nature"] },
+      { word: "Desert",        hints: ["Sand", "Dry", "Heat", "Dunes", "Camel"] },
+      { word: "Eiffel Tower",  hints: ["Paris", "France", "Landmark", "Iron", "Tourists"] },
+      { word: "Great Wall",    hints: ["China", "Long", "Historic", "Stone", "Defense"] },
+      { word: "Safari",        hints: ["Wildlife", "Jeep", "Savanna", "Adventure", "Animals"] },
+    ]
+  },
+
+  school: {
+    name: "School & Work",
+    words: [
+      { word: "Teacher",      hints: ["Classroom", "Lessons", "Students", "School", "Explain"] },
+      { word: "Exam",         hints: ["Test", "Marks", "Study", "Questions", "Hall"] },
+      { word: "Homework",     hints: ["Assignment", "School", "After class", "Notebook", "Due date"] },
+      { word: "Whiteboard",   hints: ["Marker", "Classroom", "Write", "Erase", "Teaching"] },
+      { word: "Calculator",   hints: ["Numbers", "Math", "Buttons", "Compute", "Device"] },
+      { word: "Presentation", hints: ["Slides", "Speak", "Audience", "Projector", "Meeting"] },
+      { word: "Office",       hints: ["Desk", "Work", "Company", "Meeting", "Laptop"] },
+      { word: "Interview",    hints: ["Job", "Questions", "Hiring", "Candidate", "Resume"] },
+      { word: "Deadline",     hints: ["Time limit", "Submit", "Work", "Pressure", "Date"] },
+      { word: "Notebook",     hints: ["Pages", "Write", "Notes", "Paper", "Class"] },
+    ]
+  },
+
   // ============================================================
   // ADD A NEW CATEGORY BELOW THIS LINE
   // Template:
