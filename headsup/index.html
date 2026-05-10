@@ -411,6 +411,54 @@
     margin-bottom: 12px;
   }
 
+  /* LANDSCAPE MODE */
+  body.landscape-mode {
+    transform: rotate(90deg);
+    transform-origin: center center;
+    width: 100vh;
+    height: 100vw;
+    overflow: hidden;
+  }
+
+  body.landscape-mode .container {
+    width: 100vh;
+    height: 100vw;
+    max-width: none;
+    padding: 20px;
+  }
+
+  /* GESTURE CONTROLS */
+  .gesture-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--text-dim);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .gesture-hint.show {
+    opacity: 1;
+  }
+
+  .gesture-hint.up {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .gesture-hint.down {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
   .btn-correct {
     background: var(--green);
     color: #fff;
@@ -424,21 +472,7 @@
     transition: opacity 0.15s;
   }
 
-  .btn-skip {
-    background: #92400e;
-    color: #fff;
-    border: none;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 3px;
-    padding: 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    opacity: 0.85;
-    transition: opacity 0.15s;
-  }
-
-  .btn-correct:active, .btn-skip:active { opacity: 0.7; }
+  .btn-correct:active { opacity: 0.7; }
 
   /* SCORE TRACKER */
   .score-bar {
@@ -461,8 +495,7 @@
     color: var(--green);
   }
 
-  .score-skips { font-size: 11px; color: var(--text-dim); }
-
+  
   /* ROUND RESULT */
   .round-result {
     text-align: center;
@@ -509,6 +542,15 @@
     font-size: 10px;
     letter-spacing: 2px;
     padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .tag-incorrect {
+    background: rgba(220,53,69,0.1);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    font-size: 10px;
+    padding: 2px 6px;
     border-radius: 2px;
   }
 
@@ -657,7 +699,6 @@
     <div class="score-bar">
       <div>
         <div class="score-player" id="playingName">—</div>
-        <div class="score-skips" id="skipCount">0 skips</div>
       </div>
       <div class="score-num" id="scoreNum">0</div>
     </div>
@@ -678,9 +719,10 @@
       <div class="word-card-word" id="currentWord">—</div>
     </div>
 
+    <div class="gesture-hint" id="gestureHint">Tilt down for correct, up for skip</div>
+    
     <div class="action-row">
       <button class="btn-correct" onclick="markCorrect()">✓ GOT IT</button>
-      <button class="btn-skip" onclick="markSkip()">↷ SKIP</button>
     </div>
 
     <button class="btn-secondary" style="width:100%" onclick="endRoundEarly()">END ROUND</button>
@@ -723,16 +765,17 @@ let state = {
   players: [],
   currentPlayerIdx: 0,
   scores: {},        // { name: correctCount }
-  skips: {},         // { name: skipCount }
   roundTime: 60,
   wordsPerRound: 10,
   selectedDeck: null,
   wordQueue: [],
-  wordLog: [],       // [{ word, result: 'correct'|'skip' }]
+  wordLog: [],       // [{ word, result: 'correct'|'incorrect' }]
   currentScore: 0,
-  currentSkips: 0,
   timerInterval: null,
   timeLeft: 0,
+  isLandscape: false,
+  touchStartY: 0,
+  gestureThreshold: 50,
 };
 
 // ========================
@@ -743,15 +786,16 @@ window.onload = () => {
   renderDecks();
   for (let i = 0; i < 3; i++) addPlayer();
   
-  // Handle browser back button to ensure proper navigation
-  window.addEventListener('popstate', (event) => {
-    // If the user is trying to go back from this game, redirect to hub
-    if (document.referrer.includes('/imposter/') || !document.referrer.includes(window.location.hostname)) {
-      event.preventDefault();
-      window.location.href = '../';
-    }
-  });
-
+  // Load saved theme preference
+  const saved = localStorage.getItem('headsup-theme');
+  if (saved === 'dark') {
+    document.body.classList.add('dark-mode');
+  }
+  
+  // Initialize landscape mode and gesture detection
+  initLandscapeMode();
+  initGestureDetection();
+  
   // Ensure proper navigation history
   history.replaceState({ page: 'headsup' }, '', window.location.href);
 };
@@ -857,17 +901,14 @@ function startRound() {
   state.wordQueue = shuffled.slice(0, Math.min(state.wordsPerRound, shuffled.length));
   state.wordLog = [];
   state.currentScore = 0;
-  state.currentSkips = 0;
   state.timeLeft = state.roundTime;
 
   const name = state.players[state.currentPlayerIdx];
   document.getElementById('playingName').textContent = name;
   document.getElementById('scoreNum').textContent = '0';
-  document.getElementById('skipCount').textContent = '0 skips';
   document.getElementById('deckLabel').textContent = deck.name;
 
   showScreen('screen-play');
-  showNextWord();
   startTimer();
 }
 
@@ -894,17 +935,6 @@ function markCorrect() {
   setTimeout(() => showNextWord(), 300);
 }
 
-function markSkip() {
-  const word = state.wordQueue.shift();
-  state.wordLog.push({ word, result: 'skip' });
-  state.currentSkips++;
-  document.getElementById('skipCount').textContent = `${state.currentSkips} skip${state.currentSkips !== 1 ? 's' : ''}`;
-
-  const card = document.getElementById('wordCard');
-  card.className = 'word-card skip';
-  playTone(260, 150, 'sawtooth');
-  setTimeout(() => showNextWord(), 300);
-}
 
 function endRoundEarly() {
   clearInterval(state.timerInterval);
@@ -945,6 +975,82 @@ function startTimer() {
   state.timerInterval = setInterval(tick, 1000);
 }
 
+function initGestureDetection() {
+  const wordCard = document.getElementById('wordCard');
+  
+  // Touch start
+  wordCard.addEventListener('touchstart', (e) => {
+    state.touchStartY = e.touches[0].clientY;
+  });
+  
+  // Touch end
+  wordCard.addEventListener('touchend', (e) => {
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = state.touchStartY - touchEndY;
+    
+    if (Math.abs(deltaY) > state.gestureThreshold) {
+      if (deltaY > 0) {
+        // Flick up - skip to next word
+        handleFlickUp();
+      } else {
+        // Flick down - mark as correct
+        handleFlickDown();
+      }
+    }
+  });
+  
+  // Mouse events for desktop testing
+  let mouseDown = false;
+  let mouseStartY = 0;
+  
+  wordCard.addEventListener('mousedown', (e) => {
+    mouseDown = true;
+    mouseStartY = e.clientY;
+  });
+  
+  wordCard.addEventListener('mouseup', (e) => {
+    if (mouseDown) {
+      const deltaY = mouseStartY - e.clientY;
+      if (Math.abs(deltaY) > state.gestureThreshold * 2) {
+        if (deltaY > 0) {
+          handleFlickUp();
+        } else {
+          handleFlickDown();
+        }
+      }
+    }
+    mouseDown = false;
+  });
+}
+
+function handleFlickUp() {
+  const hint = document.getElementById('gestureHint');
+  hint.textContent = '↷ Skipped';
+  hint.className = 'gesture-hint show up';
+  
+  // Mark as skip (no scoring, just move to next word)
+  const word = state.wordQueue.shift();
+  state.wordLog.push({ word, result: 'skip' });
+  
+  setTimeout(() => {
+    hint.className = 'gesture-hint';
+    showNextWord();
+  }, 1000);
+}
+
+function handleFlickDown() {
+  const hint = document.getElementById('gestureHint');
+  hint.textContent = '✓ Correct!';
+  hint.className = 'gesture-hint show down';
+  
+  // Mark as correct
+  markCorrect();
+  
+  setTimeout(() => {
+    hint.className = 'gesture-hint';
+  }, 1000);
+}
+
 // ========================
 // ROUND RESULT
 // ========================
@@ -952,11 +1058,10 @@ function endRound() {
   clearInterval(state.timerInterval);
   const name = state.players[state.currentPlayerIdx];
   state.scores[name] += state.currentScore;
-  state.skips[name] += state.currentSkips;
 
   document.getElementById('roundResultTitle').textContent = name;
   document.getElementById('roundResultSub').textContent =
-    `${state.currentScore} correct · ${state.currentSkips} skip${state.currentSkips !== 1 ? 's' : ''}`;
+    `${state.currentScore} correct`;
 
   const log = document.getElementById('wordLog');
   log.innerHTML = '';
@@ -965,18 +1070,18 @@ function endRound() {
     row.className = 'word-log-row';
     row.innerHTML = `
       <span class="word-log-word">${word}</span>
-      <span class="${result === 'correct' ? 'tag-correct' : 'tag-skip'}">${result === 'correct' ? 'CORRECT' : 'SKIP'}</span>
+      <span class="${result === 'correct' ? 'tag-correct' : 'tag-incorrect'}">${result === 'correct' ? 'CORRECT' : 'INCORRECT'}</span>
     `;
     log.appendChild(row);
   });
 
+  launchConfetti();
   // Last player done?
   const isLast = state.currentPlayerIdx >= state.players.length - 1;
   document.getElementById('nextRoundBtn').textContent = isLast ? 'SEE FINAL SCORES' : 'NEXT PLAYER';
   document.getElementById('nextRoundBtn').onclick = isLast ? showFinalScores : nextRound;
 
   showScreen('screen-round-result');
-  launchConfetti();
 }
 
 function nextRound() {
