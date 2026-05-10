@@ -271,7 +271,7 @@
 <body>
 <div class="container">
   <div class="top-controls">
-    <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
+    <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark/light mode">Dark Mode</button>
   </div>
 
   <header>
@@ -286,8 +286,8 @@
   <div class="game-grid">
 
     <!-- IMPOSTER -->
-    <a class="game-card" href="imposter/">
-      <div class="game-card-banner chhal">🕵️</div>
+    <a class="game-card" href="imposter/" aria-label="Chhal game - Find the imposter among innocents">
+      <div class="game-card-banner chhal" role="img" aria-label="Spy emoji representing imposter game">🕵️</div>
       <div class="game-card-body">
         <div class="game-card-title">CHHAL</div>
         <div class="game-card-desc">Find the imposter hiding among the innocents. One word, one traitor.</div>
@@ -296,8 +296,8 @@
     </a>
 
     <!-- HEADS UP -->
-    <a class="game-card" href="headsup/">
-      <div class="game-card-banner headsup">🙌</div>
+    <a class="game-card" href="headsup/" aria-label="Heads Up game - Guess words on forehead">
+      <div class="game-card-banner headsup" role="img" aria-label="Hands up emoji representing heads up game">🙌</div>
       <div class="game-card-body">
         <div class="game-card-title">HEADS UP</div>
         <div class="game-card-desc">Hold your phone to your forehead. Guess the word before the timer runs out.</div>
@@ -306,8 +306,8 @@
     </a>
 
     <!-- COMING SOON 1 -->
-    <div class="game-card" style="cursor:default;">
-      <div class="game-card-banner coming">🃏</div>
+    <div class="game-card" style="cursor:default;" aria-label="Coming soon game">
+      <div class="game-card-banner coming" role="img" aria-label="Card emoji representing upcoming game">🃏</div>
       <div class="coming-soon-overlay"><div class="coming-soon-badge">Coming Soon</div></div>
       <div class="game-card-body">
         <div class="game-card-title">???</div>
@@ -317,8 +317,8 @@
     </div>
 
     <!-- COMING SOON 2 -->
-    <div class="game-card" style="cursor:default;">
-      <div class="game-card-banner coming">🎯</div>
+    <div class="game-card" style="cursor:default;" aria-label="Coming soon game">
+      <div class="game-card-banner coming" role="img" aria-label="Target emoji representing upcoming game">🎯</div>
       <div class="coming-soon-overlay"><div class="coming-soon-badge">Coming Soon</div></div>
       <div class="game-card-body">
         <div class="game-card-title">???</div>
@@ -336,18 +336,27 @@
 function toggleTheme() {
   document.body.classList.toggle('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
-  localStorage.setItem('chal-theme', isDark ? 'dark' : 'light');
+  localStorage.setItem('chhal-theme', isDark ? 'dark' : 'light');
   document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
 }
 
 function applySavedTheme() {
-  const theme = localStorage.getItem('chal-theme');
+  const theme = localStorage.getItem('chhal-theme');
   if (theme === 'dark') document.body.classList.add('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
   document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
 }
 
 applySavedTheme();
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => console.log('SW registered: ', registration))
+      .catch(registrationError => console.log('SW registration failed: ', registrationError));
+  });
+}
 </script>
 </body>
 </html>

@@ -2,11 +2,16 @@ const CACHE_NAME = 'chhal-cache-v2';
 const URLS_TO_CACHE = [
   './',
   './index.html',
-  './words.js',
   './manifest.json',
   './icons/icon-180.png',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './imposter/',
+  './imposter/index.html',
+  './imposter/words.js',
+  './headsup/',
+  './headsup/index.html',
+  './headsup/headsup-words.js'
 ];
 
 self.addEventListener('install', (event) => {
