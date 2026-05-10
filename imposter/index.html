@@ -1454,8 +1454,23 @@ function setupPWAInstall() {
   }
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('../sw.js')
+        .then(registration => console.log('SW registered: ', registration))
+        .catch(registrationError => console.log('SW registration failed: ', registrationError));
+    });
   }
+
+  window.addEventListener('popstate', (event) => {
+    if (document.referrer.includes('/headsup/') || !document.referrer.includes(window.location.hostname)) {
+      event.preventDefault();
+      window.location.href = '../';
+    }
+  });
+
+  window.addEventListener('load', () => {
+    history.replaceState({ page: 'imposter' }, '', window.location.href);
+  });
 
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();

@@ -742,6 +742,18 @@ window.onload = () => {
   applySavedTheme();
   renderDecks();
   for (let i = 0; i < 3; i++) addPlayer();
+  
+  // Handle browser back button to ensure proper navigation
+  window.addEventListener('popstate', (event) => {
+    // If the user is trying to go back from this game, redirect to hub
+    if (document.referrer.includes('/imposter/') || !document.referrer.includes(window.location.hostname)) {
+      event.preventDefault();
+      window.location.href = '../';
+    }
+  });
+
+  // Ensure proper navigation history
+  history.replaceState({ page: 'headsup' }, '', window.location.href);
 };
 
 // ========================
