@@ -1,39 +1,1077 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Heads Up</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: #f3f4f6;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      text-align: center;
-    }
-    .card {
-      max-width: 640px;
-      border: 1px solid #374151;
-      border-radius: 12px;
-      padding: 24px;
-      background: #1f2937;
-    }
-    a {
-      color: #93c5fd;
-      text-decoration: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heads Up — Nepali Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Nepali:ital@0;1&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f5ef;
+    --surface: #ffffff;
+    --card: #fffaf4;
+    --border: #e4d7c9;
+    --accent: #0a3a8f;
+    --accent-dim: #8d7a66;
+    --red: #c62828;
+    --red-light: #d44637;
+    --green: #2e7d50;
+    --text: #2f2418;
+    --text-dim: #7f6a57;
+    --shadow: 0 6px 24px rgba(59,32,9,0.12);
+  }
+
+  body.dark-mode {
+    --bg: #151515;
+    --surface: #212121;
+    --card: #292929;
+    --border: #3c3c3c;
+    --accent: #f3f3f3;
+    --accent-dim: #b9b9b9;
+    --text: #f4f4f4;
+    --text-dim: #b5b5b5;
+    --shadow: 0 6px 28px rgba(0,0,0,0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(0,0,0,0.02) 60px, rgba(0,0,0,0.02) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,0,0,0.02) 60px, rgba(0,0,0,0.02) 61px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 20px 60px;
+    min-height: 100vh;
+  }
+
+  .top-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .back-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .toggle-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+
+  header {
+    text-align: center;
+    padding: 30px 0 24px;
+  }
+
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 10px;
+  }
+
+  .header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 11vw, 88px);
+    letter-spacing: 6px;
+    color: var(--red);
+    line-height: 0.9;
+  }
+
+  .header-sub {
+    font-family: 'Tiro Devanagari Nepali', serif;
+    font-size: 16px;
+    color: var(--accent-dim);
+    margin-top: 8px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 16px auto 0;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .section-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #003893, #dc143c);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  select, input[type="number"] {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    padding: 14px 16px;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888884' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  select:focus, input:focus { border-color: var(--accent); }
+
+  .field-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+  .setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 500px) { .setup-grid { grid-template-columns: 1fr; } }
+
+  /* DECK GRID */
+  .deck-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .deck-item {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.15s, transform 0.15s;
+    background: var(--card);
+    text-align: center;
+    padding: 16px 10px 12px;
+  }
+
+  .deck-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .deck-item.selected { border-color: var(--red); box-shadow: 0 0 0 2px rgba(198,40,40,0.15); }
+
+  .deck-icon { font-size: 32px; margin-bottom: 8px; }
+  .deck-name {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: #111111;
+    color: #fff;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    padding: 18px 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+  }
+
+  body.dark-mode .btn-primary { background: var(--red); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover { border-color: var(--accent-dim); color: var(--text); }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+
+  /* PLAYER PASS CARD */
+  .pass-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 48px 32px;
+    text-align: center;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .pass-icon { font-size: 48px; margin-bottom: 16px; }
+
+  .pass-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .pass-instruction { color: var(--text-dim); font-size: 13px; letter-spacing: 1px; }
+
+  /* GAMEPLAY — tilt phone card */
+  .gameplay-wrap {
+    margin-bottom: 20px;
+  }
+
+  .tilt-instruction {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .tilt-icon { font-size: 40px; margin-bottom: 8px; }
+
+  .tilt-text {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* THE WORD CARD — rotated for phone on forehead */
+  .word-card {
+    background: var(--accent);
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: background 0.3s;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 16px;
+  }
+
+  .word-card.correct { background: var(--green); }
+  .word-card.skip { background: #b45309; }
+
+  .word-card-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 16px;
+  }
+
+  .word-card-word {
+    font-family: 'Tiro Devanagari Nepali', serif;
+    font-size: clamp(28px, 8vw, 52px);
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .word-card-hint {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-style: italic;
+    letter-spacing: 1px;
+  }
+
+  /* TIMER ARC */
+  .timer-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .timer-svg { transform: rotate(-90deg); }
+
+  .timer-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+  .timer-arc { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.3s; }
+
+  .timer-text-wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--text);
+    letter-spacing: 2px;
+  }
+
+  .timer-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+
+  /* ACTION BUTTONS during play */
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .btn-correct {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn-skip {
+    background: #92400e;
+    color: #fff;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+  }
+
+  .btn-correct:active, .btn-skip:active { opacity: 0.7; }
+
+  /* SCORE TRACKER */
+  .score-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .score-player { font-size: 13px; color: var(--text-dim); }
+  .score-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    color: var(--green);
+  }
+
+  .score-skips { font-size: 11px; color: var(--text-dim); }
+
+  /* ROUND RESULT */
+  .round-result {
+    text-align: center;
+    padding: 32px 20px;
+  }
+
+  .round-result-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 9vw, 64px);
+    letter-spacing: 4px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .word-log {
+    margin: 20px 0;
+  }
+
+  .word-log-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .word-log-word { color: var(--text); flex: 1; }
+
+  .tag-correct {
+    background: rgba(46,125,80,0.1);
+    color: var(--green);
+    border: 1px solid var(--green);
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .tag-skip {
+    background: rgba(180,83,9,0.1);
+    color: #b45309;
+    border: 1px solid #b45309;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  /* FINAL SCORES */
+  .leaderboard {
+    margin: 16px 0;
+  }
+
+  .leaderboard-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lb-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--accent-dim);
+    width: 28px;
+  }
+
+  .lb-name { flex: 1; font-size: 15px; }
+
+  .lb-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--green);
+    letter-spacing: 2px;
+  }
+
+  .lb-crown { font-size: 20px; }
+
+  /* Progress */
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 2px;
+    height: 3px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-text {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  /* ANIM */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .anim-fade { animation: fadeIn 0.35s ease forwards; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+
+  .anim-pulse { animation: pulse 0.3s ease; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>Heads Up</h1>
-    <p>This folder is ready. Add your Heads Up game here.</p>
-    <p><a href="../index.html">Back to Game Hub</a></p>
+<div class="container">
+  <div class="top-controls">
+    <a href="../" class="back-btn">← Games</a>
+    <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
   </div>
+
+  <header>
+    <div class="header-eyebrow">Party Game</div>
+    <div class="header-title">HEADS UP</div>
+    <div class="header-sub">माथि राख्नुस्</div>
+    <div class="header-line"></div>
+  </header>
+
+  <!-- ===== SETUP ===== -->
+  <div id="screen-setup" class="screen active anim-fade">
+    <div class="section-card">
+      <div class="section-title">Settings</div>
+      <div class="setup-grid">
+        <div class="field-group">
+          <label>Round Time</label>
+          <select id="roundTime">
+            <option value="30">30 seconds</option>
+            <option value="60" selected>60 seconds</option>
+            <option value="90">90 seconds</option>
+            <option value="120">2 minutes</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Words per Round</label>
+          <select id="wordsPerRound">
+            <option value="5">5 words</option>
+            <option value="10" selected>10 words</option>
+            <option value="15">15 words</option>
+            <option value="999">Unlimited</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">Choose a Deck</div>
+      <div class="deck-grid" id="deckGrid"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">Players</div>
+      <div class="player-list" id="playerList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;"></div>
+      <button class="btn-secondary" style="width:100%" onclick="addPlayer()">+ Add Player</button>
+    </div>
+
+    <button class="btn-primary" onclick="startGame()" style="margin-bottom:40px">START GAME</button>
+  </div>
+
+  <!-- ===== PASS DEVICE ===== -->
+  <div id="screen-pass" class="screen">
+    <div class="pass-card anim-fade">
+      <div class="pass-icon">📱</div>
+      <div class="pass-name" id="passName">—</div>
+      <div class="pass-instruction">Hold the phone to your forehead<br>and press Ready when set</div>
+    </div>
+    <div class="progress-text" id="passProgress"></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="passProgressBar"></div></div>
+    <button class="btn-primary" onclick="startRound()">READY</button>
+  </div>
+
+  <!-- ===== GAMEPLAY ===== -->
+  <div id="screen-play" class="screen">
+    <div class="score-bar">
+      <div>
+        <div class="score-player" id="playingName">—</div>
+        <div class="score-skips" id="skipCount">0 skips</div>
+      </div>
+      <div class="score-num" id="scoreNum">0</div>
+    </div>
+
+    <div class="timer-wrap">
+      <div class="timer-container">
+        <svg class="timer-svg" width="80" height="80" viewBox="0 0 80 80">
+          <circle class="timer-bg" cx="40" cy="40" r="34"/>
+          <circle class="timer-arc" id="timerArc" cx="40" cy="40" r="34"
+            stroke-dasharray="213.6" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-text-wrap" id="timerText">—</div>
+      </div>
+    </div>
+
+    <div class="word-card" id="wordCard">
+      <div class="word-card-label" id="deckLabel">—</div>
+      <div class="word-card-word" id="currentWord">—</div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-correct" onclick="markCorrect()">✓ GOT IT</button>
+      <button class="btn-skip" onclick="markSkip()">↷ SKIP</button>
+    </div>
+
+    <button class="btn-secondary" style="width:100%" onclick="endRoundEarly()">END ROUND</button>
+  </div>
+
+  <!-- ===== ROUND RESULT ===== -->
+  <div id="screen-round-result" class="screen">
+    <div class="section-card anim-fade">
+      <div class="round-result">
+        <div class="round-result-title" id="roundResultTitle">—</div>
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:20px" id="roundResultSub">—</div>
+        <div class="word-log" id="wordLog"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" style="max-width:240px" id="nextRoundBtn" onclick="nextRound()">NEXT PLAYER</button>
+      <button class="btn-secondary" onclick="showFinalScores()">SEE SCORES</button>
+    </div>
+  </div>
+
+  <!-- ===== FINAL SCORES ===== -->
+  <div id="screen-final" class="screen">
+    <div class="section-card anim-fade">
+      <div class="section-title">Final Scores</div>
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" style="max-width:240px" onclick="playAgain()">PLAY AGAIN</button>
+      <button class="btn-secondary" onclick="resetAll()">CHANGE PLAYERS</button>
+    </div>
+  </div>
+</div>
+
+<script src="headsup-words.js"></script>
+<script>
+// ========================
+// STATE
+// ========================
+let state = {
+  players: [],
+  currentPlayerIdx: 0,
+  scores: {},        // { name: correctCount }
+  skips: {},         // { name: skipCount }
+  roundTime: 60,
+  wordsPerRound: 10,
+  selectedDeck: null,
+  wordQueue: [],
+  wordLog: [],       // [{ word, result: 'correct'|'skip' }]
+  currentScore: 0,
+  currentSkips: 0,
+  timerInterval: null,
+  timeLeft: 0,
+};
+
+// ========================
+// INIT
+// ========================
+window.onload = () => {
+  applySavedTheme();
+  renderDecks();
+  for (let i = 0; i < 3; i++) addPlayer();
+};
+
+// ========================
+// DECKS
+// ========================
+function renderDecks() {
+  const grid = document.getElementById('deckGrid');
+  grid.innerHTML = '';
+  Object.keys(headsupDecks).forEach(key => {
+    const deck = headsupDecks[key];
+    const item = document.createElement('div');
+    item.className = `deck-item${state.selectedDeck === key ? ' selected' : ''}`;
+    item.innerHTML = `
+      <div class="deck-icon">${deck.icon}</div>
+      <div class="deck-name">${deck.name}</div>
+    `;
+    item.onclick = () => {
+      state.selectedDeck = key;
+      renderDecks();
+    };
+    grid.appendChild(item);
+  });
+}
+
+// ========================
+// PLAYERS
+// ========================
+function addPlayer() {
+  const list = document.getElementById('playerList');
+  const idx = list.children.length + 1;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:10px;';
+  row.innerHTML = `
+    <span style="font-size:11px;color:var(--accent-dim);width:24px;text-align:right">${idx}</span>
+    <input type="text" placeholder="Player ${idx}" maxlength="20"
+      style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:14px;padding:10px 14px;border-radius:4px;outline:none;" />
+    <button onclick="removePlayer(this)"
+      style="background:none;border:1px solid var(--border);color:var(--text-dim);width:32px;height:32px;border-radius:4px;cursor:pointer;font-size:14px;">✕</button>
+  `;
+  list.appendChild(row);
+  updatePlayerNumbers();
+}
+
+function removePlayer(btn) {
+  const list = document.getElementById('playerList');
+  if (list.children.length <= 2) { alert('Need at least 2 players!'); return; }
+  btn.parentElement.remove();
+  updatePlayerNumbers();
+}
+
+function updatePlayerNumbers() {
+  const rows = document.querySelectorAll('#playerList > div');
+  rows.forEach((row, i) => {
+    row.querySelector('span').textContent = i + 1;
+    const inp = row.querySelector('input');
+    if (!inp.value) inp.placeholder = `Player ${i + 1}`;
+  });
+}
+
+// ========================
+// START GAME
+// ========================
+function startGame() {
+  if (!state.selectedDeck) { alert('Please choose a deck first!'); return; }
+
+  const inputs = document.querySelectorAll('#playerList input');
+  const names = [];
+  inputs.forEach((inp, i) => names.push(inp.value.trim() || `Player ${i + 1}`));
+  if (names.length < 2) { alert('Need at least 2 players!'); return; }
+
+  state.players = names;
+  state.currentPlayerIdx = 0;
+  state.roundTime = parseInt(document.getElementById('roundTime').value);
+  state.wordsPerRound = parseInt(document.getElementById('wordsPerRound').value);
+  state.scores = {};
+  state.skips = {};
+  names.forEach(n => { state.scores[n] = 0; state.skips[n] = 0; });
+
+  showPassScreen();
+}
+
+function showPassScreen() {
+  const name = state.players[state.currentPlayerIdx];
+  const total = state.players.length;
+  const idx = state.currentPlayerIdx;
+
+  document.getElementById('passName').textContent = name;
+  document.getElementById('passProgress').textContent = `Player ${idx + 1} of ${total}`;
+  document.getElementById('passProgressBar').style.width = `${((idx + 1) / total) * 100}%`;
+
+  showScreen('screen-pass');
+}
+
+// ========================
+// ROUND
+// ========================
+function startRound() {
+  const deck = headsupDecks[state.selectedDeck];
+  // Shuffle deck words
+  const shuffled = [...deck.words].sort(() => Math.random() - 0.5);
+  state.wordQueue = shuffled.slice(0, Math.min(state.wordsPerRound, shuffled.length));
+  state.wordLog = [];
+  state.currentScore = 0;
+  state.currentSkips = 0;
+  state.timeLeft = state.roundTime;
+
+  const name = state.players[state.currentPlayerIdx];
+  document.getElementById('playingName').textContent = name;
+  document.getElementById('scoreNum').textContent = '0';
+  document.getElementById('skipCount').textContent = '0 skips';
+  document.getElementById('deckLabel').textContent = deck.name;
+
+  showScreen('screen-play');
+  showNextWord();
+  startTimer();
+}
+
+function showNextWord() {
+  if (state.wordQueue.length === 0) {
+    endRound();
+    return;
+  }
+  const word = state.wordQueue[0];
+  const card = document.getElementById('wordCard');
+  card.className = 'word-card';
+  document.getElementById('currentWord').textContent = word;
+}
+
+function markCorrect() {
+  const word = state.wordQueue.shift();
+  state.wordLog.push({ word, result: 'correct' });
+  state.currentScore++;
+  document.getElementById('scoreNum').textContent = state.currentScore;
+
+  const card = document.getElementById('wordCard');
+  card.className = 'word-card correct';
+  playTone(880, 120, 'sine');
+  setTimeout(() => showNextWord(), 300);
+}
+
+function markSkip() {
+  const word = state.wordQueue.shift();
+  state.wordLog.push({ word, result: 'skip' });
+  state.currentSkips++;
+  document.getElementById('skipCount').textContent = `${state.currentSkips} skip${state.currentSkips !== 1 ? 's' : ''}`;
+
+  const card = document.getElementById('wordCard');
+  card.className = 'word-card skip';
+  playTone(260, 150, 'sawtooth');
+  setTimeout(() => showNextWord(), 300);
+}
+
+function endRoundEarly() {
+  clearInterval(state.timerInterval);
+  endRound();
+}
+
+// ========================
+// TIMER
+// ========================
+function startTimer() {
+  const arc = document.getElementById('timerArc');
+  const circumference = 213.6;
+
+  function tick() {
+    document.getElementById('timerText').textContent = state.timeLeft;
+    const progress = state.timeLeft / state.roundTime;
+    arc.style.strokeDashoffset = circumference * (1 - progress);
+
+    // Color change as time runs out
+    if (state.timeLeft <= 10) {
+      arc.style.stroke = '#c62828';
+    } else if (state.timeLeft <= 20) {
+      arc.style.stroke = '#b45309';
+    } else {
+      arc.style.stroke = 'var(--accent)';
+    }
+
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      playTone(300, 400, 'sawtooth');
+      endRound();
+      return;
+    }
+    state.timeLeft--;
+  }
+
+  tick();
+  state.timerInterval = setInterval(tick, 1000);
+}
+
+// ========================
+// ROUND RESULT
+// ========================
+function endRound() {
+  clearInterval(state.timerInterval);
+  const name = state.players[state.currentPlayerIdx];
+  state.scores[name] += state.currentScore;
+  state.skips[name] += state.currentSkips;
+
+  document.getElementById('roundResultTitle').textContent = name;
+  document.getElementById('roundResultSub').textContent =
+    `${state.currentScore} correct · ${state.currentSkips} skip${state.currentSkips !== 1 ? 's' : ''}`;
+
+  const log = document.getElementById('wordLog');
+  log.innerHTML = '';
+  state.wordLog.forEach(({ word, result }) => {
+    const row = document.createElement('div');
+    row.className = 'word-log-row';
+    row.innerHTML = `
+      <span class="word-log-word">${word}</span>
+      <span class="${result === 'correct' ? 'tag-correct' : 'tag-skip'}">${result === 'correct' ? 'CORRECT' : 'SKIP'}</span>
+    `;
+    log.appendChild(row);
+  });
+
+  // Last player done?
+  const isLast = state.currentPlayerIdx >= state.players.length - 1;
+  document.getElementById('nextRoundBtn').textContent = isLast ? 'SEE FINAL SCORES' : 'NEXT PLAYER';
+  document.getElementById('nextRoundBtn').onclick = isLast ? showFinalScores : nextRound;
+
+  showScreen('screen-round-result');
+  launchConfetti();
+}
+
+function nextRound() {
+  state.currentPlayerIdx++;
+  if (state.currentPlayerIdx >= state.players.length) {
+    showFinalScores();
+    return;
+  }
+  showPassScreen();
+}
+
+// ========================
+// FINAL SCORES
+// ========================
+function showFinalScores() {
+  const sorted = [...state.players].sort((a, b) => state.scores[b] - state.scores[a]);
+  const lb = document.getElementById('leaderboard');
+  lb.innerHTML = '';
+
+  sorted.forEach((name, i) => {
+    const row = document.createElement('div');
+    row.className = 'leaderboard-row';
+    row.innerHTML = `
+      <div class="lb-rank">${i + 1}</div>
+      <div class="lb-name">${name}</div>
+      ${i === 0 ? '<div class="lb-crown">👑</div>' : ''}
+      <div class="lb-score">${state.scores[name]}</div>
+    `;
+    lb.appendChild(row);
+  });
+
+  showScreen('screen-final');
+}
+
+function playAgain() {
+  state.currentPlayerIdx = 0;
+  state.scores = {};
+  state.skips = {};
+  state.players.forEach(n => { state.scores[n] = 0; state.skips[n] = 0; });
+  showPassScreen();
+}
+
+function resetAll() {
+  clearInterval(state.timerInterval);
+  showScreen('screen-setup');
+}
+
+// ========================
+// UTILS
+// ========================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function launchConfetti() {
+  const layer = document.createElement('div');
+  layer.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;';
+  const colors = ['#38a169','#c62828','#f6c453','#4f9cf9','#b086f9','#ffffff'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    const size = 6 + Math.random() * 8;
+    p.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};
+      left:${Math.random()*100}%;top:-10px;border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation:fall ${1.2+Math.random()*1.3}s ${Math.random()*0.3}s ease-in forwards;`;
+    layer.appendChild(p);
+  }
+  const style = document.createElement('style');
+  style.textContent = `@keyframes fall { to { transform: translateY(110vh) rotate(${Math.random()*720}deg); opacity:0; } }`;
+  layer.appendChild(style);
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 2800);
+}
+
+let audioCtx = null;
+function playTone(freq, durationMs, wave) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = wave || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = 0.001;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + durationMs / 1000);
+    osc.start(now);
+    osc.stop(now + durationMs / 1000);
+  } catch(e) {}
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('chal-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+}
+
+function applySavedTheme() {
+  const theme = localStorage.getItem('chal-theme');
+  if (theme === 'dark') document.body.classList.add('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+}
+</script>
 </body>
 </html>
