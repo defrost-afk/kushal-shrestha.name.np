@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chhal — Nepali Edition</title>
-<link rel="manifest" href="../manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#c62828">
-<link rel="apple-touch-icon" sizes="180x180" href="../icons/icon-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Nepali:ital@0;1&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -74,17 +73,28 @@
     min-height: 100vh;
   }
 
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
   .top-controls {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: 8px;
     margin-bottom: 8px;
     flex-wrap: wrap;
+  }
+
+  .back-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
   }
 
   .toggle-btn {
@@ -826,36 +836,6 @@
   }
 
   @media (max-width: 640px) {
-    .container {
-      padding: 14px 12px 40px;
-    }
-
-    header {
-      padding: 28px 0 22px;
-    }
-
-    .section-card {
-      padding: 18px;
-      margin-bottom: 14px;
-      border-radius: 7px;
-    }
-
-    .vote-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .btn-row {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .btn-row .btn-primary,
-    .btn-row .btn-secondary {
-      max-width: none !important;
-      width: 100%;
-    }
-
     .btn-primary, .btn-secondary, .btn-danger, .vote-btn, .btn-add-player {
       min-height: 52px;
       font-size: 14px;
@@ -876,8 +856,11 @@
 <body>
 <div class="container">
   <div class="top-controls">
-    <button class="install-btn" id="installBtn" type="button" onclick="installApp()">Install App</button>
-    <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
+    <a href="../" class="back-btn">← Games</a>
+    <div style="display:flex;gap:8px;">
+      <button class="install-btn" id="installBtn" type="button" onclick="installApp()">Install App</button>
+      <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
+    </div>
   </div>
   <div class="landscape-warning" id="landscapeWarning">Best experience is in portrait mode on mobile.</div>
   <header>
@@ -897,23 +880,6 @@
           <select id="imposterCount">
             <option value="1">1 Imposter</option>
             <option value="2">2 Imposters</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <label>Difficulty</label>
-          <select id="difficultyMode">
-            <option value="any">Any</option>
-            <option value="easy">Easy</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <label>Language Mode</label>
-          <select id="languageMode">
-            <option value="mixed" selected>Mixed</option>
-            <option value="english">English Only</option>
-            <option value="nepali">Nepali Only</option>
           </select>
         </div>
       </div>
@@ -1025,11 +991,9 @@
   </div>
 </div>
 
-<script src="./words.js"></script>
+<script src="words.js"></script>
 <script>
 // categories is loaded from words.js
-
-const $ = (id) => document.getElementById(id);
 
 const categoryMedia = {
   random: { icon: "🎲", label: "Random category each round", image: createCategoryImage("🎲", "RANDOM", "#355C7D", "#6C5B7B") },
@@ -1041,13 +1005,7 @@ const categoryMedia = {
   music: { icon: "🥁", label: "Music and dance culture", image: createCategoryImage("🥁", "MUSIC", "#8C2F39", "#F08A4B") },
   deities: { icon: "🕉️", label: "Deities and mythology", image: createCategoryImage("🕉️", "DEITIES", "#3C2A78", "#7E57C2") },
   crafts: { icon: "🎨", label: "Arts and handmade crafts", image: createCategoryImage("🎨", "CRAFTS", "#005B7F", "#23A6D5") },
-  customs: { icon: "🙏", label: "Customs and rituals", image: createCategoryImage("🙏", "CUSTOMS", "#9A3412", "#EA580C") },
-  animals: { icon: "🦁", label: "Wildlife and animal words", image: createCategoryImage("🦁", "ANIMALS", "#0E7490", "#22D3EE") },
-  sports: { icon: "⚽", label: "Sports and games", image: createCategoryImage("⚽", "SPORTS", "#166534", "#4ADE80") },
-  movies: { icon: "🎬", label: "Movies and TV shows", image: createCategoryImage("🎬", "MOVIES", "#6D28D9", "#A78BFA") },
-  technology: { icon: "💻", label: "Tech and gadgets", image: createCategoryImage("💻", "TECH", "#1D4ED8", "#60A5FA") },
-  travel: { icon: "✈️", label: "Travel and world places", image: createCategoryImage("✈️", "TRAVEL", "#BE185D", "#F472B6") },
-  school: { icon: "📚", label: "School and work life", image: createCategoryImage("📚", "SCHOOL", "#B45309", "#F59E0B") }
+  customs: { icon: "🙏", label: "Customs and rituals", image: createCategoryImage("🙏", "CUSTOMS", "#9A3412", "#EA580C") }
 };
 
 // ========================
@@ -1056,8 +1014,6 @@ const categoryMedia = {
 let state = {
   players: [],
   imposterCount: 1,
-  difficultyMode: 'medium',
-  languageMode: 'mixed',
   category: null,
   word: null,
   hint: null,
@@ -1086,7 +1042,7 @@ window.onload = () => {
 };
 
 function addPlayer() {
-  const list = $('playerList');
+  const list = document.getElementById('playerList');
   const row = document.createElement('div');
   row.className = 'player-row';
   row.innerHTML = `
@@ -1098,7 +1054,7 @@ function addPlayer() {
 }
 
 function removePlayer(btn) {
-  const list = $('playerList');
+  const list = document.getElementById('playerList');
   if (list.children.length <= 3) { alert("Need at least 3 players!"); return; }
   btn.parentElement.remove();
   updatePlayerNumbers();
@@ -1127,9 +1083,7 @@ function startGame() {
   if (names.length !== inputs.length) { alert("Please type all player names."); return; }
   if (new Set(names.map(n => n.toLowerCase())).size !== names.length) { alert("Player names must be unique."); return; }
 
-  state.imposterCount = parseInt($('imposterCount').value);
-  state.difficultyMode = $('difficultyMode').value;
-  state.languageMode = $('languageMode').value;
+  state.imposterCount = parseInt(document.getElementById('imposterCount').value);
   if (state.imposterCount >= names.length - 1) {
     alert("Too many imposters for this group size!"); return;
   }
@@ -1138,7 +1092,7 @@ function startGame() {
   if (!pickWordForRound()) return;
 
   // Assign roles
-  const shuffled = shuffle([...names]);
+  const shuffled = [...names].sort(() => Math.random() - 0.5);
   const imposters = shuffled.slice(0, state.imposterCount);
   state.roles = names.map(name => ({
     name,
@@ -1151,7 +1105,7 @@ function startGame() {
   names.forEach(n => state.votes[n] = 0);
 
   showScreen('screen-pass');
-  $('passName').textContent = getCurrentRevealOrder()[0];
+  document.getElementById('passName').textContent = getCurrentRevealOrder()[0];
 }
 
 // ========================
@@ -1164,23 +1118,23 @@ function showReveal() {
   const player = state.roles.find((r) => r.name === playerName);
   const total = state.players.length;
 
-  $('progressText').textContent = `Player ${idx + 1} of ${total}`;
-  $('progressBar').style.width = `${((idx + 1) / total) * 100}%`;
+  document.getElementById('progressText').textContent = `Player ${idx + 1} of ${total}`;
+  document.getElementById('progressBar').style.width = `${((idx + 1) / total) * 100}%`;
 
   // Reset overlay and content visibility
-  $('tapOverlay').classList.remove('hidden');
-  $('btnNext').style.display = 'none';
-  $('roleBadge').style.visibility = 'hidden';
-  $('revealCategory').style.visibility = 'hidden';
-  $('revealWord').style.visibility = 'hidden';
-  $('hintLabel').style.display = 'none';
+  document.getElementById('tapOverlay').classList.remove('hidden');
+  document.getElementById('btnNext').style.display = 'none';
+  document.getElementById('roleBadge').style.visibility = 'hidden';
+  document.getElementById('revealCategory').style.visibility = 'hidden';
+  document.getElementById('revealWord').style.visibility = 'hidden';
+  document.getElementById('hintLabel').style.display = 'none';
 
   // Set card content (hidden behind overlay)
-  const card = $('revealCard');
-  const badge = $('roleBadge');
-  const wordEl = $('revealWord');
-  const hintLabel = $('hintLabel');
-  const catChip = $('revealCategory');
+  const card = document.getElementById('revealCard');
+  const badge = document.getElementById('roleBadge');
+  const wordEl = document.getElementById('revealWord');
+  const hintLabel = document.getElementById('hintLabel');
+  const catChip = document.getElementById('revealCategory');
 
   card.className = 'reveal-card';
   catChip.textContent = state.categoryName;
@@ -1200,26 +1154,26 @@ function showReveal() {
 
 function revealRole() {
   playSound('reveal');
-  const card = $('revealCard');
+  const card = document.getElementById('revealCard');
   card.classList.add(card.getAttribute('data-role-class'));
-  $('tapOverlay').classList.add('hidden');
-  $('roleBadge').style.visibility = 'visible';
-  $('revealCategory').style.visibility = 'visible';
-  $('revealWord').style.visibility = 'visible';
-  if ($('hintLabel').getAttribute('data-show') === 'true') {
-    $('hintLabel').style.display = 'block';
+  document.getElementById('tapOverlay').classList.add('hidden');
+  document.getElementById('roleBadge').style.visibility = 'visible';
+  document.getElementById('revealCategory').style.visibility = 'visible';
+  document.getElementById('revealWord').style.visibility = 'visible';
+  if (document.getElementById('hintLabel').getAttribute('data-show') === 'true') {
+    document.getElementById('hintLabel').style.display = 'block';
     playSound('imposter');
   } else {
     playSound('innocent');
   }
-  $('btnNext').style.display = 'block';
+  document.getElementById('btnNext').style.display = 'block';
 
   const idx = state.currentPlayerIdx;
   const total = state.players.length;
   if (idx === total - 1) {
-    $('btnNext').textContent = 'ALL DONE — START DISCUSSION';
+    document.getElementById('btnNext').textContent = 'ALL DONE — START DISCUSSION';
   } else {
-    $('btnNext').textContent = 'DONE — PASS TO NEXT PLAYER';
+    document.getElementById('btnNext').textContent = 'DONE — PASS TO NEXT PLAYER';
   }
 }
 
@@ -1230,7 +1184,7 @@ function nextPlayer() {
     return;
   }
   showScreen('screen-pass');
-  $('passName').textContent = getCurrentRevealOrder()[state.currentPlayerIdx];
+  document.getElementById('passName').textContent = getCurrentRevealOrder()[state.currentPlayerIdx];
 }
 
 // ========================
@@ -1241,7 +1195,7 @@ function goToVoting() {
   state.currentVoterIdx = 0;
   state.votes = {};
   state.players.forEach(n => state.votes[n] = 0);
-  $('voteTally').style.display = 'none';
+  document.getElementById('voteTally').style.display = 'none';
   renderVoting();
 }
 
@@ -1249,9 +1203,9 @@ function renderVoting() {
   const idx = state.currentVoterIdx;
   const ordered = getCurrentRevealOrder();
   const voter = ordered[idx];
-  $('currentVoterName').textContent = voter;
+  document.getElementById('currentVoterName').textContent = voter;
 
-  const grid = $('voteGrid');
+  const grid = document.getElementById('voteGrid');
   grid.innerHTML = '';
 
   ordered.forEach(name => {
@@ -1277,13 +1231,13 @@ function castVote(target) {
 }
 
 function showTally() {
-  $('voterInstruction').style.display = 'none';
-  $('voteGrid').innerHTML = '<button class="btn-primary" style="margin-top:16px" onclick="showResult()">SEE RESULT</button>';
+  document.getElementById('voterInstruction').style.display = 'none';
+  document.getElementById('voteGrid').innerHTML = '<button class="btn-primary" style="margin-top:16px" onclick="showResult()">SEE RESULT</button>';
 
-  const tally = $('voteTally');
+  const tally = document.getElementById('voteTally');
   tally.style.display = 'block';
 
-  const rows = $('tallyRows');
+  const rows = document.getElementById('tallyRows');
   rows.innerHTML = '';
 
   const maxVotes = Math.max(...Object.values(state.votes));
@@ -1348,7 +1302,7 @@ function showResult() {
     </div>
   `;
 
-  $('resultContent').innerHTML = html;
+  document.getElementById('resultContent').innerHTML = html;
   launchConfetti();
 }
 
@@ -1359,7 +1313,7 @@ function playAgain() {
   state.currentPlayerIdx = 0;
   if (!pickWordForRound()) return;
 
-  const shuffled = shuffle([...state.players]);
+  const shuffled = [...state.players].sort(() => Math.random() - 0.5);
   const imposters = shuffled.slice(0, state.imposterCount);
   state.roles = state.players.map(name => ({
     name,
@@ -1372,12 +1326,12 @@ function playAgain() {
   state.startPlayerIdx = Math.floor(Math.random() * state.players.length);
 
   showScreen('screen-pass');
-  $('passName').textContent = getCurrentRevealOrder()[0];
+  document.getElementById('passName').textContent = getCurrentRevealOrder()[0];
 }
 
 function resetAll() {
   showScreen('screen-setup');
-  $('voterInstruction').style.display = 'block';
+  document.getElementById('voterInstruction').style.display = 'block';
 }
 
 // ========================
@@ -1395,36 +1349,12 @@ function getCurrentRevealOrder() {
   return order.slice(start).concat(order.slice(0, start));
 }
 
-function inferEntryLanguage(entry) {
-  if (entry.language === 'english' || entry.language === 'nepali') return entry.language;
-  const text = (entry.word || '').trim();
-  const hasDevanagari = /[\u0900-\u097F]/.test(text);
-  return hasDevanagari ? 'nepali' : 'english';
-}
-
-function inferEntryDifficulty(entry) {
-  if (entry.difficulty === 'easy' || entry.difficulty === 'medium' || entry.difficulty === 'hard') {
-    return entry.difficulty;
-  }
-  const wordText = (entry.word || '').replace(/\s*\([^)]*\)/g, '').trim();
-  const len = wordText.length;
-  if (len <= 8) return 'easy';
-  if (len >= 15) return 'hard';
-  return 'medium';
-}
-
-function matchesWordFilters(entry) {
-  const matchesDifficulty = state.difficultyMode === 'any' || inferEntryDifficulty(entry) === state.difficultyMode;
-  const matchesLanguage = state.languageMode === 'mixed' || inferEntryLanguage(entry) === state.languageMode;
-  return matchesDifficulty && matchesLanguage;
-}
-
 function pickWordForRound() {
   let catKey = state.selectedCategory || 'random';
 
   if (catKey === 'custom') {
-    const customWord = $('customWord').value.trim();
-    const customHint = $('customHint').value.trim();
+    const customWord = document.getElementById('customWord').value.trim();
+    const customHint = document.getElementById('customHint').value.trim();
     if (!customWord || !customHint) {
       alert("Please enter both custom word and custom hint.");
       return false;
@@ -1437,30 +1367,17 @@ function pickWordForRound() {
   }
 
   if (catKey === 'random') {
-    const eligibleCategories = Object.keys(categories).filter((key) =>
-      categories[key].words.some((entry) => matchesWordFilters(entry))
-    );
-    if (!eligibleCategories.length) {
-      alert("No words match your selected difficulty/language filters.");
-      return false;
-    }
-    catKey = eligibleCategories[Math.floor(Math.random() * eligibleCategories.length)];
+    const keys = Object.keys(categories);
+    catKey = keys[Math.floor(Math.random() * keys.length)];
   }
 
   const cat = categories[catKey];
   if (!cat || !cat.words.length) return false;
-  const filteredEntries = cat.words.filter((entry) => matchesWordFilters(entry));
-  if (!filteredEntries.length) {
-    alert("No words in this category match your selected difficulty/language filters.");
-    return false;
-  }
+  if (!state.usedWordsByCategory[catKey]) state.usedWordsByCategory[catKey] = new Set();
 
-  const usageKey = `${catKey}|${state.difficultyMode}|${state.languageMode}`;
-  if (!state.usedWordsByCategory[usageKey]) state.usedWordsByCategory[usageKey] = new Set();
-
-  const used = state.usedWordsByCategory[usageKey];
-  const unusedEntries = filteredEntries.filter((entry) => !used.has(entry.word));
-  const pool = unusedEntries.length ? unusedEntries : filteredEntries;
+  const used = state.usedWordsByCategory[catKey];
+  const unusedEntries = cat.words.filter((entry) => !used.has(entry.word));
+  const pool = unusedEntries.length ? unusedEntries : cat.words;
   if (!unusedEntries.length) used.clear();
 
   const entry = pool[Math.floor(Math.random() * pool.length)];
@@ -1476,14 +1393,14 @@ function pickWordForRound() {
 function updateCategoryUI() {
   const catKey = state.selectedCategory || 'random';
   const info = categoryMedia[catKey] || categoryMedia.random;
-  $('categoryPreviewIcon').textContent = info.icon;
-  $('categoryPreviewText').textContent = info.label;
-  $('categoryPreviewImage').src = info.image;
-  $('customFields').classList.toggle('active', catKey === 'custom');
+  document.getElementById('categoryPreviewIcon').textContent = info.icon;
+  document.getElementById('categoryPreviewText').textContent = info.label;
+  document.getElementById('categoryPreviewImage').src = info.image;
+  document.getElementById('customFields').classList.toggle('active', catKey === 'custom');
 }
 
 function getCategoryOrder() {
-  return ['random', 'custom', 'festivals', 'food', 'places', 'attire', 'music', 'deities', 'crafts', 'customs', 'animals', 'sports', 'movies', 'technology', 'travel', 'school'];
+  return ['random', 'custom', 'festivals', 'food', 'places', 'attire', 'music', 'deities', 'crafts', 'customs'];
 }
 
 function getCategoryDisplayName(key) {
@@ -1494,7 +1411,7 @@ function getCategoryDisplayName(key) {
 }
 
 function renderCategoryList() {
-  const list = $('categoryList');
+  const list = document.getElementById('categoryList');
   const order = getCategoryOrder();
   const limit = state.showAllCategories ? order.length : 5;
   list.innerHTML = '';
@@ -1517,7 +1434,7 @@ function renderCategoryList() {
   });
 
   const hasMore = order.length > 5;
-  const btn = $('showMoreCategoriesBtn');
+  const btn = document.getElementById('showMoreCategoriesBtn');
   btn.style.display = hasMore ? 'inline-block' : 'none';
   if (hasMore) {
     btn.textContent = state.showAllCategories ? 'SHOW LESS CATEGORIES' : 'SHOW MORE CATEGORIES';
@@ -1530,14 +1447,14 @@ function toggleMoreCategories() {
 }
 
 function setupPWAInstall() {
-  const installBtn = $('installBtn');
+  const installBtn = document.getElementById('installBtn');
 
   if (isStandaloneMode()) {
     installBtn.style.display = 'none';
   }
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 
   window.addEventListener('beforeinstallprompt', (event) => {
@@ -1580,7 +1497,7 @@ async function installApp() {
     // User can cancel install prompt.
   }
   deferredInstallPrompt = null;
-  $('installBtn').style.display = 'none';
+  document.getElementById('installBtn').style.display = 'none';
 }
 
 function isIOSDevice() {
@@ -1645,14 +1562,14 @@ function toggleTheme() {
   document.body.classList.toggle('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
   localStorage.setItem('chal-theme', isDark ? 'dark' : 'light');
-  $('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
 }
 
 function applySavedTheme() {
   const theme = localStorage.getItem('chal-theme');
   if (theme === 'dark') document.body.classList.add('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
-  $('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
 }
 
 function createCategoryImage(icon, titleText, colorA, colorB) {
@@ -1672,15 +1589,6 @@ function createCategoryImage(icon, titleText, colorA, colorB) {
   `.trim();
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 </script>
 </body>
 </html>
-

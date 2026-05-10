@@ -1,83 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Games Hub</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --border: #334155;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #60a5fa;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at top, #1f2937, #0b1220 70%);
-      color: var(--text);
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    .wrap {
-      width: 100%;
-      max-width: 760px;
-    }
-    h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      margin-bottom: 8px;
-    }
-    .sub {
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .card {
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-    }
-    .card h2 {
-      font-size: 1.2rem;
-      margin-bottom: 6px;
-    }
-    .card p {
-      color: var(--muted);
-      line-height: 1.4;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chhal Games</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c62828">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Nepali:ital@0;1&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f5ef;
+    --surface: #ffffff;
+    --card: #fffaf4;
+    --border: #e4d7c9;
+    --accent: #0a3a8f;
+    --accent-dim: #8d7a66;
+    --red: #c62828;
+    --text: #2f2418;
+    --text-dim: #7f6a57;
+    --shadow: 0 6px 24px rgba(59,32,9,0.12);
+  }
+
+  body.dark-mode {
+    --bg: #151515;
+    --surface: #212121;
+    --card: #292929;
+    --border: #3c3c3c;
+    --accent: #f3f3f3;
+    --accent-dim: #b9b9b9;
+    --text: #f4f4f4;
+    --text-dim: #b5b5b5;
+    --shadow: 0 6px 28px rgba(0,0,0,0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(0,0,0,0.02) 60px, rgba(0,0,0,0.02) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,0,0,0.02) 60px, rgba(0,0,0,0.02) 61px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 20px 60px;
+    min-height: 100vh;
+  }
+
+  .top-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .toggle-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 0 36px;
+  }
+
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 12px;
+  }
+
+  .header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 12vw, 96px);
+    letter-spacing: 6px;
+    color: var(--red);
+    line-height: 0.9;
+  }
+
+  .header-sub {
+    font-family: 'Tiro Devanagari Nepali', serif;
+    font-size: 18px;
+    color: var(--accent-dim);
+    margin-top: 10px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 20px auto 0;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* GAME CARDS */
+  .game-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 480px) {
+    .game-grid { grid-template-columns: 1fr; }
+  }
+
+  .game-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+    display: block;
+    position: relative;
+  }
+
+  .game-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #003893, #dc143c);
+    border-radius: 12px 12px 0 0;
+  }
+
+  .game-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(59,32,9,0.18);
+  }
+
+  .game-card:active { transform: scale(0.98); }
+
+  .game-card-banner {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+  }
+
+  .game-card-banner.chhal { background: linear-gradient(135deg, #003893 0%, #c62828 100%); }
+  .game-card-banner.headsup { background: linear-gradient(135deg, #1a5c38 0%, #2e7d50 100%); }
+  .game-card-banner.coming { background: linear-gradient(135deg, #3c3c3c 0%, #555 100%); opacity: 0.5; }
+
+  .game-card-body {
+    padding: 18px 20px 20px;
+  }
+
+  .game-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .game-card-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+  }
+
+  .game-card-tag {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    background: rgba(10,58,143,0.08);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  body.dark-mode .game-card-tag {
+    background: rgba(243,243,243,0.08);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .game-card-tag.coming-tag {
+    background: rgba(0,0,0,0.04);
+    color: var(--text-dim);
+    border-color: var(--border);
+  }
+
+  .coming-soon-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .coming-soon-badge {
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 2px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Games</h1>
-    <p class="sub">Choose a game to play.</p>
-    <section class="grid">
-      <a class="card" href="./imposter/index.html">
-        <h2>Imposter</h2>
-        <p>Play Chhal (Imposter Game).</p>
-      </a>
-      <a class="card" href="./headsup/index.html">
-        <h2>Heads Up</h2>
-        <p>Heads Up section ready for your game.</p>
-      </a>
-    </section>
-  </main>
+<div class="container">
+  <div class="top-controls">
+    <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
+  </div>
+
+  <header>
+    <div class="header-eyebrow">नेपाली पार्टी गेम्स</div>
+    <div class="header-title">CHHAL</div>
+    <div class="header-sub">छली • Choose a game</div>
+    <div class="header-line"></div>
+  </header>
+
+  <div class="section-label">Games</div>
+
+  <div class="game-grid">
+
+    <!-- IMPOSTER -->
+    <a class="game-card" href="imposter/">
+      <div class="game-card-banner chhal">🕵️</div>
+      <div class="game-card-body">
+        <div class="game-card-title">CHHAL</div>
+        <div class="game-card-desc">Find the imposter hiding among the innocents. One word, one traitor.</div>
+        <div class="game-card-tag">3–10 Players</div>
+      </div>
+    </a>
+
+    <!-- HEADS UP -->
+    <a class="game-card" href="headsup/">
+      <div class="game-card-banner headsup">🙌</div>
+      <div class="game-card-body">
+        <div class="game-card-title">HEADS UP</div>
+        <div class="game-card-desc">Hold your phone to your forehead. Guess the word before the timer runs out.</div>
+        <div class="game-card-tag">2+ Players</div>
+      </div>
+    </a>
+
+    <!-- COMING SOON 1 -->
+    <div class="game-card" style="cursor:default;">
+      <div class="game-card-banner coming">🃏</div>
+      <div class="coming-soon-overlay"><div class="coming-soon-badge">Coming Soon</div></div>
+      <div class="game-card-body">
+        <div class="game-card-title">???</div>
+        <div class="game-card-desc">Another Nepali party game is on the way.</div>
+        <div class="game-card-tag coming-tag">Coming Soon</div>
+      </div>
+    </div>
+
+    <!-- COMING SOON 2 -->
+    <div class="game-card" style="cursor:default;">
+      <div class="game-card-banner coming">🎯</div>
+      <div class="coming-soon-overlay"><div class="coming-soon-badge">Coming Soon</div></div>
+      <div class="game-card-body">
+        <div class="game-card-title">???</div>
+        <div class="game-card-desc">More fun coming to the collection.</div>
+        <div class="game-card-tag coming-tag">Coming Soon</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>kushal-shrestha.name.np</footer>
+</div>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('chal-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+}
+
+function applySavedTheme() {
+  const theme = localStorage.getItem('chal-theme');
+  if (theme === 'dark') document.body.classList.add('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+}
+
+applySavedTheme();
+</script>
 </body>
 </html>
