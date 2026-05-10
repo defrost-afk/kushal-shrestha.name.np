@@ -991,6 +991,9 @@
   </div>
 </div>
 
+<script src="offline-manager.js"></script>
+<script src="category-loader.js"></script>
+<script src="device-passer.js"></script>
 <script src="words.js"></script>
 <script>
 // categories is loaded from words.js
@@ -1033,13 +1036,48 @@ let deferredInstallPrompt = null;
 // ========================
 // INIT
 // ========================
-window.onload = () => {
-  for (let i = 0; i < 3; i++) addPlayer();
-  renderCategoryList();
-  updateCategoryUI();
+window.onload = async () => {
   applySavedTheme();
+  
+  // Initialize category loader and preload popular categories
+  await initializeCategoryLoader();
+  
+  renderCategoryList();
+  for (let i = 0; i < 3; i++) addPlayer();
+  updateCategoryUI();
   setupPWAInstall();
 };
+
+// Initialize category loader with preloading
+async function initializeCategoryLoader() {
+  try {
+    // Show loading state for categories
+    showCategoryLoadingState();
+    
+    // Preload popular categories in background
+    await window.categoryLoader.preloadPopularCategories();
+    
+    // Hide loading state
+    hideCategoryLoadingState();
+  } catch (error) {
+    // Fallback to traditional loading
+    hideCategoryLoadingState();
+  }
+}
+
+// Show loading state for category selection
+function showCategoryLoadingState() {
+  const categoryList = document.getElementById('categoryList');
+  if (categoryList) {
+    categoryList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-dim);">Loading categories...</div>';
+  }
+}
+
+// Hide loading state
+function hideCategoryLoadingState() {
+  // The renderCategoryList will handle this
+  renderCategoryList();
+}
 
 function addPlayer() {
   const list = document.getElementById('playerList');
@@ -1104,8 +1142,23 @@ function startGame() {
   state.votes = {};
   names.forEach(n => state.votes[n] = 0);
 
-  showScreen('screen-pass');
-  document.getElementById('passName').textContent = getCurrentRevealOrder()[0];
+  // Use enhanced device passer if available
+  if (window.devicePasser) {
+    const playerName = getCurrentRevealOrder()[0];
+    const playerIndex = state.players.findIndex(p => p.name === playerName);
+    
+    // Set callback for when pass is complete
+    window.devicePasser.onPassComplete((playerIndex) => {
+      showScreen('screen-reveal');
+    });
+    
+    // Pass device with enhanced experience
+    window.devicePasser.passDeviceToPlayer(playerIndex >= 0 ? playerIndex : 0, playerName);
+  } else {
+    // Fallback to original method
+    showScreen('screen-pass');
+    document.getElementById('passName').textContent = getCurrentRevealOrder()[0];
+  }
 }
 
 // ========================
@@ -1162,9 +1215,7 @@ function revealRole() {
   document.getElementById('revealWord').style.visibility = 'visible';
   if (document.getElementById('hintLabel').getAttribute('data-show') === 'true') {
     document.getElementById('hintLabel').style.display = 'block';
-    playSound('imposter');
-  } else {
-    playSound('innocent');
+    playSound('reveal');
   }
   document.getElementById('btnNext').style.display = 'block';
 
@@ -1412,33 +1463,56 @@ function getCategoryDisplayName(key) {
 
 function renderCategoryList() {
   const list = document.getElementById('categoryList');
-  const order = getCategoryOrder();
-  const limit = state.showAllCategories ? order.length : 5;
+  const keys = Object.keys(categories);
+  const displayKeys = state.showAllCategories ? keys : keys.slice(0, 6);
+  
   list.innerHTML = '';
-
-  order.slice(0, limit).forEach((key) => {
-    const info = categoryMedia[key] || categoryMedia.random;
-    const item = document.createElement('button');
-    item.type = 'button';
+  displayKeys.forEach(key => {
+    const cat = categories[key];
+    if (!cat) return;
+    
+    const item = document.createElement('div');
     item.className = `category-item${state.selectedCategory === key ? ' selected' : ''}`;
+    
+    // Check if category is loaded
+    const isLoaded = window.categoryLoader.isCategoryLoaded(key);
+    const isLoading = window.categoryLoader.isLoading(key);
+    
     item.innerHTML = `
-      <img src="${info.image}" alt="${getCategoryDisplayName(key)}">
-      <div class="category-item-name">${getCategoryDisplayName(key)}</div>
+      <img src="${categoryMedia[key]?.image || categoryMedia.random.image}" alt="${cat.name}" />
+      <div class="category-item-name">
+        ${cat.name}
+        ${isLoading ? '<span style="color: var(--accent-dim); font-size: 10px;"> (loading...)</span>' : ''}
+        ${!isLoaded && !isLoading ? '<span style="color: var(--accent-dim); font-size: 10px;"> (tap to load)</span>' : ''}
+      </div>
     `;
-    item.onclick = () => {
+    
+    item.onclick = async () => {
+      if (!isLoaded && !isLoading) {
+        // Load category on demand
+        item.style.opacity = '0.6';
+        try {
+          await window.categoryLoader.loadCategory(key);
+        } catch (error) {
+          return;
+        }
+      }
+      
       state.selectedCategory = key;
       renderCategoryList();
       updateCategoryUI();
     };
+    
     list.appendChild(item);
   });
 
-  const hasMore = order.length > 5;
-  const btn = document.getElementById('showMoreCategoriesBtn');
-  btn.style.display = hasMore ? 'inline-block' : 'none';
-  if (hasMore) {
-    btn.textContent = state.showAllCategories ? 'SHOW LESS CATEGORIES' : 'SHOW MORE CATEGORIES';
+  // Show/hide "show more" button
+  const showMoreBtn = document.getElementById('showMoreCategoriesBtn');
+  if (showMoreBtn) {
+    showMoreBtn.style.display = keys.length > 6 ? 'inline-block' : 'none';
+    showMoreBtn.textContent = state.showAllCategories ? 'SHOW LESS' : 'SHOW MORE CATEGORIES';
   }
+  
 }
 
 function toggleMoreCategories() {
@@ -1456,8 +1530,9 @@ function setupPWAInstall() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('../sw.js')
-        .then(registration => console.log('SW registered: ', registration))
-        .catch(registrationError => console.log('SW registration failed: ', registrationError));
+        .catch(registrationError => {
+          // Silent fail for service worker registration
+        });
     });
   }
 
@@ -1564,12 +1639,6 @@ function tone(freq, durationMs, wave) {
 function playSound(kind) {
   if (kind === 'reveal') {
     tone(170, 300, 'triangle');
-  } else if (kind === 'innocent') {
-    tone(660, 140, 'sine');
-    setTimeout(() => tone(880, 220, 'sine'), 80);
-  } else if (kind === 'imposter') {
-    tone(260, 160, 'sawtooth');
-    setTimeout(() => tone(190, 240, 'sawtooth'), 80);
   }
 }
 

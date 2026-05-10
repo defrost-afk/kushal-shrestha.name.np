@@ -9,6 +9,9 @@
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Nepali:ital@0;1&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="performance-optimizer.js"></script>
+<script src="image-optimizer.js"></script>
+<script src="game-loader.js"></script>
 <style>
   :root {
     --bg: #f8f5ef;
@@ -349,12 +352,21 @@ function applySavedTheme() {
 
 applySavedTheme();
 
+// Game Loader Integration
+window.addEventListener('load', async () => {
+  if (window.gameLoader) {
+    // Preload popular games in background
+    await window.gameLoader.preloadPopularGames();
+  }
+});
+
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
-      .then(registration => console.log('SW registered: ', registration))
-      .catch(registrationError => console.log('SW registration failed: ', registrationError));
+      .catch(registrationError => {
+        // Silent fail for service worker registration
+      });
   });
 }
 </script>
