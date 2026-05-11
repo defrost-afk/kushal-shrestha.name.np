@@ -458,7 +458,10 @@
     lockTiltUntil: 0,
     motionEnabled: false,
     correctWords: [],
-    passedWords: []
+    passedWords: [],
+    tiltNeutral: null,
+    tiltSamples: [],
+    tiltCalibrateStarted: 0
   };
 
   const categoryIcons = {
@@ -618,7 +621,52 @@
     });
   }
 
-  function startRound() {
+  function getScreenOrientationAngle() {
+    if (screen.orientation && typeof screen.orientation.angle === "number") {
+      return ((screen.orientation.angle % 360) + 360) % 360;
+    }
+    if (typeof window.orientation === "number") {
+      return ((window.orientation % 360) + 360) % 360;
+    }
+    return 0;
+  }
+
+  /** Single “nod” axis: beta in portrait, gamma-derived in landscape (matches screen lock). */
+  function getPitchScalar(event) {
+    if (typeof event.beta !== "number" || typeof event.gamma !== "number") return null;
+    if (Number.isNaN(event.beta) || Number.isNaN(event.gamma)) return null;
+    const a = getScreenOrientationAngle();
+    if (a === 90) return -event.gamma;
+    if (a === 270) return event.gamma;
+    return event.beta;
+  }
+
+  async function lockLandscapeForPlay() {
+    const o = screen.orientation;
+    if (!o || typeof o.lock !== "function") return;
+    try {
+      await o.lock("landscape-primary");
+    } catch (e1) {
+      try {
+        await o.lock("landscape");
+      } catch (e2) {
+        /* Fullscreen or policy may be required; play still works with buttons. */
+      }
+    }
+  }
+
+  function unlockPlayOrientation() {
+    const o = screen.orientation;
+    if (o && typeof o.unlock === "function") {
+      try {
+        o.unlock();
+      } catch (e) {
+        /* ignore */
+      }
+    }
+  }
+
+  async function startRound() {
     const selected = game.categoryKey;
     const sec = Number(ui.timeLimit.value);
     if (!selected || !headsUpCategories[selected]) return;
@@ -627,11 +675,16 @@
       return;
     }
 
+    await lockLandscapeForPlay();
+
     game.categoryKey = selected;
     game.deck = shuffle(headsUpCategories[selected].words);
     game.seconds = sec;
     game.correctWords = [];
     game.passedWords = [];
+    game.tiltNeutral = null;
+    game.tiltSamples = [];
+    game.tiltCalibrateStarted = 0;
     game.active = true;
     ui.categoryName.textContent = headsUpCategories[selected].name;
     ui.timeLeft.textContent = String(game.seconds);
@@ -651,18 +704,40 @@
     ui.passCount.textContent = String(game.passedWords.length);
     renderList(ui.correctList, game.correctWords);
     renderList(ui.passList, game.passedWords);
+    unlockPlayOrientation();
     showScreen("result");
   }
 
+  const TILT_THRESHOLD = 28;
+
   function handleOrientation(event) {
     if (!game.active) return;
+    const pitch = getPitchScalar(event);
+    if (pitch === null) return;
+
+    if (game.tiltNeutral === null) {
+      const now = Date.now();
+      if (!game.tiltCalibrateStarted) game.tiltCalibrateStarted = now;
+      game.tiltSamples.push(pitch);
+      if (game.tiltSamples.length >= 10 || now - game.tiltCalibrateStarted > 600) {
+        game.tiltSamples.sort((x, y) => x - y);
+        const mid = Math.floor(game.tiltSamples.length / 2);
+        game.tiltNeutral = game.tiltSamples.length % 2
+          ? game.tiltSamples[mid]
+          : (game.tiltSamples[mid - 1] + game.tiltSamples[mid]) / 2;
+        game.tiltSamples = [];
+        game.tiltCalibrateStarted = 0;
+      }
+      return;
+    }
+
     const now = Date.now();
     if (now < game.lockTiltUntil) return;
-    if (typeof event.beta !== "number") return;
-    if (event.beta <= -25) {
+    const n = game.tiltNeutral;
+    if (pitch < n - TILT_THRESHOLD) {
       game.lockTiltUntil = now + 900;
       markCorrect();
-    } else if (event.beta >= 25) {
+    } else if (pitch > n + TILT_THRESHOLD) {
       game.lockTiltUntil = now + 900;
       markPass();
     }
@@ -705,13 +780,16 @@
     ui.correctBtn.addEventListener("click", markCorrect);
     ui.passBtn.addEventListener("click", markPass);
     ui.stopBtn.addEventListener("click", endRound);
-    ui.playAgainBtn.addEventListener("click", () => showScreen("setup"));
+    ui.playAgainBtn.addEventListener("click", () => {
+      unlockPlayOrientation();
+      showScreen("setup");
+    });
 
     ui.startBtn.addEventListener("click", async () => {
       if (!game.motionEnabled) {
         game.motionEnabled = await requestMotionIfNeeded();
       }
-      startRound();
+      await startRound();
     });
 
     window.addEventListener("deviceorientation", handleOrientation);

@@ -1,11 +1,11 @@
 {
-  "name": "Chhal",
-  "short_name": "Chhal",
+  "name": "Games Hub",
+  "short_name": "Games Hub",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f8f5ef",
   "theme_color": "#c62828",
-  "description": "Chhal - Nepali social deduction party game",
+  "description": "Games Hub — Nepali party games including Chhal, Heads Up, and more",
   "icons": [
     {
       "src": "icons/icon-192.png",
