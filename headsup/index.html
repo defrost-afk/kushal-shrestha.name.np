@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape">
 <title>Heads Up - Chhal Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -38,6 +38,11 @@
     font-family: "DM Mono", monospace;
     min-height: 100vh;
     overflow-x: hidden;
+  }
+
+  body.playing .top,
+  body.playing header {
+    display: none;
   }
 
   .container {
@@ -281,6 +286,10 @@
     margin-top: 8px;
   }
 
+  #playScreen.active .actions {
+    display: none;
+  }
+
   .btn-alt {
     padding: 12px;
     border-radius: 4px;
@@ -289,6 +298,36 @@
     color: var(--text);
     font-family: inherit;
     cursor: pointer;
+  }
+
+  .mobile-tilt-arrows {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .btn-arrow {
+    font-size: 28px;
+    line-height: 1;
+    padding: 10px 12px;
+  }
+
+  @media (max-width: 900px) and (orientation: landscape) {
+    body.playing .container {
+      max-width: 100vw;
+      padding: 10px 12px 14px;
+      min-height: 100vh;
+    }
+
+    body.playing .game-card {
+      height: min(58vh, 360px);
+      margin: 10px 0;
+    }
+
+    body.playing .mobile-tilt-arrows {
+      display: grid;
+    }
   }
 
   .scores {
@@ -391,6 +430,10 @@
       <button class="btn-alt" id="correctBtn" type="button">Correct (Tilt Up)</button>
       <button class="btn-alt" id="passBtn" type="button">Pass (Tilt Down)</button>
     </div>
+    <div class="mobile-tilt-arrows" id="mobileTiltArrows">
+      <button class="btn-alt btn-arrow" id="upArrowBtn" type="button" aria-label="Tilt up">↑</button>
+      <button class="btn-alt btn-arrow" id="downArrowBtn" type="button" aria-label="Tilt down">↓</button>
+    </div>
     <div class="actions">
       <button class="btn-alt" id="stopBtn" type="button" style="grid-column:1 / -1;">End Round</button>
     </div>
@@ -440,6 +483,8 @@
     word: document.getElementById("word"),
     correctBtn: document.getElementById("correctBtn"),
     passBtn: document.getElementById("passBtn"),
+    upArrowBtn: document.getElementById("upArrowBtn"),
+    downArrowBtn: document.getElementById("downArrowBtn"),
     stopBtn: document.getElementById("stopBtn"),
     correctCount: document.getElementById("correctCount"),
     passCount: document.getElementById("passCount"),
@@ -461,7 +506,8 @@
     passedWords: [],
     tiltNeutral: null,
     tiltSamples: [],
-    tiltCalibrateStarted: 0
+    tiltCalibrateStarted: 0,
+    fullscreenActive: false
   };
 
   const categoryIcons = {
@@ -641,7 +687,24 @@
     return event.beta;
   }
 
+  async function enterFullscreenForPlay() {
+    const target = document.documentElement;
+    if (!target || typeof target.requestFullscreen !== "function") return false;
+    try {
+      if (!document.fullscreenElement) {
+        await target.requestFullscreen();
+      }
+      return !!document.fullscreenElement;
+    } catch (e) {
+      return false;
+    }
+  }
+
   async function lockLandscapeForPlay() {
+    const isMobile = window.matchMedia("(max-width: 900px)").matches;
+    if (isMobile) {
+      game.fullscreenActive = await enterFullscreenForPlay();
+    }
     const o = screen.orientation;
     if (!o || typeof o.lock !== "function") return;
     try {
@@ -650,7 +713,11 @@
       try {
         await o.lock("landscape");
       } catch (e2) {
-        /* Fullscreen or policy may be required; play still works with buttons. */
+        try {
+          await o.lock("landscape-secondary");
+        } catch (e3) {
+          /* Fullscreen or policy may be required; play still works with buttons. */
+        }
       }
     }
   }
@@ -664,6 +731,10 @@
         /* ignore */
       }
     }
+    if (document.fullscreenElement && typeof document.exitFullscreen === "function") {
+      document.exitFullscreen().catch(() => {});
+    }
+    game.fullscreenActive = false;
   }
 
   async function startRound() {
@@ -686,6 +757,7 @@
     game.tiltSamples = [];
     game.tiltCalibrateStarted = 0;
     game.active = true;
+    document.body.classList.add("playing");
     ui.categoryName.textContent = headsUpCategories[selected].name;
     ui.timeLeft.textContent = String(game.seconds);
     ui.score.textContent = "0";
@@ -699,6 +771,7 @@
   function endRound() {
     if (!game.active) return;
     game.active = false;
+    document.body.classList.remove("playing");
     clearInterval(game.timerId);
     ui.correctCount.textContent = String(game.correctWords.length);
     ui.passCount.textContent = String(game.passedWords.length);
@@ -734,10 +807,10 @@
     const now = Date.now();
     if (now < game.lockTiltUntil) return;
     const n = game.tiltNeutral;
-    if (pitch < n - TILT_THRESHOLD) {
+    if (pitch > n + TILT_THRESHOLD) {
       game.lockTiltUntil = now + 900;
       markCorrect();
-    } else if (pitch > n + TILT_THRESHOLD) {
+    } else if (pitch < n - TILT_THRESHOLD) {
       game.lockTiltUntil = now + 900;
       markPass();
     }
@@ -779,6 +852,8 @@
     ui.themeBtn.addEventListener("click", toggleTheme);
     ui.correctBtn.addEventListener("click", markCorrect);
     ui.passBtn.addEventListener("click", markPass);
+    ui.upArrowBtn.addEventListener("click", markCorrect);
+    ui.downArrowBtn.addEventListener("click", markPass);
     ui.stopBtn.addEventListener("click", endRound);
     ui.playAgainBtn.addEventListener("click", () => {
       unlockPlayOrientation();
@@ -790,6 +865,17 @@
         game.motionEnabled = await requestMotionIfNeeded();
       }
       await startRound();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (!game.active) return;
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        markCorrect();
+      } else if (event.key === "ArrowDown") {
+        event.preventDefault();
+        markPass();
+      }
     });
 
     window.addEventListener("deviceorientation", handleOrientation);
