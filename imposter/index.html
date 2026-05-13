@@ -110,19 +110,7 @@
     cursor: pointer;
   }
 
-  .install-btn {
-    background: var(--red);
-    color: #fff;
-    border: 1px solid var(--red);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border-radius: 4px;
-    padding: 10px 12px;
-    cursor: pointer;
-    display: inline-block;
-  }
+
 
   /* HEADER */
   header {
@@ -857,10 +845,7 @@
 <div class="container">
   <div class="top-controls">
     <a href="../" class="back-btn">← Games</a>
-    <div style="display:flex;gap:8px;">
-      <button class="install-btn" id="installBtn" type="button" onclick="installApp()">Install App</button>
-      <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
-    </div>
+    <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
   </div>
   <div class="landscape-warning" id="landscapeWarning">Best experience is in portrait mode on mobile.</div>
   <header>
@@ -1041,7 +1026,7 @@ let state = {
   showAllCategories: false,
 };
 
-let deferredInstallPrompt = null;
+
 
 // ========================
 // INIT
@@ -1531,12 +1516,6 @@ function toggleMoreCategories() {
 }
 
 function setupPWAInstall() {
-  const installBtn = document.getElementById('installBtn');
-
-  if (isStandaloneMode()) {
-    installBtn.style.display = 'none';
-  }
-
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('../sw.js')
@@ -1556,48 +1535,6 @@ function setupPWAInstall() {
   window.addEventListener('load', () => {
     history.replaceState({ page: 'imposter' }, '', window.location.href);
   });
-
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    installBtn.style.display = 'inline-block';
-  });
-
-  window.addEventListener('appinstalled', () => {
-    deferredInstallPrompt = null;
-    installBtn.style.display = 'none';
-  });
-}
-
-async function installApp() {
-  if (isStandaloneMode()) {
-    alert('App is already installed on this device.');
-    return;
-  }
-
-  if (!deferredInstallPrompt) {
-    if (!window.isSecureContext) {
-      alert('Install only works on HTTPS (or localhost). Open this site with your domain over HTTPS.');
-      return;
-    }
-
-    if (isIOSDevice()) {
-      alert('On iPhone/iPad: tap Share -> Add to Home Screen.');
-      return;
-    }
-
-    alert('Install prompt is not available yet. Use Chrome/Edge and visit the site a few times, then try again.');
-    return;
-  }
-
-  deferredInstallPrompt.prompt();
-  try {
-    await deferredInstallPrompt.userChoice;
-  } catch (e) {
-    // User can cancel install prompt.
-  }
-  deferredInstallPrompt = null;
-  document.getElementById('installBtn').style.display = 'none';
 }
 
 function isIOSDevice() {

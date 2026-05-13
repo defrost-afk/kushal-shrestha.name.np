@@ -89,6 +89,20 @@
     cursor: pointer;
   }
 
+  .install-btn {
+    background: var(--red);
+    color: #fff;
+    border: 1px solid var(--red);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+    display: none;
+  }
+
   header {
     text-align: center;
     padding: 40px 0 36px;
@@ -274,7 +288,10 @@
 <body>
 <div class="container">
   <div class="top-controls">
-    <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark/light mode">Dark Mode</button>
+    <div style="display:flex;gap:8px;">
+      <button class="install-btn" id="installBtn" type="button" onclick="installApp()">Install App</button>
+      <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark/light mode">Dark Mode</button>
+    </div>
   </div>
 
   <header>
@@ -352,6 +369,66 @@ function applySavedTheme() {
 
 applySavedTheme();
 
+let deferredInstallPrompt = null;
+
+function setupPWAInstall() {
+  const installBtn = document.getElementById('installBtn');
+
+  if (isStandaloneMode()) {
+    installBtn.style.display = 'none';
+  }
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installBtn.style.display = 'inline-block';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    installBtn.style.display = 'none';
+  });
+}
+
+async function installApp() {
+  if (isStandaloneMode()) {
+    alert('App is already installed on this device.');
+    return;
+  }
+
+  if (!deferredInstallPrompt) {
+    if (!window.isSecureContext) {
+      alert('Install only works on HTTPS (or localhost). Open this site with your domain over HTTPS.');
+      return;
+    }
+
+    if (isIOSDevice()) {
+      alert('On iPhone/iPad: tap Share -> Add to Home Screen.');
+      return;
+    }
+
+    alert('Install prompt is not available yet. Use Chrome/Edge and visit the site a few times, then try again.');
+    return;
+  }
+
+  deferredInstallPrompt.prompt();
+  try {
+    await deferredInstallPrompt.userChoice;
+  } catch (e) {
+    // User can cancel install prompt.
+  }
+  deferredInstallPrompt = null;
+  document.getElementById('installBtn').style.display = 'none';
+}
+
+function isIOSDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
 // Game Loader Integration
 window.addEventListener('load', async () => {
   if (window.gameLoader) {
@@ -369,6 +446,9 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+// Setup PWA Install
+setupPWAInstall();
 </script>
 </body>
 </html>

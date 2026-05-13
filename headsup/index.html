@@ -45,6 +45,19 @@
     display: none;
   }
 
+  body.playing #playScreen {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  body.playing #playScreen .hud,
+  body.playing #playScreen .actions,
+  body.playing #playScreen .mobile-tilt-arrows {
+    display: none !important;
+  }
+
   .container {
     max-width: 720px;
     margin: 0 auto;
@@ -232,6 +245,24 @@
     line-height: 1.6;
   }
 
+  .motion-warning {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #e08a00;
+    background: rgba(224, 138, 0, 0.1);
+    color: #8a4b00;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+    display: none;
+  }
+
+  body.dark-mode .motion-warning {
+    border-color: #d4a24f;
+    background: rgba(212, 162, 79, 0.12);
+    color: #ffd48b;
+  }
+
   .game-card {
     height: min(72vh, 560px);
     display: flex;
@@ -316,17 +347,15 @@
   @media (max-width: 900px) and (orientation: landscape) {
     body.playing .container {
       max-width: 100vw;
-      padding: 10px 12px 14px;
+      padding: 0;
       min-height: 100vh;
     }
 
     body.playing .game-card {
-      height: min(58vh, 360px);
-      margin: 10px 0;
-    }
-
-    body.playing .mobile-tilt-arrows {
-      display: grid;
+      height: 100vh;
+      margin: 0;
+      border-radius: 0;
+      border-width: 0;
     }
   }
 
@@ -413,6 +442,7 @@
     <div class="card help">
       Hold phone on forehead so friends can see the word. Tilt up for correct answer, tilt down to pass.
       Motion controls need permission on some devices. Manual buttons are always available.
+      <div class="motion-warning" id="motionWarning"></div>
     </div>
     <button class="btn-main" id="startBtn" type="button">START ROUND</button>
   </section>
@@ -476,6 +506,7 @@
     categoryPreviewText: document.getElementById("categoryPreviewText"),
     timeLimit: document.getElementById("timeLimit"),
     startBtn: document.getElementById("startBtn"),
+    motionWarning: document.getElementById("motionWarning"),
     categoryName: document.getElementById("categoryName"),
     timeLeft: document.getElementById("timeLeft"),
     score: document.getElementById("score"),
@@ -509,6 +540,16 @@
     tiltCalibrateStarted: 0,
     fullscreenActive: false
   };
+
+  function showMotionWarning(message) {
+    ui.motionWarning.textContent = message;
+    ui.motionWarning.style.display = "block";
+  }
+
+  function hideMotionWarning() {
+    ui.motionWarning.textContent = "";
+    ui.motionWarning.style.display = "none";
+  }
 
   const categoryIcons = {
     festivals: "🎊",
@@ -817,15 +858,30 @@
   }
 
   async function requestMotionIfNeeded() {
+    if (typeof DeviceOrientationEvent === "undefined") {
+      showMotionWarning("Motion is not available on this device/browser. Tilt controls will not work.");
+      return false;
+    }
+
     const iosStylePermission = (
       typeof DeviceOrientationEvent !== "undefined" &&
       typeof DeviceOrientationEvent.requestPermission === "function"
     );
-    if (!iosStylePermission) return true;
+    if (!iosStylePermission) {
+      hideMotionWarning();
+      return true;
+    }
     try {
       const response = await DeviceOrientationEvent.requestPermission();
-      return response === "granted";
+      const granted = response === "granted";
+      if (!granted) {
+        showMotionWarning("Motion permission was denied. Please allow motion access in browser settings before starting.");
+      } else {
+        hideMotionWarning();
+      }
+      return granted;
     } catch (error) {
+      showMotionWarning("Could not access motion sensors. Check permissions or use a supported mobile browser.");
       return false;
     }
   }
@@ -864,6 +920,7 @@
       if (!game.motionEnabled) {
         game.motionEnabled = await requestMotionIfNeeded();
       }
+      if (!game.motionEnabled) return;
       await startRound();
     });
 
