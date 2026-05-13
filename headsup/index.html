@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape">
 <title>Heads Up - Chhal Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #f8f5ef;
@@ -14,8 +14,8 @@
     --border: #e4d7c9;
     --accent: #1a5c38;
     --red: #c62828;
-    --text: #2f2418;
-    --text-dim: #7f6a57;
+    --text: #1e1812;
+    --text-dim: #5c4d40;
     --shadow: 0 6px 24px rgba(59, 32, 9, 0.12);
   }
 
@@ -26,7 +26,7 @@
     --border: #3c3c3c;
     --accent: #6fd39a;
     --text: #f4f4f4;
-    --text-dim: #b5b5b5;
+    --text-dim: #c4beb6;
     --shadow: 0 6px 28px rgba(0, 0, 0, 0.35);
   }
 
@@ -35,7 +35,10 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: "DM Mono", monospace;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -62,7 +65,7 @@
     max-width: 720px;
     margin: 0 auto;
     min-height: 100vh;
-    padding: 18px 18px 36px;
+    padding: 20px 20px 40px;
     display: flex;
     flex-direction: column;
   }
@@ -79,11 +82,12 @@
     border: 1px solid var(--border);
     color: var(--text);
     font-family: inherit;
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     border-radius: 4px;
-    padding: 10px 12px;
+    padding: 12px 14px;
     text-decoration: none;
     cursor: pointer;
   }
@@ -103,10 +107,14 @@
 
   .sub {
     color: var(--text-dim);
-    font-size: 12px;
-    letter-spacing: 2px;
-    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+    margin-top: 10px;
     text-transform: uppercase;
+    max-width: 22rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .screen { display: none; }
@@ -117,16 +125,17 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: var(--shadow);
-    padding: 22px;
+    padding: 24px;
     margin-bottom: 16px;
   }
 
   .line {
-    font-size: 11px;
-    letter-spacing: 3px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--text-dim);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
   .row {
@@ -140,12 +149,13 @@
   }
 
   label {
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-dim);
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   input {
@@ -154,8 +164,10 @@
     border: 1px solid var(--border);
     color: var(--text);
     font-family: inherit;
-    border-radius: 4px;
-    padding: 12px;
+    font-size: 1.0625rem;
+    border-radius: 6px;
+    padding: 14px 14px;
+    line-height: 1.35;
   }
 
   .category-list {
@@ -192,11 +204,12 @@
   }
 
   .category-item-name {
-    font-size: 11px;
-    letter-spacing: 1px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     color: var(--text);
-    padding: 8px 10px;
-    min-height: 44px;
+    padding: 10px 12px;
+    min-height: 48px;
     display: flex;
     align-items: center;
   }
@@ -204,12 +217,14 @@
   .category-preview {
     display: flex;
     align-items: stretch;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 12px;
+    margin-top: 14px;
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 12px;
-    color: var(--text-dim);
+    border-radius: 8px;
+    padding: 14px;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
   }
 
   .category-preview-image {
@@ -231,29 +246,29 @@
     background: var(--accent);
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-family: "Bebas Neue", sans-serif;
-    font-size: 24px;
-    letter-spacing: 4px;
-    padding: 16px 20px;
+    font-size: 26px;
+    letter-spacing: 0.12em;
+    padding: 18px 22px;
     cursor: pointer;
   }
 
   .help {
     color: var(--text-dim);
-    font-size: 12px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.65;
   }
 
   .motion-warning {
-    margin-top: 10px;
-    padding: 10px 12px;
+    margin-top: 12px;
+    padding: 12px 14px;
     border: 1px solid #e08a00;
     background: rgba(224, 138, 0, 0.1);
-    color: #8a4b00;
-    border-radius: 6px;
-    font-size: 12px;
-    line-height: 1.5;
+    color: #6b3d00;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.55;
     display: none;
   }
 
@@ -261,6 +276,38 @@
     border-color: #d4a24f;
     background: rgba(212, 162, 79, 0.12);
     color: #ffd48b;
+  }
+
+  .motion-info {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  .btn-enable-tilt {
+    display: none;
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    background: var(--surface);
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .btn-enable-tilt.visible {
+    display: block;
   }
 
   .game-card {
@@ -275,14 +322,17 @@
     margin: 16px 0;
     position: relative;
     overflow: hidden;
-    padding: 20px;
+    padding: 24px;
   }
 
   .word {
     font-family: "Bebas Neue", sans-serif;
-    font-size: clamp(48px, 14vw, 118px);
-    letter-spacing: 4px;
-    line-height: 0.95;
+    font-size: clamp(44px, 12vw, 104px);
+    letter-spacing: 0.04em;
+    line-height: 1.08;
+    word-break: break-word;
+    hyphens: auto;
+    max-width: 95vw;
   }
 
   .status-good {
@@ -299,15 +349,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     color: var(--text-dim);
-    font-size: 12px;
-    letter-spacing: 1px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    flex-wrap: wrap;
   }
 
   .big {
     color: var(--text);
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: 600;
   }
 
   .actions {
@@ -322,12 +375,15 @@
   }
 
   .btn-alt {
-    padding: 12px;
-    border-radius: 4px;
+    padding: 14px 14px;
+    border-radius: 6px;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
     font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
     cursor: pointer;
   }
 
@@ -374,11 +430,12 @@
   }
 
   .score-title {
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-dim);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .score-num {
@@ -388,18 +445,19 @@
   }
 
   .list {
-    max-height: 180px;
+    max-height: 220px;
     overflow: auto;
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 8px;
+    padding: 10px;
     background: var(--card);
   }
 
   .list-row {
-    font-size: 13px;
+    font-size: 15px;
+    line-height: 1.4;
     color: var(--text);
-    padding: 6px 4px;
+    padding: 10px 8px;
     border-bottom: 1px solid var(--border);
   }
 
@@ -441,9 +499,12 @@
     </div>
     <div class="card help">
       Hold phone on forehead so friends can see the word. Tilt up for correct answer, tilt down to pass.
-      Motion controls need permission on some devices. Manual buttons are always available.
+      <div class="motion-info" id="motionInfo">
+        Chrome on Android does not show a permission popup for tilt. If the phone moves but the word does not change, open the site over HTTPS, update Chrome, and check Site settings (padlock → Site settings → Motion sensors, if listed). iPhone/iPad Safari is different: it can show an “allow motion” dialog when you tap “Enable tilt sensors” or “Start round”.
+      </div>
       <div class="motion-warning" id="motionWarning"></div>
     </div>
+    <button class="btn-enable-tilt" id="enableTiltBtn" type="button">Enable tilt sensors</button>
     <button class="btn-main" id="startBtn" type="button">START ROUND</button>
   </section>
 
@@ -495,6 +556,19 @@
 
 <script src="./headsup-words.js"></script>
 <script>
+  const TIME_SEC_MIN = 20;
+  const TIME_SEC_MAX = 180;
+  const TICK_MS = 1000;
+  const TILT_THRESHOLD_DEG = 28;
+  const TILT_ACTION_COOLDOWN_MS = 900;
+  const TILT_STATUS_FLASH_MS = 240;
+  const TILT_CALIB_MIN_SAMPLES = 10;
+  const TILT_CALIB_MAX_WAIT_MS = 600;
+  const MOBILE_MAX_WIDTH_PX = 900;
+
+  const SCREEN = { SETUP: "setup", PLAY: "play", RESULT: "result" };
+  const LANDSCAPE_LOCK_TYPES = ["landscape-primary", "landscape", "landscape-secondary"];
+
   const ui = {
     themeBtn: document.getElementById("themeBtn"),
     setupScreen: document.getElementById("setupScreen"),
@@ -506,6 +580,7 @@
     categoryPreviewText: document.getElementById("categoryPreviewText"),
     timeLimit: document.getElementById("timeLimit"),
     startBtn: document.getElementById("startBtn"),
+    enableTiltBtn: document.getElementById("enableTiltBtn"),
     motionWarning: document.getElementById("motionWarning"),
     categoryName: document.getElementById("categoryName"),
     timeLeft: document.getElementById("timeLeft"),
@@ -522,6 +597,12 @@
     correctList: document.getElementById("correctList"),
     passList: document.getElementById("passList"),
     playAgainBtn: document.getElementById("playAgainBtn")
+  };
+
+  const screensByName = {
+    [SCREEN.SETUP]: ui.setupScreen,
+    [SCREEN.PLAY]: ui.playScreen,
+    [SCREEN.RESULT]: ui.resultScreen
   };
 
   const game = {
@@ -584,7 +665,7 @@
         <rect width="220" height="160" rx="14" fill="url(#g)" />
         <path d="M0,124 C46,103 84,147 130,126 C170,110 194,121 220,112 L220,160 L0,160 Z" fill="rgba(255,255,255,0.22)" />
         <text x="18" y="58" font-size="34">${icon}</text>
-        <text x="18" y="98" font-size="16" font-family="DM Mono, monospace" fill="#ffffff">${titleText}</text>
+        <text x="18" y="98" font-size="16" font-family="Inter, sans-serif" fill="#ffffff">${titleText}</text>
       </svg>
     `.trim();
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -612,12 +693,8 @@
   };
 
   function showScreen(name) {
-    ui.setupScreen.classList.remove("active");
-    ui.playScreen.classList.remove("active");
-    ui.resultScreen.classList.remove("active");
-    if (name === "setup") ui.setupScreen.classList.add("active");
-    if (name === "play") ui.playScreen.classList.add("active");
-    if (name === "result") ui.resultScreen.classList.add("active");
+    Object.values(screensByName).forEach((el) => el.classList.remove("active"));
+    screensByName[name]?.classList.add("active");
     window.scrollTo(0, 0);
   }
 
@@ -670,7 +747,7 @@
   function setFlash(className) {
     ui.gameCard.classList.remove("status-good", "status-pass");
     ui.gameCard.classList.add(className);
-    setTimeout(() => ui.gameCard.classList.remove(className), 240);
+    setTimeout(() => ui.gameCard.classList.remove(className), TILT_STATUS_FLASH_MS);
   }
 
   function markCorrect() {
@@ -720,12 +797,13 @@
 
   /** Single “nod” axis: beta in portrait, gamma-derived in landscape (matches screen lock). */
   function getPitchScalar(event) {
-    if (typeof event.beta !== "number" || typeof event.gamma !== "number") return null;
-    if (Number.isNaN(event.beta) || Number.isNaN(event.gamma)) return null;
+    const beta = typeof event.beta === "number" && !Number.isNaN(event.beta) ? event.beta : null;
+    const gamma = typeof event.gamma === "number" && !Number.isNaN(event.gamma) ? event.gamma : null;
+    if (beta === null && gamma === null) return null;
     const a = getScreenOrientationAngle();
-    if (a === 90) return -event.gamma;
-    if (a === 270) return event.gamma;
-    return event.beta;
+    if (a === 90) return gamma !== null ? -gamma : beta;
+    if (a === 270) return gamma !== null ? gamma : beta;
+    return beta !== null ? beta : gamma;
   }
 
   async function enterFullscreenForPlay() {
@@ -742,23 +820,18 @@
   }
 
   async function lockLandscapeForPlay() {
-    const isMobile = window.matchMedia("(max-width: 900px)").matches;
+    const isMobile = window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH_PX}px)`).matches;
     if (isMobile) {
       game.fullscreenActive = await enterFullscreenForPlay();
     }
-    const o = screen.orientation;
-    if (!o || typeof o.lock !== "function") return;
-    try {
-      await o.lock("landscape-primary");
-    } catch (e1) {
+    const orientation = screen.orientation;
+    if (!orientation?.lock) return;
+    for (const lockType of LANDSCAPE_LOCK_TYPES) {
       try {
-        await o.lock("landscape");
-      } catch (e2) {
-        try {
-          await o.lock("landscape-secondary");
-        } catch (e3) {
-          /* Fullscreen or policy may be required; play still works with buttons. */
-        }
+        await orientation.lock(lockType);
+        return;
+      } catch {
+        /* Try next lock type; fullscreen or policy may block all of them. */
       }
     }
   }
@@ -782,8 +855,8 @@
     const selected = game.categoryKey;
     const sec = Number(ui.timeLimit.value);
     if (!selected || !headsUpCategories[selected]) return;
-    if (!Number.isFinite(sec) || sec < 20 || sec > 180) {
-      alert("Time must be between 20 and 180 seconds.");
+    if (!Number.isFinite(sec) || sec < TIME_SEC_MIN || sec > TIME_SEC_MAX) {
+      alert(`Time must be between ${TIME_SEC_MIN} and ${TIME_SEC_MAX} seconds.`);
       return;
     }
 
@@ -805,8 +878,8 @@
     nextWord();
 
     clearInterval(game.timerId);
-    game.timerId = setInterval(tick, 1000);
-    showScreen("play");
+    game.timerId = setInterval(tick, TICK_MS);
+    showScreen(SCREEN.PLAY);
   }
 
   function endRound() {
@@ -819,71 +892,116 @@
     renderList(ui.correctList, game.correctWords);
     renderList(ui.passList, game.passedWords);
     unlockPlayOrientation();
-    showScreen("result");
+    showScreen(SCREEN.RESULT);
   }
 
-  const TILT_THRESHOLD = 28;
+  function median(sortedValues) {
+    const mid = Math.floor(sortedValues.length / 2);
+    if (sortedValues.length % 2) return sortedValues[mid];
+    return (sortedValues[mid - 1] + sortedValues[mid]) / 2;
+  }
+
+  function finishTiltCalibration() {
+    const samples = [...game.tiltSamples].sort((a, b) => a - b);
+    game.tiltNeutral = median(samples);
+    game.tiltSamples = [];
+    game.tiltCalibrateStarted = 0;
+  }
+
+  function recordTiltSampleWhileCalibrating(pitch, now) {
+    if (!game.tiltCalibrateStarted) game.tiltCalibrateStarted = now;
+    game.tiltSamples.push(pitch);
+    const enoughSamples = game.tiltSamples.length >= TILT_CALIB_MIN_SAMPLES;
+    const timedOut = now - game.tiltCalibrateStarted > TILT_CALIB_MAX_WAIT_MS;
+    if (enoughSamples || timedOut) finishTiltCalibration();
+  }
+
+  function tryTiltActions(pitch, now) {
+    if (now < game.lockTiltUntil) return;
+    const neutral = game.tiltNeutral;
+    if (pitch > neutral + TILT_THRESHOLD_DEG) {
+      game.lockTiltUntil = now + TILT_ACTION_COOLDOWN_MS;
+      markCorrect();
+    } else if (pitch < neutral - TILT_THRESHOLD_DEG) {
+      game.lockTiltUntil = now + TILT_ACTION_COOLDOWN_MS;
+      markPass();
+    }
+  }
 
   function handleOrientation(event) {
     if (!game.active) return;
     const pitch = getPitchScalar(event);
     if (pitch === null) return;
 
+    const now = Date.now();
     if (game.tiltNeutral === null) {
-      const now = Date.now();
-      if (!game.tiltCalibrateStarted) game.tiltCalibrateStarted = now;
-      game.tiltSamples.push(pitch);
-      if (game.tiltSamples.length >= 10 || now - game.tiltCalibrateStarted > 600) {
-        game.tiltSamples.sort((x, y) => x - y);
-        const mid = Math.floor(game.tiltSamples.length / 2);
-        game.tiltNeutral = game.tiltSamples.length % 2
-          ? game.tiltSamples[mid]
-          : (game.tiltSamples[mid - 1] + game.tiltSamples[mid]) / 2;
-        game.tiltSamples = [];
-        game.tiltCalibrateStarted = 0;
-      }
+      recordTiltSampleWhileCalibrating(pitch, now);
       return;
     }
-
-    const now = Date.now();
-    if (now < game.lockTiltUntil) return;
-    const n = game.tiltNeutral;
-    if (pitch > n + TILT_THRESHOLD) {
-      game.lockTiltUntil = now + 900;
-      markCorrect();
-    } else if (pitch < n - TILT_THRESHOLD) {
-      game.lockTiltUntil = now + 900;
-      markPass();
-    }
+    tryTiltActions(pitch, now);
   }
 
-  async function requestMotionIfNeeded() {
-    if (typeof DeviceOrientationEvent === "undefined") {
-      showMotionWarning("Motion is not available on this device/browser. Tilt controls will not work.");
-      return false;
-    }
-
-    const iosStylePermission = (
+  function usesIosStyleMotionPrompt() {
+    return (
       typeof DeviceOrientationEvent !== "undefined" &&
       typeof DeviceOrientationEvent.requestPermission === "function"
     );
-    if (!iosStylePermission) {
-      hideMotionWarning();
-      return true;
-    }
-    try {
-      const response = await DeviceOrientationEvent.requestPermission();
-      const granted = response === "granted";
-      if (!granted) {
-        showMotionWarning("Motion permission was denied. Please allow motion access in browser settings before starting.");
-      } else {
+  }
+
+  /**
+   * iOS Safari only shows the motion dialog when requestPermission() is invoked
+   * from a user gesture. Avoid async/await wrappers before this call so the
+   * gesture chain is not broken.
+   */
+  function requestIosSensorPermissionsThen(onDone) {
+    const orientationReq = usesIosStyleMotionPrompt()
+      ? DeviceOrientationEvent.requestPermission()
+      : Promise.resolve("granted");
+
+    orientationReq
+      .then((orientationState) => {
+        if (orientationState !== "granted") return Promise.reject(new Error("orientation-denied"));
+        if (
+          typeof DeviceMotionEvent !== "undefined" &&
+          typeof DeviceMotionEvent.requestPermission === "function"
+        ) {
+          return DeviceMotionEvent.requestPermission();
+        }
+        return "granted";
+      })
+      .then((motionState) => {
+        if (motionState !== "granted") return Promise.reject(new Error("motion-denied"));
+        game.motionEnabled = true;
         hideMotionWarning();
-      }
-      return granted;
-    } catch (error) {
-      showMotionWarning("Could not access motion sensors. Check permissions or use a supported mobile browser.");
-      return false;
+        onDone();
+      })
+      .catch(() => {
+        game.motionEnabled = false;
+        showMotionWarning(
+          "Motion permission was denied or could not be requested. On iPhone/iPad use Safari, tap this button again, and choose Allow. You can also allow motion under Settings → Safari → Motion & Orientation Access."
+        );
+      });
+  }
+
+  function ensureMotionThenStartRound() {
+    if (typeof DeviceOrientationEvent === "undefined") {
+      game.motionEnabled = false;
+      showMotionWarning("Motion is not available on this device/browser. Tilt controls will not work.");
+      return;
     }
+    if (game.motionEnabled) {
+      void startRound();
+      return;
+    }
+    if (usesIosStyleMotionPrompt()) {
+      requestIosSensorPermissionsThen(() => {
+        void startRound();
+      });
+      return;
+    }
+    game.motionEnabled = true;
+    hideMotionWarning();
+    void startRound();
   }
 
   function toggleTheme() {
@@ -900,11 +1018,33 @@
     ui.themeBtn.textContent = isDark ? "Light Mode" : "Dark Mode";
   }
 
-  async function init() {
-    game.categoryKey = Object.keys(headsUpCategories)[0];
-    renderCategoryList();
-    updateCategoryPreview();
-    applyTheme();
+  function onKeyDownDuringPlay(event) {
+    if (!game.active) return;
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      markCorrect();
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      markPass();
+    }
+  }
+
+  function onEnableTiltClick() {
+    if (typeof DeviceOrientationEvent === "undefined") {
+      showMotionWarning("Motion is not available on this device/browser.");
+      return;
+    }
+    if (!usesIosStyleMotionPrompt()) {
+      showMotionWarning(
+        "This browser does not show a motion prompt; tilt should work without one. If it does not, try another browser or HTTPS."
+      );
+      game.motionEnabled = true;
+      return;
+    }
+    requestIosSensorPermissionsThen(() => {});
+  }
+
+  function bindEventListeners() {
     ui.themeBtn.addEventListener("click", toggleTheme);
     ui.correctBtn.addEventListener("click", markCorrect);
     ui.passBtn.addEventListener("click", markPass);
@@ -913,29 +1053,23 @@
     ui.stopBtn.addEventListener("click", endRound);
     ui.playAgainBtn.addEventListener("click", () => {
       unlockPlayOrientation();
-      showScreen("setup");
+      showScreen(SCREEN.SETUP);
     });
-
-    ui.startBtn.addEventListener("click", async () => {
-      if (!game.motionEnabled) {
-        game.motionEnabled = await requestMotionIfNeeded();
-      }
-      if (!game.motionEnabled) return;
-      await startRound();
-    });
-
-    window.addEventListener("keydown", (event) => {
-      if (!game.active) return;
-      if (event.key === "ArrowUp") {
-        event.preventDefault();
-        markCorrect();
-      } else if (event.key === "ArrowDown") {
-        event.preventDefault();
-        markPass();
-      }
-    });
-
+    ui.enableTiltBtn.addEventListener("click", onEnableTiltClick);
+    ui.startBtn.addEventListener("click", ensureMotionThenStartRound);
+    window.addEventListener("keydown", onKeyDownDuringPlay);
     window.addEventListener("deviceorientation", handleOrientation);
+  }
+
+  function init() {
+    game.categoryKey = Object.keys(headsUpCategories)[0];
+    renderCategoryList();
+    updateCategoryPreview();
+    applyTheme();
+    if (usesIosStyleMotionPrompt()) {
+      ui.enableTiltBtn.classList.add("visible");
+    }
+    bindEventListeners();
   }
 
   init();

@@ -1,7 +1,7 @@
-const CACHE_NAME = 'chhal-cache-v3';
-const STATIC_CACHE = 'chhal-static-v1';
-const DYNAMIC_CACHE = 'chhal-dynamic-v1';
-const POPULAR_CACHE = 'chhal-popular-v1';
+const CACHE_NAME = 'chhal-cache-v4';
+const STATIC_CACHE = 'chhal-static-v2';
+const DYNAMIC_CACHE = 'chhal-dynamic-v2';
+const POPULAR_CACHE = 'chhal-popular-v2';
 
 // Core files that should always be cached
 const CORE_URLS = [
@@ -21,6 +21,7 @@ const POPULAR_CATEGORIES = [
 
 // Install event - cache core files
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     Promise.all([
       caches.open(STATIC_CACHE).then((cache) => cache.addAll(CORE_URLS)),
@@ -106,15 +107,9 @@ async function handleStaticAssetRequest(request) {
   }
 }
 
-// Handle page requests
+// Handle page requests (HTML / navigations): network-first so game updates are not stuck on old cache.
 async function handlePageRequest(request) {
   const cache = await caches.open(STATIC_CACHE);
-  const cached = await cache.match(request);
-
-  if (cached) {
-    return cached;
-  }
-
   try {
     const response = await fetch(request);
     if (response.ok) {
@@ -122,11 +117,13 @@ async function handlePageRequest(request) {
     }
     return response;
   } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
     // Return index.html for navigation requests (SPA fallback)
     if (request.mode === 'navigate') {
       return cache.match('./index.html') || new Response('Offline', { status: 503 });
     }
-    return cached || new Response('Page not available', { status: 404 });
+    return new Response('Page not available', { status: 404 });
   }
 }
 
@@ -151,18 +148,21 @@ async function updateCacheInBackground(request) {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== STATIC_CACHE && 
-              cacheName !== DYNAMIC_CACHE && 
-              cacheName !== POPULAR_CACHE &&
-              cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    Promise.all([
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== STATIC_CACHE &&
+                cacheName !== DYNAMIC_CACHE &&
+                cacheName !== POPULAR_CACHE &&
+                cacheName !== CACHE_NAME) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      }),
+      self.clients.claim()
+    ])
   );
 });
 
