@@ -1148,10 +1148,11 @@ function startGame() {
   // Use enhanced device passer if available
   if (window.devicePasser) {
     const playerName = getCurrentRevealOrder()[0];
-    const playerIndex = state.players.findIndex(p => p.name === playerName);
+    const playerIndex = state.players.findIndex(p => p === playerName);
     
     // Set callback for when pass is complete
     window.devicePasser.onPassComplete((playerIndex) => {
+      showReveal();
       showScreen('screen-reveal');
     });
     

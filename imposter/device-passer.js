@@ -7,6 +7,8 @@ class DevicePasser {
     this.players = [];
     this.passHistory = [];
     this.isTransitioning = false;
+    this.passCompleteCallback = null;
+    this.passCancelledCallback = null;
     
     // Detect device capabilities
     this.hasVibration = 'vibrate' in navigator;
@@ -38,8 +40,17 @@ class DevicePasser {
     styles.id = 'passer-styles';
     styles.textContent = `
       .pass-device-enhanced {
-        position: relative;
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: rgba(248,245,239,0.98);
+        z-index: 9999;
         overflow: hidden;
+        padding: 24px;
       }
       
       .pass-device-enhanced::before {
@@ -50,7 +61,7 @@ class DevicePasser {
         right: -2px;
         bottom: -2px;
         background: linear-gradient(45deg, var(--accent), var(--red), var(--accent));
-        border-radius: 12px;
+        border-radius: 14px;
         opacity: 0;
         z-index: -1;
         transition: opacity 0.3s;
@@ -76,10 +87,10 @@ class DevicePasser {
         color: var(--accent);
         text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         z-index: 10;
-        animation: pulse 1s infinite;
+        animation: pulse-countdown 1s infinite;
       }
       
-      @keyframes pulse {
+      @keyframes pulse-countdown {
         0%, 100% { transform: translate(-50%, -50%) scale(1); }
         50% { transform: translate(-50%, -50%) scale(1.1); }
       }
@@ -260,8 +271,8 @@ class DevicePasser {
     this.hidePassScreen();
     
     // Trigger next step
-    if (typeof this.onPassComplete === 'function') {
-      this.onPassComplete(this.currentPlayerIndex);
+    if (typeof this.passCompleteCallback === 'function') {
+      this.passCompleteCallback(this.currentPlayerIndex);
     }
   }
 
@@ -372,8 +383,8 @@ class DevicePasser {
     this.isTransitioning = false;
     this.hidePassScreen();
     
-    if (typeof this.onPassCancelled === 'function') {
-      this.onPassCancelled();
+    if (typeof this.passCancelledCallback === 'function') {
+      this.passCancelledCallback();
     }
   }
 
@@ -402,12 +413,12 @@ class DevicePasser {
 
   // Set callback for pass completion
   onPassComplete(callback) {
-    this.onPassComplete = callback;
+    this.passCompleteCallback = callback;
   }
 
   // Set callback for pass cancellation
   onPassCancelled(callback) {
-    this.onPassCancelled = callback;
+    this.passCancelledCallback = callback;
   }
 
   // Reset passer state

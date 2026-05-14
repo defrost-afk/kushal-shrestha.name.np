@@ -49,6 +49,14 @@ class CategoryLoader {
   // Load all categories (for fallback)
   async loadAllCategories() {
     try {
+      if (typeof categories !== 'undefined') {
+        window.categories = categories;
+        return window.categories;
+      }
+      if (typeof window.categories !== 'undefined') {
+        return window.categories;
+      }
+
       const response = await fetch('./words.js');
       const text = await response.text();
       
@@ -57,6 +65,9 @@ class CategoryLoader {
       script.textContent = text;
       document.head.appendChild(script);
       
+      if (typeof categories !== 'undefined') {
+        window.categories = categories;
+      }
       return window.categories;
     } catch (error) {
       return {};

@@ -439,3 +439,7 @@ const categories = {
   // ============================================================
 
 };
+
+if (typeof window !== 'undefined') {
+  window.categories = categories;
+}
