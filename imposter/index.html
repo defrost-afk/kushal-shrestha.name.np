@@ -986,10 +986,27 @@
 
 <script src="offline-manager.js"></script>
 <script src="category-loader.js"></script>
-<script src="device-passer.js"></script>
 <script src="words.js"></script>
 <script>
 // categories is loaded from words.js
+
+function createCategoryImage(icon, titleText, colorA, colorB) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${colorA}" />
+          <stop offset="100%" stop-color="${colorB}" />
+        </linearGradient>
+      </defs>
+      <rect width="220" height="160" rx="14" fill="url(#g)" />
+      <path d="M0,124 C46,103 84,147 130,126 C170,110 194,121 220,112 L220,160 L0,160 Z" fill="rgba(255,255,255,0.22)" />
+      <text x="18" y="58" font-size="34">${icon}</text>
+      <text x="18" y="98" font-size="18" font-family="Inter, sans-serif" fill="#ffffff">${titleText}</text>
+    </svg>
+  `.trim();
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
 
 const categoryMedia = {
   random: { icon: "🎲", label: "Random category each round", image: createCategoryImage("🎲", "RANDOM", "#355C7D", "#6C5B7B") },
@@ -1145,24 +1162,8 @@ function startGame() {
   state.votes = {};
   names.forEach(n => state.votes[n] = 0);
 
-  // Use enhanced device passer if available
-  if (window.devicePasser) {
-    const playerName = getCurrentRevealOrder()[0];
-    const playerIndex = state.players.findIndex(p => p === playerName);
-    
-    // Set callback for when pass is complete
-    window.devicePasser.onPassComplete((playerIndex) => {
-      showReveal();
-      showScreen('screen-reveal');
-    });
-    
-    // Pass device with enhanced experience
-    window.devicePasser.passDeviceToPlayer(playerIndex >= 0 ? playerIndex : 0, playerName);
-  } else {
-    // Fallback to original method
-    showScreen('screen-pass');
-    document.getElementById('passName').textContent = getCurrentRevealOrder()[0];
-  }
+  showScreen('screen-pass');
+  document.getElementById('passName').textContent = getCurrentRevealOrder()[0];
 }
 
 // ========================
@@ -1613,24 +1614,6 @@ function applySavedTheme() {
   if (theme === 'dark') document.body.classList.add('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
   document.getElementById('themeToggle').textContent = isDark ? 'Light Mode' : 'Dark Mode';
-}
-
-function createCategoryImage(icon, titleText, colorA, colorB) {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${colorA}" />
-          <stop offset="100%" stop-color="${colorB}" />
-        </linearGradient>
-      </defs>
-      <rect width="220" height="160" rx="14" fill="url(#g)" />
-      <path d="M0,124 C46,103 84,147 130,126 C170,110 194,121 220,112 L220,160 L0,160 Z" fill="rgba(255,255,255,0.22)" />
-      <text x="18" y="58" font-size="34">${icon}</text>
-      <text x="18" y="98" font-size="18" font-family="Inter, sans-serif" fill="#ffffff">${titleText}</text>
-    </svg>
-  `.trim();
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 </script>
 </body>
