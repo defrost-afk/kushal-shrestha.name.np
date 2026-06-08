@@ -140,6 +140,19 @@ class GameLoader {
 
   // Load game CSS
   async loadGameCSS(cssPath, priority = 'normal') {
+    if (!cssPath) {
+      return;
+    }
+
+    try {
+      const response = await fetch(cssPath, { method: 'HEAD' });
+      if (!response.ok) {
+        return;
+      }
+    } catch (error) {
+      return;
+    }
+
     return new Promise((resolve, reject) => {
       // Check if already loaded
       if (document.querySelector(`link[href="${cssPath}"]`)) {
@@ -166,24 +179,33 @@ class GameLoader {
 
   // Load game JavaScript
   async loadGameJS(jsPath, priority = 'normal') {
+    if (!jsPath) {
+      return null;
+    }
+
     try {
       const response = await fetch(jsPath);
       if (!response.ok) {
-        throw new Error(`Failed to load JS: ${jsPath}`);
+        return null;
       }
-      
+
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        return null;
+      }
+
       const jsText = await response.text();
-      
+
       // Execute JavaScript in global scope
       const script = document.createElement('script');
       script.textContent = jsText;
       document.head.appendChild(script);
-      
+
       // Return game module if available
       return window.gameModule || null;
     } catch (error) {
-      console.error(`Failed to load game JS: ${jsPath}`, error);
-      throw error;
+      console.warn(`Skipping unavailable game JS: ${jsPath}`);
+      return null;
     }
   }
 
@@ -264,7 +286,7 @@ class GameLoader {
 
   // Preload games based on user behavior
   async preloadPopularGames() {
-    const popularGames = ['imposter', 'headsup'];
+    const popularGames = ['headsup'];
     
     // Preload with low priority in background
     const preloadPromises = popularGames.map(game => 

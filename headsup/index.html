@@ -2,467 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Heads Up - Chhal Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #f8f5ef;
-    --surface: #ffffff;
-    --card: #fffaf4;
-    --border: #e4d7c9;
-    --accent: #1a5c38;
-    --red: #c62828;
-    --text: #1e1812;
-    --text-dim: #5c4d40;
-    --shadow: 0 6px 24px rgba(59, 32, 9, 0.12);
-  }
+<link rel="stylesheet" href="styles.css">
 
-  body.dark-mode {
-    --bg: #151515;
-    --surface: #212121;
-    --card: #292929;
-    --border: #3c3c3c;
-    --accent: #6fd39a;
-    --text: #f4f4f4;
-    --text-dim: #c4beb6;
-    --shadow: 0 6px 28px rgba(0, 0, 0, 0.35);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body.playing .top,
-  body.playing header {
-    display: none;
-  }
-
-  body.playing #playScreen {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  body.playing #playScreen .hud,
-  body.playing #playScreen .actions,
-  body.playing #playScreen .mobile-tilt-arrows {
-    display: none !important;
-  }
-
-  .container {
-    max-width: 720px;
-    margin: 0 auto;
-    min-height: 100vh;
-    padding: 20px 20px 40px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .top {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .btn-top {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    border-radius: 4px;
-    padding: 12px 14px;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  header {
-    text-align: center;
-    padding: 28px 0 18px;
-  }
-
-  .title {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: clamp(52px, 12vw, 90px);
-    letter-spacing: 6px;
-    line-height: 0.9;
-    color: var(--accent);
-  }
-
-  .sub {
-    color: var(--text-dim);
-    font-size: 15px;
-    line-height: 1.45;
-    letter-spacing: 0.04em;
-    margin-top: 10px;
-    text-transform: uppercase;
-    max-width: 22rem;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    padding: 24px;
-    margin-bottom: 16px;
-  }
-
-  .line {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 14px;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  @media (max-width: 520px) {
-    .row { grid-template-columns: 1fr; }
-  }
-
-  label {
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  input {
-    width: 100%;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: inherit;
-    font-size: 1.0625rem;
-    border-radius: 6px;
-    padding: 14px 14px;
-    line-height: 1.35;
-  }
-
-  .category-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 10px;
-    margin-top: 2px;
-  }
-
-  .category-item {
-    border: 1px solid var(--border);
-    background: transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    overflow: hidden;
-    transition: border-color 0.15s, transform 0.15s;
-  }
-
-  .category-item:hover {
-    border-color: var(--accent);
-    transform: translateY(-1px);
-  }
-
-  .category-item.selected {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(27, 79, 174, 0.15);
-  }
-
-  .category-item img {
-    width: 100%;
-    height: 116px;
-    object-fit: cover;
-    display: block;
-  }
-
-  .category-item-name {
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: var(--text);
-    padding: 10px 12px;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-  }
-
-  .category-preview {
-    display: flex;
-    align-items: stretch;
-    gap: 12px;
-    margin-top: 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.5;
-  }
-
-  .category-preview-image {
-    width: 74px;
-    height: 74px;
-    border-radius: 6px;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
-  .category-preview-icon {
-    font-size: 28px;
-    width: 38px;
-    text-align: center;
-  }
-
-  .btn-main {
-    width: 100%;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 26px;
-    letter-spacing: 0.12em;
-    padding: 18px 22px;
-    cursor: pointer;
-  }
-
-  .help {
-    color: var(--text-dim);
-    font-size: 15px;
-    line-height: 1.65;
-  }
-
-  .motion-warning {
-    margin-top: 12px;
-    padding: 12px 14px;
-    border: 1px solid #e08a00;
-    background: rgba(224, 138, 0, 0.1);
-    color: #6b3d00;
-    border-radius: 8px;
-    font-size: 14px;
-    line-height: 1.55;
-    display: none;
-  }
-
-  body.dark-mode .motion-warning {
-    border-color: #d4a24f;
-    background: rgba(212, 162, 79, 0.12);
-    color: #ffd48b;
-  }
-
-  .motion-info {
-    margin-top: 12px;
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    border-radius: 8px;
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--text-dim);
-  }
-
-  .btn-enable-tilt {
-    display: none;
-    width: 100%;
-    margin-top: 14px;
-    padding: 14px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--accent);
-    background: var(--surface);
-    color: var(--accent);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-
-  .btn-enable-tilt.visible {
-    display: block;
-  }
-
-  .game-card {
-    height: min(72vh, 560px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    border-radius: 12px;
-    border: 2px solid var(--border);
-    background: var(--card);
-    margin: 16px 0;
-    position: relative;
-    overflow: hidden;
-    padding: 24px;
-  }
-
-  .word {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: clamp(44px, 12vw, 104px);
-    letter-spacing: 0.04em;
-    line-height: 1.08;
-    word-break: break-word;
-    hyphens: auto;
-    max-width: 95vw;
-  }
-
-  .status-good {
-    border-color: #2e7d50;
-    background: rgba(46, 125, 80, 0.12);
-  }
-
-  .status-pass {
-    border-color: var(--red);
-    background: rgba(198, 40, 40, 0.12);
-  }
-
-  .hud {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    color: var(--text-dim);
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    flex-wrap: wrap;
-  }
-
-  .big {
-    color: var(--text);
-    font-size: 20px;
-    font-weight: 600;
-  }
-
-  .actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 8px;
-  }
-
-  #playScreen.active .actions {
-    display: none;
-  }
-
-  .btn-alt {
-    padding: 14px 14px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.35;
-    cursor: pointer;
-  }
-
-  .mobile-tilt-arrows {
-    display: none;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
-  }
-
-  .btn-arrow {
-    font-size: 28px;
-    line-height: 1;
-    padding: 10px 12px;
-  }
-
-  @media (max-width: 900px) and (orientation: landscape) {
-    body.playing .container {
-      max-width: 100vw;
-      padding: 0;
-      min-height: 100vh;
-    }
-
-    body.playing .game-card {
-      height: 100vh;
-      margin: 0;
-      border-radius: 0;
-      border-width: 0;
-    }
-  }
-
-  .scores {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .score-box {
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
-    background: var(--card);
-  }
-
-  .score-title {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 8px;
-  }
-
-  .score-num {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 44px;
-    letter-spacing: 3px;
-  }
-
-  .list {
-    max-height: 220px;
-    overflow: auto;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px;
-    background: var(--card);
-  }
-
-  .list-row {
-    font-size: 15px;
-    line-height: 1.4;
-    color: var(--text);
-    padding: 10px 8px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .list-row:last-child { border-bottom: none; }
-</style>
 </head>
 <body>
 <div class="container">
@@ -485,7 +30,7 @@
           <input id="timeLimit" type="number" min="20" max="180" value="60">
         </div>
       </div>
-      <div style="margin-top:14px;">
+      <div class="category-panel">
         <label>Category</label>
         <div id="categoryList" class="category-list"></div>
         <div class="category-preview" id="categoryPreview">
@@ -526,7 +71,7 @@
       <button class="btn-alt btn-arrow" id="downArrowBtn" type="button" aria-label="Tilt down">↓</button>
     </div>
     <div class="actions">
-      <button class="btn-alt" id="stopBtn" type="button" style="grid-column:1 / -1;">End Round</button>
+      <button class="btn-alt full-width-btn" id="stopBtn" type="button">End Round</button>
     </div>
   </section>
 
@@ -545,11 +90,11 @@
       </div>
       <div class="line">Correct Words</div>
       <div id="correctList" class="list"></div>
-      <div class="line" style="margin-top:12px;">Passed Words</div>
+      <div class="line passed-words-label">Passed Words</div>
       <div id="passList" class="list"></div>
     </div>
     <div class="actions">
-      <button class="btn-alt" id="playAgainBtn" type="button" style="grid-column:1 / -1;">Play Again</button>
+      <button class="btn-alt full-width-btn" id="playAgainBtn" type="button">Play Again</button>
     </div>
   </section>
 </div>
@@ -752,6 +297,7 @@
 
   function markCorrect() {
     if (!game.active) return;
+    playFeedback("correct");
     game.correctWords.push(game.currentWord);
     ui.score.textContent = String(game.correctWords.length);
     setFlash("status-good");
@@ -760,6 +306,7 @@
 
   function markPass() {
     if (!game.active) return;
+    playFeedback("pass");
     game.passedWords.push(game.currentWord);
     setFlash("status-pass");
     nextWord();
@@ -821,19 +368,28 @@
 
   async function lockLandscapeForPlay() {
     const isMobile = window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH_PX}px)`).matches;
-    if (isMobile) {
-      game.fullscreenActive = await enterFullscreenForPlay();
-    }
+    if (!isMobile) return;
+
+    game.fullscreenActive = await enterFullscreenForPlay();
+
     const orientation = screen.orientation;
-    if (!orientation?.lock) return;
-    for (const lockType of LANDSCAPE_LOCK_TYPES) {
-      try {
-        await orientation.lock(lockType);
-        return;
-      } catch {
-        /* Try next lock type; fullscreen or policy may block all of them. */
+    if (!orientation || typeof orientation.lock !== "function") return;
+
+    const lockAttempts = (async () => {
+      for (const lockType of LANDSCAPE_LOCK_TYPES) {
+        try {
+          await orientation.lock(lockType);
+          return;
+        } catch {
+          /* Try the next lock type if this one is rejected. */
+        }
       }
-    }
+    })();
+
+    await Promise.race([
+      lockAttempts,
+      new Promise((resolve) => setTimeout(resolve, 700))
+    ]).catch(() => {});
   }
 
   function unlockPlayOrientation() {
@@ -860,8 +416,6 @@
       return;
     }
 
-    await lockLandscapeForPlay();
-
     game.categoryKey = selected;
     game.deck = shuffle(headsUpCategories[selected].words);
     game.seconds = sec;
@@ -880,10 +434,12 @@
     clearInterval(game.timerId);
     game.timerId = setInterval(tick, TICK_MS);
     showScreen(SCREEN.PLAY);
+    void lockLandscapeForPlay();
   }
 
   function endRound() {
     if (!game.active) return;
+    playFeedback("finish");
     game.active = false;
     document.body.classList.remove("playing");
     clearInterval(game.timerId);
@@ -891,6 +447,12 @@
     ui.passCount.textContent = String(game.passedWords.length);
     renderList(ui.correctList, game.correctWords);
     renderList(ui.passList, game.passedWords);
+    recordGameStat('Heads Up', {
+      score: game.correctWords.length,
+      label: `${game.correctWords.length} correct · ${game.passedWords.length} passed`,
+      scoreLabel: 'correct words',
+      timestamp: Date.now()
+    });
     unlockPlayOrientation();
     showScreen(SCREEN.RESULT);
   }
@@ -1059,6 +621,44 @@
     ui.startBtn.addEventListener("click", ensureMotionThenStartRound);
     window.addEventListener("keydown", onKeyDownDuringPlay);
     window.addEventListener("deviceorientation", handleOrientation);
+  }
+
+  function recordGameStat(gameName, entry) {
+    const stats = JSON.parse(localStorage.getItem('chhal-stats') || '[]');
+    stats.unshift({ game: gameName, ...entry });
+    if (stats.length > 8) stats.length = 8;
+    localStorage.setItem('chhal-stats', JSON.stringify(stats));
+  }
+
+  let audioCtx = null;
+  function tone(freq, durationMs, wave) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = wave || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.value = 0.001;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      gain.gain.exponentialRampToValueAtTime(0.06, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + durationMs / 1000);
+      osc.start(now);
+      osc.stop(now + durationMs / 1000);
+    } catch (e) {}
+  }
+
+  function playFeedback(kind) {
+    if (kind === 'correct') {
+      tone(660, 90, 'sine');
+      setTimeout(() => tone(880, 110, 'triangle'), 75);
+    } else if (kind === 'pass') {
+      tone(420, 90, 'sawtooth');
+    } else if (kind === 'finish') {
+      tone(520, 90, 'sine');
+      setTimeout(() => tone(650, 120, 'triangle'), 90);
+    }
   }
 
   function init() {

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codename — Chhal Games</title>
+  <link rel="stylesheet" href="styles.css" />
+
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">CHHAL <span>GAMES</span></div>
+  <a class="nav-back" href="../index.html" aria-label="Back to games hub">← Back</a>
+</nav>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-title">CODENAME</div>
+  <div class="setup-sub">नेपाली संस्करण · Nepali Edition</div>
+
+  <div class="field-label">Time per turn (seconds)</div>
+  <div class="time-row">
+    <button class="time-btn" onclick="changeTime(-15)">−</button>
+    <div class="time-val" id="time-val">60</div>
+    <button class="time-btn" onclick="changeTime(15)">+</button>
+  </div>
+
+  <button class="start-btn" onclick="startGame()">START GAME →</button>
+</div>
+
+<!-- GAME -->
+<div id="game-screen">
+  <div class="game-header">
+    <div class="score-pill score-red" id="score-red">🔴 9</div>
+    <div>
+      <div class="turn-indicator">Turn: <strong id="turn-label">RED</strong></div>
+    </div>
+    <div class="timer-display" id="timer-el">60</div>
+    <div class="score-pill score-blue" id="score-blue">8 🔵</div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="game-controls">
+    <button class="ctrl-btn" id="spy-btn" onclick="toggleSpy()">👁 SPY</button>
+    <button class="ctrl-btn" id="end-turn-btn" onclick="endTurn()">END TURN</button>
+    <button class="ctrl-btn" onclick="startGame()">↺ NEW</button>
+    <button class="ctrl-btn" onclick="showSetup()">⚙ SETUP</button>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot legend-red"></span>Red</span>
+    <span class="legend-item"><span class="legend-dot legend-blue"></span>Blue</span>
+    <span class="legend-item"><span class="legend-dot legend-neutral"></span>Neutral</span>
+    <span class="legend-item"><span class="legend-dot legend-assassin"></span>Assassin</span>
+  </div>
+</div>
+
+<!-- WINNER -->
+<div class="winner-overlay" id="winner-overlay">
+  <div class="winner-emoji" id="winner-emoji">🏆</div>
+  <div class="winner-title" id="winner-title">RED TEAM WINS!</div>
+  <div class="winner-np" id="winner-np">रातो टोली जित्यो!</div>
+  <div class="winner-sub" id="winner-sub"></div>
+  <button class="winner-btn" onclick="startGame()">PLAY AGAIN</button>
+  <button class="winner-btn-ghost" onclick="showSetup()">Change Setup</button>
+</div>
+
+<script>
+const ALL_WORDS = [
+  // Festivals
+  { en: "Dashain", np: "दशैं" }, { en: "Tihar", np: "तिहार" },
+  { en: "Teej", np: "तीज" }, { en: "Lhosar", np: "ल्होसार" },
+  { en: "Indra Jatra", np: "इन्द्रजात्रा" }, { en: "Gai Jatra", np: "गाईजात्रा" },
+  { en: "Holi", np: "होली" }, { en: "Chhath", np: "छठ" },
+  { en: "Buddha Jayanti", np: "बुद्ध जयन्ती" }, { en: "Maghe Sankranti", np: "माघे सङ्क्रान्ति" },
+  { en: "Bisket Jatra", np: "बिस्केट जात्रा" }, { en: "Yomari Punhi", np: "योमरी पुन्ही" },
+  { en: "Nag Panchami", np: "नाग पञ्चमी" }, { en: "Janai Purnima", np: "जनाई पूर्णिमा" },
+  { en: "Shiva Ratri", np: "शिवरात्रि" }, { en: "Ghatasthapana", np: "घटस्थापना" },
+  { en: "Deusi Bhailo", np: "देउसी भैलो" }, { en: "Phagu Purnima", np: "फागु पूर्णिमा" },
+  // Food
+  { en: "Dal Bhat", np: "दाल भात" }, { en: "Momo", np: "मम:" },
+  { en: "Sel Roti", np: "सेल रोटी" }, { en: "Yomari", np: "योमरी" },
+  { en: "Thukpa", np: "थुक्पा" }, { en: "Dhido", np: "ढिँडो" },
+  { en: "Gundruk", np: "गुन्द्रुक" }, { en: "Achaar", np: "अचार" },
+  { en: "Chiura", np: "चिउरा" }, { en: "Kwati", np: "क्वाँटी" },
+  { en: "Tongba", np: "टोङ्बा" }, { en: "Juju Dhau", np: "जुजु ध्यौ" },
+  { en: "Chatamari", np: "चताम्बरी" }, { en: "Bara", np: "बरा" },
+  { en: "Samay Baji", np: "सामय बाजी" }, { en: "Aloo Tama", np: "आलु तामा" },
+  { en: "Lapsi", np: "लप्सी" }, { en: "Wo", np: "वो" },
+  // Places
+  { en: "Pashupatinath", np: "पशुपतिनाथ" }, { en: "Boudhanath", np: "बौद्धनाथ" },
+  { en: "Swayambhu", np: "स्वयम्भू" }, { en: "Lumbini", np: "लुम्बिनी" },
+  { en: "Pokhara", np: "पोखरा" }, { en: "Chitwan", np: "चितवन" },
+  { en: "Kathmandu", np: "काठमाडौं" }, { en: "Patan", np: "ललितपुर" },
+  { en: "Bhaktapur", np: "भक्तपुर" }, { en: "Janakpur", np: "जनकपुर" },
+  { en: "Mustang", np: "मुस्ताङ" }, { en: "Rara Lake", np: "रारा ताल" },
+  { en: "Phewa Lake", np: "फेवा ताल" }, { en: "Gosaikunda", np: "गोसाइँकुण्ड" },
+  { en: "Nagarkot", np: "नगरकोट" }, { en: "Changu Narayan", np: "चाँगुनारायण" },
+  { en: "Bandipur", np: "बन्दीपुर" }, { en: "Everest", np: "सगरमाथा" },
+  { en: "Annapurna", np: "अन्नपूर्णा" }, { en: "Machapuchare", np: "माछापुच्छ्रे" },
+  // Attire
+  { en: "Dhaka Topi", np: "ढाका टोपी" }, { en: "Daura Suruwal", np: "दौरा सुरुवाल" },
+  { en: "Gunyo Cholo", np: "गुन्यु चोलो" }, { en: "Bakhu", np: "बख्खु" },
+  { en: "Patuka", np: "पटुका" }, { en: "Haku Patasi", np: "हाकु पटासी" },
+  { en: "Dhaka Fabric", np: "ढाका कपडा" }, { en: "Pote", np: "पोते" },
+  { en: "Tilhari", np: "तिलहरी" }, { en: "Pangden", np: "पाङ्देन" },
+  // Music
+  { en: "Madal", np: "मादल" }, { en: "Sarangi", np: "सारंगी" },
+  { en: "Bansuri", np: "बाँसुरी" }, { en: "Dhol", np: "ढोल" },
+  { en: "Damphu", np: "डम्फु" }, { en: "Tungna", np: "तुङ्ना" },
+  { en: "Panche Baja", np: "पञ्चे बाजा" }, { en: "Dohori", np: "दोहोरी" },
+  { en: "Deuda", np: "देउडा" }, { en: "Narasinga", np: "नरसिंगा" },
+  // Deities
+  { en: "Kumari", np: "कुमारी" }, { en: "Ganesh", np: "गणेश" },
+  { en: "Laxmi", np: "लक्ष्मी" }, { en: "Durga", np: "दुर्गा" },
+  { en: "Shiva", np: "शिव" }, { en: "Bhairav", np: "भैरव" },
+  { en: "Manakamana", np: "मनकामना" }, { en: "Muktinath", np: "मुक्तिनाथ" },
+  { en: "Hanuman", np: "हनुमान" }, { en: "Krishna", np: "कृष्ण" },
+  { en: "Taleju", np: "तलेजु" }, { en: "Saraswati", np: "सरस्वती" },
+  // Crafts & Culture
+  { en: "Thangka", np: "थाङ्का" }, { en: "Pashmina", np: "पश्मिना" },
+  { en: "Khukuri", np: "खुकुरी" }, { en: "Mithila Art", np: "मिथिला कला" },
+  { en: "Singing Bowl", np: "गाउने कचौरा" }, { en: "Lokta Paper", np: "लोक्ता कागज" },
+  { en: "Woodcarving", np: "काठ कुँदाई" }, { en: "Puppet Art", np: "कठपुतली" },
+  // Customs
+  { en: "Tika", np: "टीका" }, { en: "Jamara", np: "जमरा" },
+  { en: "Bratabandha", np: "ब्रतबन्ध" }, { en: "Mehendi", np: "मेहेन्दी" },
+  { en: "Prasad", np: "प्रसाद" }, { en: "Sindoor", np: "सिन्दूर" },
+  { en: "Pasni", np: "पस्नी" }, { en: "Aarati", np: "आरती" },
+  { en: "Hawan", np: "हवन" }, { en: "Nwaran", np: "न्वारान" },
+  // Animals & Nature
+  { en: "Yak", np: "याक" }, { en: "Rhododendron", np: "लालीगुराँस" },
+  { en: "Snow Leopard", np: "हिउँ चितुवा" }, { en: "Elephant", np: "हात्ती" },
+  { en: "Bagmati", np: "बागमती" }, { en: "Sherpa", np: "शेर्पा" },
+  { en: "Gurkha", np: "गोर्खा" }, { en: "Newari", np: "नेवारी" },
+];
+
+let roundTime = 60;
+let gameState = null;
+let timerInterval = null;
+let spyMode = false;
+
+function changeTime(delta) {
+  roundTime = Math.max(15, Math.min(300, roundTime + delta));
+  document.getElementById('time-val').textContent = roundTime;
+}
+
+function showSetup() {
+  clearInterval(timerInterval);
+  document.getElementById('setup-screen').style.display = 'block';
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('winner-overlay').classList.remove('visible');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  clearInterval(timerInterval);
+  spyMode = false;
+  document.getElementById('spy-btn').classList.remove('spy-active');
+  document.getElementById('winner-overlay').classList.remove('visible');
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+
+  const words = shuffle(ALL_WORDS).slice(0, 25);
+  const colors = shuffle([
+    ...Array(9).fill('red'),
+    ...Array(8).fill('blue'),
+    ...Array(7).fill('neutral'),
+    'assassin'
+  ]);
+
+  gameState = {
+    cards: words.map((w, i) => ({ ...w, color: colors[i], revealed: false })),
+    turn: 'red',
+    remaining: { red: 9, blue: 8 },
+    timeLeft: roundTime,
+  };
+
+  renderBoard();
+  updateScores();
+  updateTurn();
+  startTimer();
+}
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  gameState.cards.forEach((card, i) => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    if (card.revealed) el.classList.add('revealed', 'revealed-' + card.color);
+    if (spyMode && !card.revealed) el.classList.add('spy-' + card.color);
+    el.innerHTML = `<div class="card-en">${card.en}</div><div class="card-np">${card.np}</div>`;
+    if (!card.revealed) el.addEventListener('click', () => revealCard(i));
+    board.appendChild(el);
+  });
+}
+
+function revealCard(i) {
+  const card = gameState.cards[i];
+  if (card.revealed) return;
+  card.revealed = true;
+
+  if (card.color === 'assassin') {
+    renderBoard();
+    endGame(gameState.turn === 'red' ? 'blue' : 'red', 'The assassin was revealed!');
+    return;
+  }
+
+  if (card.color === 'red') gameState.remaining.red = Math.max(0, gameState.remaining.red - 1);
+  if (card.color === 'blue') gameState.remaining.blue = Math.max(0, gameState.remaining.blue - 1);
+
+  updateScores();
+  renderBoard();
+
+  if (gameState.remaining.red === 0) { endGame('red', 'All red agents found!'); return; }
+  if (gameState.remaining.blue === 0) { endGame('blue', 'All blue agents found!'); return; }
+
+  if (card.color !== gameState.turn) switchTurn();
+}
+
+function endTurn() { switchTurn(); }
+
+function switchTurn() {
+  gameState.turn = gameState.turn === 'red' ? 'blue' : 'red';
+  gameState.timeLeft = roundTime;
+  updateTurn();
+}
+
+function updateTurn() {
+  const lbl = document.getElementById('turn-label');
+  lbl.textContent = gameState.turn.toUpperCase();
+  lbl.style.color = gameState.turn === 'red' ? '#ff8a80' : '#82b1ff';
+  document.getElementById('end-turn-btn').className = 'ctrl-btn end-' + gameState.turn;
+}
+
+function updateScores() {
+  document.getElementById('score-red').textContent = '🔴 ' + gameState.remaining.red;
+  document.getElementById('score-blue').textContent = gameState.remaining.blue + ' 🔵';
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  renderTimer();
+  timerInterval = setInterval(() => {
+    gameState.timeLeft--;
+    renderTimer();
+    if (gameState.timeLeft <= 0) { clearInterval(timerInterval); switchTurn(); startTimer(); }
+  }, 1000);
+}
+
+function renderTimer() {
+  const el = document.getElementById('timer-el');
+  el.textContent = gameState.timeLeft;
+  el.classList.toggle('urgent', gameState.timeLeft <= 10);
+}
+
+function toggleSpy() {
+  spyMode = !spyMode;
+  document.getElementById('spy-btn').classList.toggle('spy-active', spyMode);
+  renderBoard();
+}
+
+function endGame(winner, reason) {
+  clearInterval(timerInterval);
+  const nepali = { red: 'रातो टोली जित्यो!', blue: 'नीलो टोली जित्यो!' };
+  const emoji = { red: '🔴', blue: '🔵' };
+  document.getElementById('winner-emoji').textContent = emoji[winner];
+  document.getElementById('winner-title').textContent = winner.toUpperCase() + ' TEAM WINS!';
+  document.getElementById('winner-np').textContent = nepali[winner];
+  document.getElementById('winner-sub').textContent = reason;
+  document.getElementById('winner-overlay').classList.add('visible');
+}
+</script>
+</body>
+</html>

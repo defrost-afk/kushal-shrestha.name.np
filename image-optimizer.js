@@ -400,7 +400,7 @@ const observer = new MutationObserver((mutations) => {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const images = node.querySelectorAll ? node.querySelectorAll('img:not([data-optimized])') : [];
         images.forEach(img => window.imageOptimizer.optimizeImage(img));
-        
+
         // Check if the node itself is an image
         if (node.tagName === 'IMG' && !node.dataset.optimized) {
           window.imageOptimizer.optimizeImage(node);
@@ -410,8 +410,18 @@ const observer = new MutationObserver((mutations) => {
   });
 });
 
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
+function startImageObserver() {
+  if (!document.body) return;
+  if (!observer) return;
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startImageObserver, { once: true });
+} else {
+  startImageObserver();
+}
 
