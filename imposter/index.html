@@ -444,14 +444,21 @@
   .btn-primary:hover::before { background: rgba(255,255,255,0.1); }
   .btn-primary:active { transform: scale(0.98); }
 
+  body.dark-mode .btn-primary {
+    background: #0a3a8f;
+    color: #ffffff;
+  }
+
+  body.dark-mode .btn-primary:hover::before { background: rgba(255,255,255,0.12); }
+
   #startGameBtn {
     background: #111111;
-    color: #ffffff;
+    color: #18b933;
   }
 
   body.dark-mode #startGameBtn {
     background: #c62828;
-    color: #ffffff;
+    color: #d1dad2;
   }
 
   .btn-secondary {
@@ -640,6 +647,39 @@
 
   .vote-btn:hover { border-color: var(--red); color: var(--red); background: rgba(179,58,46,0.05); }
   .vote-btn.selected { border-color: var(--red); background: rgba(179,58,46,0.08); color: var(--red); }
+
+  .vote-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  .vote-status {
+    min-height: 24px;
+    text-align: center;
+    color: var(--accent-dim);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .vote-grid.locked {
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  .vote-skip-btn {
+    max-width: 260px;
+  }
+
+  .voter-label {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 4px;
+  }
 
   .tally-row {
     display: flex;
@@ -965,9 +1005,16 @@
         <div id="tallyRows"></div>
       </div>
 
-      <div id="voterInstruction" style="margin-bottom:16px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);letter-spacing:2px;" id="currentVoterName">—</div>
-        <div style="font-size:13px;color:var(--text-dim);letter-spacing:0.06em;">IS VOTING</div>
+      <div id="voterInstruction" style="margin-bottom:16px;text-align:center;">
+        <div class="voter-label">Current Voter</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent);letter-spacing:2px;margin-top:4px;" id="currentVoterName">—</div>
+        <div style="font-size:13px;color:var(--text-dim);letter-spacing:0.06em;margin-top:6px;">IS VOTING</div>
+      </div>
+
+      <div class="vote-status" id="voteStatus" aria-live="polite">Tap a player to cast your vote.</div>
+
+      <div class="vote-actions">
+        <button class="btn-secondary vote-skip-btn" type="button" onclick="skipVote()">SKIP THIS VOTE</button>
       </div>
 
       <div class="vote-grid" id="voteGrid"></div>
@@ -1260,6 +1307,8 @@ function renderVoting() {
   const ordered = getCurrentRevealOrder();
   const voter = ordered[idx];
   document.getElementById('currentVoterName').textContent = voter;
+  document.getElementById('voteStatus').textContent = 'Tap a player to cast your vote.';
+  document.getElementById('voteGrid').classList.remove('locked');
 
   const grid = document.getElementById('voteGrid');
   grid.innerHTML = '';
@@ -1275,14 +1324,39 @@ function renderVoting() {
 }
 
 function castVote(target) {
+  const ordered = getCurrentRevealOrder();
+  const currentVoter = ordered[state.currentVoterIdx];
+
   state.votes[target]++;
+  document.getElementById('voteGrid').classList.add('locked');
+  document.getElementById('voteStatus').textContent = `Vote recorded for ${target}. ${currentVoter} has finished voting.`;
+
+  setTimeout(() => {
+    moveToNextVoter();
+  }, 350);
+}
+
+function skipVote() {
+  const ordered = getCurrentRevealOrder();
+  const currentVoter = ordered[state.currentVoterIdx];
+
+  document.getElementById('voteGrid').classList.add('locked');
+  document.getElementById('voteStatus').textContent = `Skipped vote for ${currentVoter}.`;
+
+  setTimeout(() => {
+    moveToNextVoter();
+  }, 350);
+}
+
+function moveToNextVoter() {
   state.currentVoterIdx++;
 
   if (state.currentVoterIdx >= state.players.length) {
-    // Show tally then results
     showTally();
   } else {
     renderVoting();
+    const nextVoter = getCurrentRevealOrder()[state.currentVoterIdx];
+    document.getElementById('voteStatus').textContent = `Next up: ${nextVoter}`;
   }
 }
 
