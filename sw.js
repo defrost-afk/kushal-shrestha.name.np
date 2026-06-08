@@ -1,7 +1,7 @@
-const CACHE_NAME = 'chhal-cache-v4';
-const STATIC_CACHE = 'chhal-static-v2';
-const DYNAMIC_CACHE = 'chhal-dynamic-v2';
-const POPULAR_CACHE = 'chhal-popular-v2';
+const CACHE_NAME = 'chhal-cache-v5';
+const STATIC_CACHE = 'chhal-static-v3';
+const DYNAMIC_CACHE = 'chhal-dynamic-v3';
+const POPULAR_CACHE = 'chhal-popular-v3';
 
 // Core files that should always be cached
 const CORE_URLS = [

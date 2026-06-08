@@ -485,8 +485,10 @@ function moveToNextVoter() {
 }
 
 function showTally() {
+  const voteGrid = document.getElementById('voteGrid');
   document.getElementById('voterInstruction').style.display = 'none';
-  document.getElementById('voteGrid').innerHTML = '<button class="btn-primary" style="margin-top:16px" onclick="showResult()">SEE RESULT</button>';
+  voteGrid.classList.remove('locked');
+  voteGrid.innerHTML = '<button class="btn-primary" style="margin-top:16px" onclick="showResult()">SEE RESULT</button>';
 
   const tally = document.getElementById('voteTally');
   tally.style.display = 'block';
